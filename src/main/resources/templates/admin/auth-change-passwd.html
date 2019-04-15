@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="梦想小鱼的博客,ALONE SPACE,DreamFish,梦想小鱼的个人分享博客,梦想小鱼的个人分享平台,梦想小鱼">
+    <meta name="description" content="梦想小鱼的个人分享博客-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
+    <title>更改密码 - ALONE SPACE</title>
+    <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
+    <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
+    <script type="text/javascript">
+        setLoaderCSS(new Array(
+            "/assets/libs/bootstrap/css/bootstrap.min.css",
+            "/assets/libs/font-awesome/css/font-awesome.min.css",
+            "yzc-blog.min.css",
+            "/assets/libs/owl.carousel/css/owl.carousel.css",
+            "/assets/libs/owl.carousel/css/owl.theme.css",
+            "/assets/libs/owl.carousel/css/owl.transitions.css"));
+        setLoaderJS(new Array(
+            "/assets/libs/jquery/jquery.min.js",
+            "/assets/libs/popper/popper.min.js",
+            "/assets/libs/jquery/jquery.min.js",
+            "/assets/libs/bootstrap/js/bootstrap.min.js",
+            "config.js", "utils.min.js",
+            "/assets/libs/scrollReveal/scrollReveal.js",
+            "/assets/libs/owl.carousel/js/owl.carousel.min.js"));
+    </script>
+    <!--Baidu tongji-->
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?b817302b643ad43baed860443308c8d1";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    <style>
+        .logon-icon {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            top: 80px;
+            left: 50%;
+            margin-left: -50px;
+            background-color: #efeff4;
+            border-radius: 50%;
+            padding: 18px;
+        }
+
+        .logon-icon img {
+            width: 64px;
+            height: 64px;
+
+        }
+    </style>
+</head>
+
+<body class="not-load">
+
+    <!--Header-->
+    <header id="header-minimum">
+        <div class="container main-menu main-menu-white" style="padding-top: 40px; padding-bottom: 30px;">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div class="nav-header-text">
+                    <span class="logo"></span>
+                    <a href="../../">Alone space</a>
+                </div>
+                <button type="button" id="mobile-nav-toggle">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <nav id="nav-menu-container" class="nav-menu-container">
+                    <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;">
+                        <li><a href="https://www.imyzc.com">主页</a></li>
+                        <li><a href="https://www.imyzc.com/storehouse">我的仓库</a></li>
+                        <li><a href="/">博客主页</a></li>
+                        <li><a href="/archives/">所有文章</a></li>
+                        <li class="menu-active"><a>博客后台</a></li>
+                        <li><a href="https://www.imyzc.com/about.html">关于我</a></li>
+                    </ul>
+                </nav><!-- #nav-menu-container -->
+            </div>
+        </div>
+    </header>
+    <!--Main-->
+    <article id="main" class="sm-padding bg-grey-no-border">
+        <div class="container">
+            <div class="row">
+                <div style="max-width:400px;min-width:270px;margin: 0 auto; padding: 10px">
+                    <div class="text-center mt-4">
+                        <div class="logon-icon"><img src="/images/logo/big_icon.png"></div>
+                        <p class="h2" style="margin-top: 110px">更改密码</p>
+                        <p class="text-secondary">更改 <span class="text-primary" id="change_user_name"></span> 的密码</p>
+                    </div>
+                    <form class="" method="post" action="send/">
+                        <div class="form-group">
+                            <input class="flat" type="password" id="change_old" name="change_old" placeholder="旧密码">
+                            <div class="invalid-feedback">请输入旧密码</div>
+                        </div>
+                        <div class="form-group">
+                            <input class="flat" type="password" id="change_new" name="change_new" placeholder="新密码">
+                            <div class="invalid-feedback">请输入新密码</div>
+                            <div class="password-type p-2" id="password-type" style="display:none;">
+                                <p id="password-type-len" class="m-0"><i class="fa fa-times"></i>
+                                    长度不在8-20位之间</p>
+                                <p id="password-type-char" class="m-0"><i class="fa fa-times"></i>
+                                    必须包含数字、字母和特殊符号</p>
+                                <p id="password-type-noeqname" class="m-0"><i class="fa fa-times"></i>
+                                    不可以与用户名相同</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input class="flat" type="password" id="change_new2" name="change_new2"
+                                placeholder="再输入一次新密码">
+                            <div class="invalid-feedback">请再输入一次新密码</div>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="flat-btn flat-btn-black mb-2 mt-3 btn-block">更改密码</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </article>
+    <footer>
+        <div class="row align-items-center  justify-content-center mt-3">
+            <p class="text-secondary">Copyright © 2019 Dreamfish.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

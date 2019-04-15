@@ -1,0 +1,56 @@
+//Root style
+
+$white: #fff;
+$black: #000;
+
+$highlight-color: #6195FF;
+$highlight-color-more: #005fff;
+$highlight-color-content: #0089ea;
+
+$input-border-color: #e2e2e2;
+$input-highlight-border-color: $highlight-color;
+$input-invalid-border-color: #dc3545;
+$input-valid-border-color: #29af4a;
+$input-footer-color: #717981;
+
+$colorbg-foregound-color: $white;
+$defbg-foregound-color: $black;
+$def-border-color: #eee;
+
+$bg-footer: #f0f0f0;
+$bg-grey: #fafafa;
+$bg-dark: #1C1D21;
+
+$color-danger:#dc3545;
+$color-success:#28a745;
+$color-info:#17a2b8;
+$color-warning:#fff3ce;
+
+$dev-sizes:(
+    "xl":    1200px,
+    "lg":    992px,
+    "md":    768px,
+    "sm":    576px,
+);
+
+
+html,body {
+	width: 100%;
+    height: 100%;
+
+    font-family:  'HelveticaNeue', 'Microsoft YaHei UI';
+    font-weight: normal;
+}
+
+*::selection {
+    background:$highlight-color; 
+    color:#fff;
+}
+
+
+@media (max-width: 425px) {
+    ol,ul{
+		-webkit-padding-start: 25px;
+	}
+}
+

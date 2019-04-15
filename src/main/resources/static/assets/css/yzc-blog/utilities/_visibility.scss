@@ -1,0 +1,36 @@
+
+.visible {
+    @include invisible(visible);
+}
+ 
+.invisible {
+    @include invisible(hidden);
+}
+
+//bulid invisible
+
+@each $size, $value in $dev-sizes {
+    @media (max-width: #{$value}) {
+        .invisible-#{$size} {
+            @include invisible(hidden);
+        }
+    }
+}
+
+@each $size, $value in $dev-sizes {
+    @media (max-width: #{$value}) {
+        .no-display-#{$size} {
+            display: none;
+        }
+    }
+}
+
+//bulid visible
+
+@each $size, $value in $dev-sizes {
+    @media (max-width: #{$value}) {
+        .visible-#{$size} {
+            @include invisible(visible);
+        }
+    }
+}

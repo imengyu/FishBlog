@@ -1,0 +1,257 @@
+.logon-content {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    bottom: 0;
+    left: 0
+}
+
+.logon-bg {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: url(/images/background/background1.jpg) top center no-repeat #efeff4;
+    background-size: 100% auto;
+    z-index: -2
+}
+
+.logon-bg-mask {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: -1
+}
+
+.logon-border {
+    display: block;
+    z-index: 2;
+    height: auto;
+    margin: 0 auto;
+    margin-top: 60px;
+    background-color: rgba(255, 255, 255, 0.5)
+}
+
+.logon-icon {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    left: 50%;
+    top: -60px;
+    margin-left: -50px;
+    background-color: #efeff4;
+    border-radius: 50%;
+    padding: 18px;
+}
+
+.logon-icon-text {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.logon-icon img {
+    width: 64px;
+    height: 64px;
+
+}
+
+.logon-block {
+    background: #fff
+}
+
+.logon-center {
+    position: relative;
+    padding: 2rem 2rem 0rem 2rem;
+    height: auto;
+    margin: 0 auto
+}
+
+.logon-footer {
+    font-size: 16px;
+    font-weight: 300;
+    font-family: "Poppins", sans-serif;
+    padding: 10px;
+    border-top: 1px solid #f5f4f4;
+    text-align: center
+}
+
+.logon-xfooter {
+    font-size: 16px;
+    font-weight: 300;
+    padding: 10px;
+    text-align: center;
+    color: #fff;
+}
+
+.logon-footer p {
+    color: #aaa;
+    font-size: 14px;
+    line-height: 16px;
+    margin-bottom: 2px
+}
+
+/*logon tab brn*/
+.logon-tab {
+    padding: 5px 8px;
+    color: #969696;
+    background-color: #fff;
+    outline: none;
+    border: none;
+    border-bottom: 2px solid #fff;
+    width: 48%;
+}
+.logon-tab:active,.logon-tab:focus{
+    outline: none;
+}
+.logon-tab:hover{
+    color: #000;
+    outline: none;
+}
+.logon-tab.active {
+    color: #000;
+    background-color: #fff;
+    border-bottom: 2px solid #6195FF;
+}
+
+/*logon act brn*/
+.logon-act-choose{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid #cecece;
+    border-radius: 50px;
+    padding: 5px 35px;
+    background: transparent;
+}
+.logon-act-choose:hover {
+    border: 1px solid #6195FF;
+}
+.logon-act-choose i{
+    font-size: 2.5em;
+}
+.logon-act-choose span{
+    margin-left: 10px;
+}
+.logon-link{
+    color: #858585;
+    font-size: 14px;
+}
+
+
+
+/*Verify bar*/
+.verify-sub-block {
+    display: none;
+}
+
+.verify-img-panel {
+    display: none;
+    position: absolute !important;
+    top: -205px;
+    max-width: 100%;
+}
+#valid_panel {
+    position: relative;
+}
+
+#valid_panel:hover .verify-img-panel,#valid_panel:active .verify-img-panel {
+    display: block !important;
+}
+
+#valid_panel:hover .verify-sub-block,#valid_panel:active .verify-sub-block {
+    display: block;
+}
+
+@media screen and (min-width:768px) {
+
+    .logon-border {
+        width: 25rem;
+        padding: 20px
+    }
+}
+
+@media screen and (min-width:400px) and (max-width:768px) {
+    .logon-border {
+        margin-top: 10px;
+        width: 25rem;
+        padding: 15px
+    }
+
+    .logon-icon {
+        top: -50px;
+    }
+
+    .logon-icon-text {
+        margin-top: 30px;
+    }
+}
+
+@media screen and (max-width:400px) {
+    .logon-icon {
+        top: -10px;
+    }
+
+    .logon-icon-text {
+        margin-top: 65px;
+    }
+
+    .logon-content {
+        top: 0
+    }
+
+    .logon-border {
+        margin-top: 0;
+        width: 100%;
+        padding: 10px
+    }
+
+    .logon-bg-mask {
+        display: none
+    }
+
+    .logon-content {
+        position: relative;
+        display: block;
+        height: auto
+    }
+
+    .logon-xfooter {
+    font-size: 16px;
+    font-weight: 300;
+    padding: 10px;
+    text-align: center;
+        color: #000;
+    }
+
+    #navbar {
+        background-color: #fff
+    }
+}
+
+.logon-qr-switch {
+    text-align: right;
+    padding: 15px;
+    padding-bottom: 0;
+    position: absolute;
+    top: 0;
+    right: 0
+}
+
+.logon-qr-switch i {
+    font-size: 26px
+}
+
+#logon-qrcode {
+    text-align: center
+}
+
+#logon-qrcode img {
+    display: inline-block;
+    margin: 0 auto
+}

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title th:text="${title} + ' - ALONE SPACE'"></title>
+</head>
+
+<body>
+    <div th:each="item:${archives}">
+        <a th:href="'/archives/post/' + (${item.urlName == null || item.urlName == ''} ? ${item.id} : ${item.urlName}) + '/'" th:text="${item.title}"></a>
+        <p th:text="${item.previewText}"></p>
+        <p th:text="${item.keywords}"></p>
+    </div>
+</body>
+
+</html>

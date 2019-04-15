@@ -1,0 +1,26 @@
+<nav aria-label="common-pagination">
+    <ul class="pagination justify-content-end">
+      <li :class="\'page-item\' + (1==currentPage? \' disabled\' : \'\')">
+        <span v-if="currentPage == 1" class="page-link">{{previousText}}</span>
+        <a v-else class="page-link" href="javascript:void(0)" v-on:click="itemClick(\'previous\')">{{previousText}}></a></li>
+      <li v-if="showFirstAndEnd && currentPage!=1 && getPageRangeShouldShowStart()" class="page-item">
+        <span v-if="currentPage == 1" class="page-link">1</span>
+        <a v-else class="page-link" href="javascript:void(0)" v-on:click="itemClick(1)">1</a></li>
+      <li v-if="getPageRangeShouldShowStart()" class="page-item">
+        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+      </li>
+      <li v-for="index in allPage" v-if="index &gt;= getPageRangeStart() && index &lt;= getPageRangeEnd()" :class="\'page-item\' + (index==currentPage? \' active\' : \'\')">
+        <span v-if="index==currentPage" class="page-link">{{index}}
+          <span class="sr-only">(current)</span></span>
+        <a v-else class="page-link" href="javascript:void(0)" v-on:click="itemClick(index)">{{index}}</a></li>
+      <li v-if="getPageRangeShouldShowEnd()" class="page-item">
+        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+      </li>
+      <li v-if="showFirstAndEnd && currentPage!=allPage && getPageRangeShouldShowEnd()" class="page-item">
+        <span v-if="currentPage == allPage" class="page-link">{{allPage}}</span>
+        <a v-else class="page-link" href="javascript:void(0)" v-on:click="itemClick(allPage)">{{allPage}}</a></li>
+      <li :class="\'page-item\' + (allPage==currentPage? \' disabled\' : \'\')">
+        <span v-if="currentPage == allPage" class="page-link">{{nextText}}</span>
+        <a class="page-link" v-on:click="itemClick(\'next\')" href="javascript:void(0)">{{nextText}}</a></li>
+    </ul>
+  </nav>

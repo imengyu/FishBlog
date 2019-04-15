@@ -1,0 +1,23 @@
+/* Common Scroll bar */
+
+/* PC Scrollbar */
+
+@mixin pc-fix-scrollbar(){
+    @media (min-width: 768px) {
+        &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: #707070;
+            border-radius: 3px;
+    
+            &:hover {
+                background: #e0e0e0;
+            }
+        }
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    }
+}

@@ -1,0 +1,122 @@
+//Panel and accordion
+//
+.panel-collapse {
+    padding-bottom: 0;
+    .panel-title {
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+}
+.panel {
+	position: relative;
+    
+    @include common-shadow;
+
+    border-radius: 0.25rem;
+    border: 1px solid #e5e5e5;
+    background: #fff;
+}
+.panel-heading {
+    font: {
+        size: 20px;
+        weight: 300;
+    }
+}
+.panel-default {
+    border-color: #ddd;
+    > .panel-heading {
+        background-color: inherit;
+        border-bottom: 0;
+        color: #3D464D;
+    }
+}
+.panel-body {
+    flex: 1 1 auto;
+    padding: 20px;
+}
+
+.panel-title {
+    font: {
+        size: 13px;
+        weight: bold;
+        family: 'Montserrat', sans-serif;
+        transform: uppercase;
+    }
+    color: #58666e;
+    padding: 10px 12px;
+    margin-bottom: 5px;
+    border: {
+        bottom: none;
+        top-left-radius: 3px;
+        top-right-radius: 3px;
+    }
+}
+
+.panel-collapse {
+    padding-bottom: 0;
+
+    .panel-title {
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+}
+.accordion{
+    .panel:not(:first-of-type):not(:last-of-type) {
+        border: {
+            bottom: 0;
+            radius: 0;
+        }
+    }
+    .panel:first-of-type {
+        border: {
+            bottom: 0;
+            bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+    .panel:last-of-type {
+        border: {
+            top-left-radius: 0;
+            top-right-radius: 0;
+        }
+    }
+    .panel-title{
+        position: relative;
+        button { 
+            display: block;
+            &::before {
+                position: absolute;
+                content: "\e874";
+                width: 1em;
+                line-height: 1em;
+                margin-top: -0.5em;
+                color: #999999;
+                right: 30px;
+                top: 50%;
+                font: {
+                    family: 'Linearicons-Free';
+                    style: normal;
+                    variant: normal;
+                    transform: none;
+                    size: 1.1rem;
+                    weight: 600;
+                }
+
+                @include prefix(transition, all 0.2s, webkit moz);
+                @include prefix(transition-delay, 0s, webkit moz);
+            }
+
+            &[aria-expanded="true"]::before {
+                @include prefix(transform, rotate(180deg), webkit moz);
+            }
+        }
+    }
+    .panel-body {
+        padding-top: 0px;
+    }
+    .list-group{
+        padding: 0 0 10px 0;
+
+        .list-group-item{ border: none!important; }
+    }
+}

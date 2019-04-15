@@ -1,0 +1,121 @@
+//Forms styles
+//
+
+//Input and valid invalid
+input, select, textarea {
+	font-family: "Merriweather", Georgia, serif;
+	font-weight: 300;
+	line-height: 2.4;
+    color: #212931;
+
+    @include prefix(transition, border-color 0.2s ease-in-out);
+
+    &:focus.flat,&:active.flat {
+        border-color: $input-highlight-border-color!important;
+    }
+
+    &.valid-from:required:invalid {
+        &.flat {
+            border-color: $input-invalid-border-color!important;
+        }
+        + .invalid-feedback {
+            display: inline-block;
+        }
+    }
+
+    &.is-invalid{
+        &.flat {
+            border-color: $input-invalid-border-color!important;
+        }
+        + .invalid-feedback {
+            display: inline-block;
+        }
+    }
+    &.is-valid{
+        &.flat {
+            border-color: $input-valid-border-color!important;
+        }
+        + .valid-feedback {
+            display: inline-block;
+        }
+    }
+}
+
+//Flat controls
+input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, select.flat, textarea.flat {
+    
+    @include prefix(appearance, none, webkit);
+    
+	background: transparent;
+	border-radius: 0;
+	border: solid 2px;
+	color: inherit;
+	display: block;
+	outline: 0;
+	padding: 0 .5rem;
+	text-decoration: none;
+	width: 100%;
+}
+input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, select.flat {
+	height: 2.5rem;
+}
+
+//Logon area
+.logon-content{
+    input.flat {
+        border-color: $input-border-color;
+    }
+    input:focus.flat {
+        border-color: $input-highlight-border-color;
+    }
+}
+
+//Footer form control styles
+#footer{
+    input[type="text"], input[type="password"], input[type="email"], select, textarea {
+        border-color: $input-border-color;
+    }
+    input, select, textarea {
+        color: $input-footer-color;
+    }
+}
+
+//Editor area
+.editor-area {
+	padding: 0;
+	line-height: 1.2;
+	white-space: pre;
+	word-wrap: normal;
+	overflow-x: scroll;
+}
+.form-control-inline{
+	display: inline-block;
+	width: auto;
+}
+
+//Copy to clipboard
+.bd-clipboard {
+    position: relative;
+    display: none;
+    float: right;
+}
+.btn-clipboard {
+    position: absolute;
+    top: .7rem;
+    right: .5rem;
+    z-index: 10;
+    width: 55px;
+    display: block;
+    padding: .25rem .5rem;
+    font-size: 75%;
+    color: #818a91;
+    cursor: pointer;
+    background-color: transparent;
+    border: 0;
+    border-radius: .25rem;
+
+    &:hover{
+        color: #fff;
+        background-color: #027de7;
+    }
+}

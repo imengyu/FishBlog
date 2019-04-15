@@ -1,0 +1,35 @@
+@mixin prefix($stylename, $value, $options: webkit moz o ms) {
+    #{$stylename}: $value;
+
+    @each $option in $options {
+        @if $option == webkit {
+            -webkit-#{$stylename}: $value;
+        }
+        @else if $option == moz {
+            -moz-#{$stylename}: #{$value};
+        }
+        @else if $option == o {
+            -o-#{$stylename}: #{$value};
+        }
+        @else if $option == ms {
+            -ms-#{$stylename}: #{$value};
+        }
+    }
+}
+@mixin abslute-top($top:0,$left:0,$right:0){
+    position: absolute;
+    left: $left;
+    top: $top;
+    right: $right;
+}
+@mixin size($w, $h: auto) {
+    width: $w;
+    height: $h;
+}
+@mixin border-radius($radius) {
+    -webkit-border-radius: $radius;
+    -moz-border-radius: $radius;
+    border-radius: $radius;
+    // 这样写是不是就更完美了。
+    // @include prefix(border-radius, $radius); 
+}

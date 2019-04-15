@@ -1,0 +1,9 @@
+@mixin common-shadow {
+    @include prefix(box-shadow,0px 0px 15px 0px rgba(0, 0, 0, 0.06), webkit moz);
+}
+@mixin no-shadow {
+    @include prefix(box-shadow, none, webkit moz);
+}
+@mixin dirty-shadow {
+    box-shadow: 8px 14px 38px rgba(39,44,49,.06), 1px 3px 8px rgba(39,44,49,.03);
+}

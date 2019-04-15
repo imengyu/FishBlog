@@ -1,0 +1,98 @@
+<div class="container" id="dashboard_content_base">
+    <div class="row justify-content-start">
+        <div class="col">
+            <div class="box">
+                <div class="container" id="dashboard_content_base">
+                    <div class="row justify-content-start">
+                        <div v-if="hasPrivilege && !currentAddSuccess" class="col-lg-8 col-md-10 col-sm-12">
+                            <h5 class="box-title mt-2">添加用户</h5>
+                            <form>
+                                <div class="form-row">
+                                    <div class="form-group col-md-3 text-right-md">
+                                        <label for="userName" class="mt-2">用户名(登录名)</label>
+                                    </div>
+                                    <div class="form-group col-md-9">
+                                        <input type="text"
+                                            :class="'form-control' + (currentAddStartValid&&currentAddUserName==''?' is-invalid':'')"
+                                            id="userName" placeholder="用户登录用户名，最大12个字符" v-model="currentAddUserName">
+                                        <div class="invalid-feedback">请输入用户名 ！</div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-3 text-right-md">
+                                        <label for="userFriendlyName" class="mt-2">用户友好名字</label>
+                                    </div>
+                                    <div class="form-group col-md-9">
+
+                                        <input type="text"
+                                            :class="'form-control' + (currentAddStartValid&&currentAddUserFriendlyName==''?' is-invalid':'')"
+                                            id="userFriendlyName" placeholder="一个形容这个用户的友好名字"
+                                            v-model="currentAddUserFriendlyName">
+                                        <div class="invalid-feedback">请输入用户友好名字 ！</div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-3 text-right-md">
+                                        <label for="password" class="mt-2">密码</label>
+                                    </div>
+                                    <div class="form-group col-md-9">
+                                        <input type="password" :class="'form-control' + validPassWord1()" id="password"
+                                            v-model="currentAddUserPassword">
+                                        <div v-if="currentAddUserPassword == ''" class="invalid-feedback">请输入密码 ！</div>
+                                        <div v-if="currentAddUserPassword.length &lt; 8" class="invalid-feedback">密码最短需要
+                                            8 位</div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-3 text-right-md">
+                                        <label for="password2" class="mt-2">重复密码</label>
+                                    </div>
+                                    <div class="form-group col-md-9">
+                                        <input type="password" :class="'form-control' + validPassWord2()" id="password2"
+                                            v-model="currentAddUserPassword2">
+                                        <div v-if="currentAddUserPassword == ''" class="invalid-feedback">请再次输入密码 ！
+                                        </div>
+                                        <div v-if="currentAddUserPassword != currentAddUserPassword2"
+                                            class="invalid-feedback">两次密码不一致，请重新输入</div>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-primary mt-3" v-on:click="submit()">新建用户</button>
+                            </form>
+
+                        </div><div v-else-if="currentAddSuccess" class="col">
+                            <div class="container" style="height:300px">
+                                <div
+                                    class="box full text-center d-flex justify-content-center align-items-center flex-column">
+                                    <i class="fa fa-check-circle-o text-success" aria-hidden="true"
+                                        style="font-size: 3.5em"></i>
+                                    <p class="text-secondary mt-2">用户添加成功<br /><span
+                                            class="text-secondary">请让此用户登录此账号并修改个人信息</span></p>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary"
+                                            v-on:click="clearInput()">添加其他用户</button>
+                                        <button type="button ml-2" class="btn btn-primary"
+                                            onclick="location.href='../manage-users/'">管理用户</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><div v-else class="col">
+                            <div class="container" style="height:300px">
+                                <div
+                                    class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column">
+                                    <i class=" fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
+                                    <p class="text-secondary mt-2"><span class="h4">403</span><br /> 您无权添加用户</p>
+                                    <button type="button" class="btn btn-primary"
+                                        onclick="location.href='../'">返回首页</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="dashboard-footer"><span>© 2019 Theme designed by DreamFish</span></div>

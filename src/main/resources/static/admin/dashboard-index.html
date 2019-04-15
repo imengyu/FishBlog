@@ -1,0 +1,52 @@
+<div class="container" id="dashboard_content_base">
+    <div class="row justify-content-start">
+        <div class="col">
+            <div class="box">
+                <div class="row">
+                    <div class="col-sm-6 col-md-3 col-lg-3 number">
+                        <p class="text-secondary">今日 PV / 昨日 PV</p>
+                        <span v-if="statData" class="text-black">{{ statData.todayPv + '/' + statData.yesterdayPv }}</span>
+                        <span v-else class="text-warning">无数据</span>
+                    </div>
+                    <div class="col-sm-6 col-md-3 col-lg-3 number">
+                        <p class="text-secondary">今日 IP / 昨日 IP</p>
+                        <span v-if="statData" class="text-black">{{ statData.todayIp + '/' + statData.yesterdayIp }}</span>
+                        <span v-else class="text-warning">无数据</span>
+                    </div>
+                    <div class="col-sm-6 col-md-3 col-lg-3 number">
+                        <p class="text-secondary">新评论 / 新文章</p>
+                        <span v-if="statData" class="text-black">{{ statData.newComment + '/' + statData.newArchiveCont }}</span>
+                        <span v-else class="text-warning">无数据</span>
+                    </div>
+                    <div class="col-sm-6 col-md-3 col-lg-3 number">
+                        <p class="text-secondary">用户数 / 作者数</p>
+                        <span v-if="statData" class="text-black">{{ statData.visitorCount + '/' + statData.userCount }}</span>
+                        <span v-else class="text-warning">无数据</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-start mt-3">
+        <div class="col">
+            <div class="box">
+                <h5 class="box-title no-underline">近一月浏览量走势</h5>
+                <div class="text-secondary text-center mt2 mb-1">无数据</div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-start mt-3">
+        <div class="col-sm-12 col-md-6">
+            <div class="box">
+                <h5 class="box-title no-underline">TOP 10 浏览网站</h5>
+                <div class="text-secondary text-center mt2 mb-1">无数据</div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <div class="box">
+                <h5 class="box-title no-underline">TOP 10 访问页面</h5>
+                <div class="text-secondary text-center mt2 mb-1">无数据</div>
+            </div>
+        </div>
+    </div>
+</div>

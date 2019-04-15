@@ -1,0 +1,106 @@
+<div class="container" id="dashboard_content_base">
+    <div class="row justify-content-start">
+        <div class="col">
+            <div v-if="currentUser || !userInfoLoaded" class="box">
+                <ul class="nav nav-tabs" id="marchives-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#marchives-tab-all" role="tab"
+                            aria-controls="home" aria-selected="true" v-on:click="loadTable('all')">所有文章</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#marchives-tab-publish" role="tab"
+                            aria-controls="profile" aria-selected="false" v-on:click="loadTable('publish')">已发布</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#marchives-tab-draft" role="tab"
+                            aria-controls="contact" aria-selected="false" v-on:click="loadTable('draft')">草稿箱</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" role="tabpanel" id="marchives-tab-all">
+                    
+                        <common-table ref="tableAll" v-bind:columns="tableAllColumns" v-bind:items="tableAllDatas"
+                            v-bind:show-check-boxes="true" v-bind:loaded-status="tableAllLoadStatus" v-bind:null-text="'当前列表没有项目'"
+                            v-on:item-click="tableItemClick" v-on:item-customer-click="tableAllCustomItemClick"
+                            v-on:retry-load="loadTable('all')">
+                            <template slot="marchives-slot" slot-scope="itemData">
+                                <button type="button" class="btn btn-primary"
+                                    v-on:click="tableAllCustomItemClick('edit', itemData.item)">编辑</button>
+                                <button type="button" class="btn btn-danger"
+                                    v-on:click="tableAllCustomItemClick('del', itemData.item)">删除</button>
+                            </template>
+                        </common-table>
+                        <common-pagination ref="tablePaginationAll" v-bind:current-page="tableAllPageCurrent"
+                            v-bind:all-page="tableAllPageAll" v-on:item-click="tableAllPagerClick"
+                            v-on:page-size-changed="tableAllPageSizeChanged">
+                            <template slot="left-slot">
+                                <div class="my-1 mr-3"><span class="mr-2">选中项</span> <button type="button" class="btn btn-danger"
+                                        v-on:click="tableAllCustomItemClick('del-all')">删除</button></div>
+                                <div v-if="userHasManagePrivilege" class="custom-control custom-checkbox mr-3">
+                                    <input type="checkbox" class="custom-control-input" id="checkSwitchAllArchives" v-model="tableAllShowAllUserArchive" v-on:change="tableAllCustomItemClick('switch-show-all')">
+                                    <label class="custom-control-label" for="checkSwitchAllArchives">显示所有用户的文章</label>
+                                </div>
+                            </template>
+                        </common-pagination>
+                    
+                    </div>
+                    <div class="tab-pane fade" role="tabpanel" id="marchives-tab-publish">
+                        <common-table ref="tablePublish" v-bind:columns="tablePublishColumns" v-bind:items="tablePublishDatas"
+                            v-bind:show-check-boxes="true" v-bind:loaded-status="tablePublishLoadStatus" v-bind:null-text="'当前列表没有项目'"
+                            v-on:item-click="tableItemClick" v-on:item-customer-click="tablePublishCustomItemClick"
+                            v-on:retry-load="loadTable('all')">
+                            <template slot="marchives-slot" slot-scope="itemData">
+                                <button type="button" class="btn btn-primary"
+                                    v-on:click="tablePublishCustomItemClick('edit', itemData.item)">编辑</button>
+                                <button type="button" class="btn btn-danger"
+                                    v-on:click="tablePublishCustomItemClick('del', itemData.item)">删除</button>
+                            </template>
+                        </common-table>
+                        <common-pagination ref="tablePaginationPublish" v-bind:current-page="tablePublishPageCurrent"
+                            v-bind:all-page="tablePublishPageAll" v-on:item-click="tablePublishPagerClick"
+                            v-on:page-size-changed="tablePublishPageSizeChanged">
+                            <template slot="left-slot">
+                                <div class="my-1 mr-3"><span class="mr-2">选中项</span> <button type="button" class="btn btn-danger"
+                                        v-on:click="tablePublishCustomItemClick('del-all')">删除</button></div>
+                            </template>
+                        </common-pagination>
+                    </div>
+                    <div class="tab-pane fade" role="tabpanel" id="marchives-tab-draft">
+                        <common-table ref="tableDraft" 
+                            v-bind:columns="tableDraftColumns" v-bind:items="tableDraftDatas" v-bind:show-check-boxes="true" 
+                            v-bind:loaded-status="tableDraftLoadStatus" v-bind:null-text="'当前列表没有项目'"
+                            v-on:item-customer-click="tableDraftCustomItemClick"
+                            v-on:retry-load="loadTable('draft')">
+                            <template slot="marchives-draft-slot" slot-scope="itemData" >
+                                <div class="btn-group" role="group" aria-label="文章草稿操作">
+                                    <button type="button" class="btn btn-success" v-on:click="tableDraftCustomItemClick('publish', itemData.item)">发布</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="tableDraftCustomItemClick('edit', itemData.item)">编辑</button>
+                                    <button type="button" class="btn btn-danger" v-on:click="tableDraftCustomItemClick('del', itemData.item)">删除</button>
+                                </div>
+                            </template>
+                        </common-table>
+                        <common-pagination ref="tablePaginationDraft" 
+                            v-bind:current-page="tableDraftPageCurrent"
+                            v-bind:all-page="tableDraftPageAll"
+                            v-on:item-click="tableDraftPagerClick"
+                            v-on:page-size-changed="tableDraftPageSizeChanged">
+                            <template slot="left-slot">
+                                <div class="my-1 mr-3"><span class="mr-2">选中项</span> <button type="button" class="btn btn-danger" v-on:click="tableDraftCustomItemClick('del-all')">删除</button></div>
+                            </template>
+                        </common-pagination>
+                    </div>
+                </div>
+            </div><div v-else-if="userInfoLoaded" class="box">
+                <div class="container" style="height:100%">
+                    <div
+                        class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column">
+                        <i class=" fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
+                        <p class="text-secondary mt-2"><span class="h4">403</span><br /> 您无权查看该页面</p>
+                        <button type="button" class="btn btn-primary">返回首页</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="dashboard-footer"><span>© 2019 Theme designed by DreamFish</span></div>

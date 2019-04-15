@@ -1,0 +1,86 @@
+<div class="container" id="dashboard_content_base">
+    <div class="row justify-content-start">
+        <div class="col">
+            <div v-if="tableUsersLoadStatus == 'noprivilege'" class="box">
+                <div class="container" style="height:500px">
+                    <div
+                        class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column">
+                        <i class=" fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
+                        <p class="text-secondary mt-2"><span class="h4">403</span><br /> 您无权查看该页面</p>
+                        <button type="button" class="btn btn-primary">返回首页</button>
+                    </div>
+                </div>
+            </div><div v-else class="box">
+
+                <h5 class="box-title mt-2">用户管理</h5>
+                <common-table ref="tableUsers" v-bind:columns="tableUsersColumns" v-bind:items="tableUsersDatas"
+                    v-bind:show-check-boxes="false" v-bind:loaded-status="tableUsersLoadStatus"
+                    v-bind:null-text="'当前列表没有项目'" v-on:item-click="tableUsersItemClick"
+                    v-on:item-customer-click="tableUsersCustomItemClick" v-on:retry-load="loadUsers(true)">
+                    <template slot="marchives-slot" slot-scope="itemData">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary" type="button" id="dropdownUserActionMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right"
+                                aria-labelledby="dropdownUserActionMenuButton">
+                                <a class="dropdown-item" href="javascript:;"
+                                    v-on:click="tableUsersCustomItemClick('edit-prv', itemData.item)"><i
+                                        class="fa fa-shield mr-2"></i>管理权限</a>
+                                <a v-if="itemData.item.level != 0" class="dropdown-item" href="javascript:;"
+                                    v-on:click="tableUsersCustomItemClick('edit-ban', itemData.item)"><i
+                                        class="fa fa-ban mr-2"></i>封禁用户</a><a v-else class="dropdown-item"
+                                    href="javascript:;"
+                                    v-on:click="tableUsersCustomItemClick('edit-unban', itemData.item)"><i
+                                        class="fa fa-unlock-alt mr-2"></i>取消封禁</a>
+                                <a class="dropdown-item text-danger" href="javascript:;"
+                                    v-on:click="tableUsersCustomItemClick('del', itemData.item)"><i
+                                        class="fa fa-trash mr-2"></i>注销用户</a>
+                            </div>
+                        </div>
+                    </template>
+                </common-table>
+                <common-pagination ref="tablePaginationAll" v-bind:current-page="tableUsersPageCurrent"
+                    v-bind:all-page="tableUsersPageAll" v-on:item-click="tableUsersPagerClick"
+                    v-on:page-size-changed="tableUsersPageSizeChanged">
+                    <template slot="left-slot">
+                        <div class="my-1 mr-3">
+                            <button type="button" class="btn btn-success" v-on:click="addUser()"><i
+                                    class="fa fa-plus"></i> 添加用户</button>
+                        </div>
+                    </template>
+                </common-pagination>
+
+                <!-- Privilege Modal -->
+                <div class="modal" id="eeitPrivilegeModal" tabindex="-1" role="dialog" style="animation: swal2-show 0.3s; -webkit-animation: swal2-show 0.3s;"
+                    aria-labelledby="eeitPrivilegeModalLabel" aria-hidden="true" data-backdrop="static">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="eeitPrivilegeModalLabel">编辑权限</h5>
+                            </div>
+                            <div class="modal-body" v-if="currentEditPrvUser">
+                                <div>
+                                    <label>该用户已有权限</label>
+                                    <span>{{ '用户： ' + currentEditPrvUser.friendlyName }}</span>
+                                    <div class="tags" v-html="getPrivilegeCurrentUser()"></div>
+                                </div>
+                                <hr />
+                                <div class="mt-2">
+                                    <label>可赋予的权限</label>
+                                    <div class="tags" v-html="getPrivilegeCanUse()"></div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal" v-on:click="resetPrivilege()">取消</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="savePrivilege()">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="dashboard-footer"><span>© 2019 Theme designed by DreamFish</span></div>

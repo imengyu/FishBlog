@@ -1,0 +1,30 @@
+@each $size, $value in $dev-sizes {
+    @media (max-width: #{$value}) {
+        .no-margin-#{$size} {
+            margin: 0!important;
+        }
+    }
+}
+
+
+@each $size, $value in $dev-sizes {
+    @media (min-width: #{$value}) {
+        .text-right-#{$size} {
+            text-align: right;
+        }
+    }
+}
+@each $size, $value in $dev-sizes {
+    @media (min-width: #{$value}) {
+        .text-center-#{$size} {
+            text-align: center;
+        }
+    }
+}
+@each $size, $value in $dev-sizes {
+    @media (min-width: #{$value}) {
+        .text-left-#{$size} {
+            text-align: left;
+        }
+    }
+}

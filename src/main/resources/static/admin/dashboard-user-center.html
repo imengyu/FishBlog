@@ -1,0 +1,71 @@
+<div class="container" id="dashboard_content_base">
+    <div class="row justify-content-start">
+        <div class="col">
+            <div class="box">
+                <h5 class="box-title mt-2">个人信息修改</h5>
+                <form v-if="currentUser">
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userFriendlyName" class="mt-2">您的用户友好名字</label>
+                        </div>
+                        <div class="form-group col-md-9">
+
+                            <input type="text"
+                                :class="'form-control' + (currentStartValid&&currentUser.friendlyName==''?' is-invalid':'')"
+                                id="userFriendlyName" placeholder="一个形容您的友好名字" v-model="currentUser.friendlyName">
+                            <div class="invalid-feedback">请输入用户友好名字 ！</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userEmail" class="mt-2">头像</label>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <img style="width:80px;height:80px;border-radius:50%;padding:10px" :src="getUserHead()">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userEmail" class="mt-2">性别</label>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="radioMale" name="radioMale" class="custom-control-input" v-on:change="setGender(true)">
+                                <label class="custom-control-label" for="radioMale"><i
+                                        class="fa fa-mars mr-2 text-primary"></i>男</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="radioFemale" name="radioFemale" class="custom-control-input" v-on:change="setGender(false)">
+                                <label class="custom-control-label" for="radioFemale"><i class="fa fa-venus mr-2"
+                                        style="color: #f76fe5"></i>女</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userEmail" class="mt-2">邮箱</label>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <input type="text" class="form-control" id="userEmail" v-model="currentUser.email">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userEmail" class="mt-2">您的个人主页地址</label>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <input type="text" class="form-control" id="userEmail" v-model="currentUser.home">
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary mt-3" v-on:click="submit()">修改设置</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="dashboard-footer"><span>© 2019 Theme designed by DreamFish</span></div>

@@ -1,0 +1,7 @@
+@each $size, $value in $dev-sizes {
+    @media (max-width: #{$value}) {
+        .no-padding-#{$size} {
+            padding: 0!important;
+        }
+    }
+}

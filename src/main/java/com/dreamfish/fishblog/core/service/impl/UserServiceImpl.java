@@ -1,0 +1,191 @@
+package com.dreamfish.fishblog.core.service.impl;
+
+import com.dreamfish.fishblog.core.annotation.RequestAuth;
+import com.dreamfish.fishblog.core.annotation.RequestPrivilegeAuth;
+import com.dreamfish.fishblog.core.entity.User;
+import com.dreamfish.fishblog.core.entity.UserExtened;
+import com.dreamfish.fishblog.core.enums.UserPrivileges;
+import com.dreamfish.fishblog.core.mapper.UserMapper;
+import com.dreamfish.fishblog.core.repository.UserRepository;
+import com.dreamfish.fishblog.core.service.UserService;
+import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
+import com.dreamfish.fishblog.core.utils.Result;
+import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
+import com.dreamfish.fishblog.core.utils.StringUtils;
+import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
+import com.dreamfish.fishblog.core.utils.response.AuthCode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserMapper userMapper = null;
+    @Autowired
+    private UserRepository userRepository = null;
+
+
+    /**
+     * 检查用户是否存在
+     * @param id 用户id
+     * @return 返回用户是否存在
+     */
+    @Override
+    public boolean isUserExistes(int id) {
+        Integer i = userMapper.isUserIdExists(id);
+        return i != null && i > 0;
+    }
+
+    /**
+     * 根据用户 ID 获取用户实体
+     * @param id 用户 ID
+     * @return 用户实体
+     */
+    @Override
+    public UserExtened findUser(int id) {
+        return userMapper.findByFullById(id);
+    }
+
+    /**
+     * 带认证删除用户（公开需认证）
+     * @param userId 用户 ID
+     * @return 返回请求结果
+     */
+    @Override
+    public Result deleteUser(int userId) {
+
+        if (!userRepository.existsById(userId))
+            return Result.failure(ResultCodeEnum.NOT_FOUNT);
+
+        if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
+            return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限删除指定用户");
+
+        deleteUserInternal(userId);
+        return Result.success();
+    }
+
+    /**
+     * 添加新用户（公开需认证）
+     * @param user 用户实体
+     * @return 返回新添加的用户实体信息
+     */
+    @Override
+    public Result addUser(UserExtened user) {
+
+        String userName = user.getName();
+        String password = user.getPasswd();
+
+        //Force set value
+        user.setOldLevel(User.LEVEL_WRITER);
+        user.setLevel(User.LEVEL_WRITER);
+        user.setUserFrom("here");
+        user.setPrivilege(0);
+
+        if(StringUtils.isBlank(userName) || StringUtils.isBlank(password))
+            return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(),"用户名或密码不能为空");
+
+        if (userRepository.existsByName(userName))
+            return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST.getCode(),"指定用户名已存在");
+
+        return Result.success(addUserInternal(user));
+    }
+
+    /**
+     * 更新用户封禁状态（公开需认证）
+     * @param userId 用户 ID
+     * @param ban 是否封禁
+     * @return 结果数据
+     */
+    @Override
+    public Result userUpdateBan(int userId, boolean ban) {
+
+        if(ban) {
+            if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
+                return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限对指定用户操作");
+
+            userMapper.updateUserLevel(userId, User.LEVEL_LOCKED);
+        }
+        else {
+            userMapper.updateUserLevelSetToOld(userId);
+        }
+        return Result.success();
+    }
+
+    /**
+     * 更新用户权限（公开需认证）
+     * @param userId 用户 ID
+     * @param newPrivilege 用户新权限
+     * @return 结果数据
+     */
+    @Override
+    public Result userUpdatePrivilege(int userId, int newPrivilege) {
+
+        //认证
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        if(PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, newPrivilege) < AuthCode.SUCCESS)
+            return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"当前用户无权限赋予其他用户权限");
+
+        if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
+            return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限对指定用户操作");
+
+        userMapper.updateUsePrivilege(userId, newPrivilege);
+        return Result.success();
+    }
+
+
+    @Override
+    public void deleteUserInternal(int userId) { userRepository.deleteById(userId); }
+    @Override
+    public UserExtened addUserInternal(UserExtened user) { return userRepository.saveAndFlush(user); }
+    @Override
+    public UserExtened updateUserInternal(UserExtened user) { return userRepository.saveAndFlush(user); }
+
+    /**
+     * 更新 用户 ID
+     * @param oldId 用户 ID
+     * @param newId 用户新 ID
+     */
+    @Override
+    public void updateUserId(Integer oldId, Integer newId) {  userMapper.updateUserId(oldId, newId); }
+
+    /**
+     * 更新用户信息
+     * @param user
+     * @return
+     */
+    @Override
+    public Result updateUser(UserExtened user) {
+
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        int userID = PublicAuth.authGetUseId(request);
+        if(userID < AuthCode.SUCCESS) return Result.failure(ResultCodeEnum.UNAUTHORIZED);
+        if(userID != user.getId()) return Result.failure(ResultCodeEnum.FORIBBEN.getCode(), "当前用户无法修改其他用户个人信息");
+
+        UserExtened userOld = userMapper.findByFullById(user.getId());
+        if(userOld == null) return Result.failure(ResultCodeEnum.NOT_FOUNT.getCode(), "未找到指定用户");
+
+        user.setPrivilege(userOld.getPrivilege());
+        user.setLevel(userOld.getLevel());
+        user.setOldLevel(userOld.getOldLevel());
+        user.setUserFrom(userOld.getUserFrom());
+        user.setPasswd(userOld.getPasswd());
+        user.setName(userOld.getName());
+
+        return Result.success();
+    }
+
+    /**
+     * 获取所有用户（带分页）（公开需认证）
+     * @param pageIndex 页码
+     * @param pageSize 页大小
+     * @return 分页结果数据
+     */
+    @Override
+    public Result getUsersWithPageable(Integer pageIndex, Integer pageSize) {
+        return Result.success(userRepository.findAll(new PageRequest(pageIndex, pageSize)));
+    }
+}

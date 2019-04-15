@@ -1,0 +1,61 @@
+//Boackground
+
+@mixin abslute-full(){
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+$header-overlay-black-color: #1C1D21;
+$header-overlay-white-color: #e0e0e0;
+
+//Header background image
+.bg-img {
+    @include abslute-full();
+    
+	z-index: -1;
+	background: {
+        position: center;
+	    size: cover;
+        attachment: fixed;
+    }
+    
+    .overlay {
+        @include abslute-full();
+        opacity: .8;
+        background-color: $header-overlay-black-color;
+    }
+    .overlay-white {
+        @include abslute-full();
+        opacity: .5;
+        background:$header-overlay-white-color;
+    }
+}
+
+/*Background*/
+.bg-footer{
+	background: $bg-footer;
+}
+.bg-grey {
+	background-color: $bg-grey;
+	border: {
+        top: 1px solid $def-border-color;
+        bottom: 1px solid $def-border-color;
+    }
+}
+.bg-grey-no-border {
+	background-color: $bg-grey;
+	border:none;
+}
+.bg-white {
+	background-color: $white;
+}
+.bg-dark {
+	background-color: $bg-dark;
+}
+.bg-night {
+	background-color: rgb(46, 50, 62);
+	border:none;
+}

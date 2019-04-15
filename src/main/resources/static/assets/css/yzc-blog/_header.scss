@@ -1,0 +1,164 @@
+// Base class
+//
+// Basic Header styles
+.home-wrapper {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 50%;
+	max-height: 100%;
+    
+    @include prefix(transform, translateY(-50%),webkit ms);
+
+	text-align: center;
+}
+.home-content {
+	color: $white;
+}
+.blog-wrapper {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 30%;
+	max-height: 100%;
+
+    @include prefix(transform, translateY(-30%),webkit ms);
+	text-align: left;
+}
+
+#header {
+	height: 100%;
+}
+#header-small {
+	display: block;
+	position: relative;
+	width: 100%;
+	height: auto;
+	top: 0;
+    left: 0;
+    
+    .home-wrapper {
+        display: block;
+		position: relative;
+		max-height: 100%;
+        padding: {
+            top: 110px;
+            bottom: 30px;
+        }
+
+        @include prefix(transform, translateY(0),webkit ms);
+    }
+    .blog-wrapper {
+        display: block;
+		position: relative;
+		max-height: 100%;
+        padding: {
+            top: 100px;
+            bottom: 30px;
+        }
+
+        @include prefix(transform, translateY(0),webkit ms);
+    }
+}
+#header-minimum {
+    height: 60px;
+    
+    .main-menu {
+        background-color: rgba(90,90,90,0.9);
+    }
+    .main-menu-white {
+		background-color: $white;
+		@include common-shadow;
+    }
+}
+
+
+//Header More scroll button
+.more {
+    transition: color 0.2s ease;
+
+    @include prefix(transform, translateY(0));
+
+	border: none;
+	bottom: 0;
+	color: $white;
+	font-size: 0.8em;
+	height: 8.5em;
+	left: 50%;
+	letter-spacing: 0.3em;
+	margin-left: -8em;
+	opacity: 1;
+	outline: 0;
+	padding-left: 0.225em;
+	position: absolute;
+	text-align: center;
+	text-transform: uppercase;
+	width: 16em;
+    z-index: 1;
+    
+    &.sw {
+        bottom: 120px;
+        height: 30px;
+        font-size: 12px;
+
+        &.top{
+            margin-bottom: 15px;
+        }
+        &.bottom{
+            margin-top: 15px;
+        }
+    }
+    &:active,&:hover {
+        color: #6195FF;
+        outline: 0;
+    }
+    &:focus {
+        outline: 0;
+    }
+
+    i {
+        color: inherit;
+        margin-top: 5px;
+        font-size: 3em;
+        display: block;
+        -webkit-animation: finger 1.5s infinite;
+        animation: finger 1.5s infinite;
+    }
+}
+
+//Header More Anim
+@-webkit-keyframes finger {
+	0% {
+		opacity: 1;
+		-webkit-transform: translateY(0px);
+		transform: translateY(0px);
+	}
+	50% {
+		opacity: .2;
+		-webkit-transform: translateY(15px);
+		transform: translateY(15px);
+	}
+	100% {
+		opacity: 1;
+		-webkit-transform: translateY(0);
+		transform: translateY(0);
+	}
+}
+
+@keyframes finger {
+	0% {
+		opacity: 1;
+		-webkit-transform: translateY(0px);
+		transform: translateY(0px);
+	}
+	50% {
+		opacity: .2;
+		-webkit-transform: translateY(15px);
+		transform: translateY(15px);
+	}
+	100% {
+		opacity: 1;
+		-webkit-transform: translateY(0);
+		transform: translateY(0);
+	}
+}

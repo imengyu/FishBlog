@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="梦想小鱼的博客,文章标签,ALONE SPACE,DreamFish,梦想小鱼的个人分享博客,梦想小鱼的个人分享平台,梦想小鱼">
+    <meta name="description" content="梦想小鱼的个人分享博客-文章标签-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
+    <title>文章标签 - ALONE SPACE</title>
+    <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
+    <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
+    <!--Debug only
+    <script type="text/javascript" src="/assets/libs/vue.js/vue.js"></script>-->
+    <script type="text/javascript">
+        setLoaderCSS(new Array("/assets/libs/bootstrap/css/bootstrap.min.css", "/assets/libs/font-awesome/css/font-awesome.min.css", "yzc-blog.min.css"));
+        setLoaderJS(new Array("/assets/libs/jquery/jquery.min.js", "/assets/libs/popper/popper.min.js", "/assets/libs/jquery/jquery.min.js", "/assets/libs/bootstrap/js/bootstrap.min.js", "/assets/libs/vue.js/vue.min.js", "config.js", "utils.min.js", "string-hlp.min.js", "blog-tags.min.js", "blog-components.min.js", "/assets/libs/scrollReveal/scrollReveal.js"));
+    </script>
+    <!--Baidu tongji-->
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?b817302b643ad43baed860443308c8d1";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+
+<body class="not-load">
+    <div id="main">
+        <!--Header-->
+        <header id="header-small">
+            <div class="container main-menu main-menu-white" style="padding-top: 40px; padding-bottom: 30px;">
+                <div class="row align-items-center justify-content-between d-flex">
+                    <div class="nav-header-text">
+                        <span class="logo"></span>
+                        <a href="../../">Alone space</a>
+                    </div>
+                    <button type="button" id="mobile-nav-toggle">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <nav id="nav-menu-container" class="nav-menu-container">
+                        <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;">
+                            <li><a href="https://www.imyzc.com">主页</a></li>
+                            <li><a href="https://www.imyzc.com/storehouse">我的仓库</a></li>
+                            <li><a href="/">博客主页</a></li>
+                            <li class="menu-active"><a href="/archives/">所有文章</a></li>
+                            <li><a href="https://www.imyzc.com/about.html">关于我</a></li>
+                        </ul>
+                    </nav><!-- #nav-menu-container -->
+                </div>
+            </div>
+            <div class="bg-img dealy-load-bgimg" data-original="/images/background/edu-white.jpg"></div>
+            <div class="home-wrapper pb-0">
+                <div class="container">
+                    <div class="row">
+                        <!-- home content -->
+                        <div class="col">
+                            <div class="home-content black-text">
+                                <h2 class="text-background-light">{{ currentTagShow }}</h2>
+                                <p>分类标签</p>
+                            </div>
+                        </div>
+                        <!-- /home content -->
+                    </div>
+                </div>
+                <div class="half bg-transparent pt-2">
+                    <span class="half-bg bg-grey-no-border"></span>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col text-center">
+                                <div class="card icon-card blog-side-content">
+                                    <div class="card-body p-2">
+                                        <div class="tags" v-if="contentTagsLoaded">
+                                            <a v-for="tag in contentTags" class="tag-color tag-big"
+                                                v-on:click="goViewTag(tag.id)" href="javascript:void(0);"
+                                                :id="'tag_'+tag.id"
+                                                :style="'background-color:#'+(tag.id==contentLoadTag?'343a40!important;font-size:18px;line-height:35px;':(tag.color+';'))">{{ tag.name }}</a>
+                                        </div>
+                                        <div v-else class="text-center text-danger">加载错误</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!--Main-->
+        <article class="sm-padding bg-grey-no-border pb-0">
+            <div class="container">
+                <div class="row justify-content-start">
+                    <div class="col-12 col-sm-12 col-lg-3">
+                        <div class="blog-side-content mt-3 no-display-sm no-display-md">
+                            <div class="blog-side-head mb-3">
+                                <div class="author">
+                                    <img class="img-responsive mt-3" src="/images/default/head-img.jpg" alt="head-img">
+                                </div>
+                                <div class="author_name"><a href="https://www.imyzc.com/about.html"
+                                        title="梦想的小鱼">DreamFish</a><span>博主</span>
+                                </div>
+                                <p>喜欢自己 快乐随意<br>I'm an ugly man...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-12 col-lg-9 blog-list-col">
+
+                        <div class="blog-list mt-3">
+                            <ul v-if="!contentMainLoading">
+                                <li v-for="post in contentPosts" :class="post.isHead ? 'blog-list-head' : ''">
+                                    <div v-if="post.isHead" class="blog-preview">
+                                        <h3>
+                                            <i class="fa fa-calendar-check-o"></i>{{ post.year }}<small>发布的文章</small>
+                                        </h3>
+                                    </div>
+                                    <div v-if="!post.isHead && post.previewImage" class="blog-img">
+                                        <img :src="getImageUrl(post.previewImage)">
+                                    </div>
+                                    <div v-if="!post.isHead" class="blog-preview">
+                                        <a target="_blank" :href="getPostUrl(post)">
+                                            <h4 v-html="getPostPrefix(post.postPrefix) + post.title"></h4>
+                                            <p>{{ post.previewText }}</p>
+                                        </a>
+                                        <ul class="blog-meta">
+                                            <li>
+                                                <i class="fa fa-clock-o"></i>
+                                                {{ post.postDate.substr(0, 10) }}
+                                                <span v-if="post.lastmodifyDate" class="ml-1">最近修改</span>
+                                                {{ post.lastmodifyDate ? post.lastmodifyDate.substr(0, 10) : '' }}
+                                            </li>
+                                            <li><i class="fa fa-eye"></i>{{ post.viewCount }}</li>
+                                            <li><i class="fa fa-comment"></i>{{ post.commentCount }}</li>
+                                            <li v-if="post.author && post.author!=''"><i
+                                                    class="fa fa-user"></i>{{ post.author }}</li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div v-if="contentMainLoading" class="text-center">
+                                <span class="simple-loading"></span>
+                                <p>加载中</p>
+                            </div>
+                            <div v-if="!contentMainLoading && contentMainLoadFailed" class="text-center text-danger">
+                                <div class="text-center">{{ contentMainLoadError }}</div>
+                            </div>
+                            <div v-if="currentPostPage &lt; allPostPage" class="text-center">
+                                <a v-on:click="loadTagPosts" class="flat-btn flat-pill"
+                                    href="javascript:void(0)">加载更多文章</a>
+                            </div>
+                            <div v-else-if="!contentMainLoading && !contentMainLoadFailed"
+                                class="text-center text-secondary">
+                                没有更多了，去别处看看其他文章吧
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="half bg-grey-no-border pt-2 mt-4">
+                <span class="half-bg bg-footer" style="z-index:100"></span>
+                <div class="hello-vue">
+                    <span @mouseenter="message = 'Powered by Vue.js'"
+                        @mouseleave="message = 'Hello Vue.js !'">{{ message }}</span>
+                </div>
+            </div>
+        </article>
+
+        <!--Footer-->
+        <footer id="footer">
+            <ul class="icons">
+                <li><a href="javascript:void(0)" id="footer_qq" class="icon fa fa-qq"><span class="label">QQ</span></a>
+                </li>
+                <li><a href="javascript:void(0)" id="footer_weixin" class="icon fa fa-weixin text-success"><span
+                            class="label">Weixin</span></a></li>
+                <li class="pr-0"><a href="https://github.com/717021" id="footer_github"
+                        class="icon fa fa-github text-dark" data-original-title="" title=""><span
+                            class="label">Github</span></a></li>
+            </ul>
+            <ul class="copyright">
+                <li><i class="fa fa-copyright" aria-hidden="true"></i> 2019. All rights reserved</li>
+                <li>Design by <a class="link" href="https://www.imyzc.com//about.html">DreamFish</a></li>
+            </ul>
+            <ul class="copyright copyright-line">
+                <li><a href="https://www.imyzc.com/support-browser.html" target="_blank"
+                        class="badge badge-pill badge-dark">推荐使用 Microsoft
+                        Edge
+                        或 Chrome 浏览器浏览本页面</a></li>
+            </ul>
+            <ul class="copyright">
+                <li><a class="link" href="https://www.miitbeian.gov.cn">浙ICP备18051956号-1</a></li>
+                <li>
+                    <a class="jgwab" target="_blank"
+                        href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33080202000390">
+                        <p><i></i>浙公网安备 33080202000390号</p>
+                    </a>
+                </li>
+            </ul>
+        </footer>
+        <!--Back to top button-->
+        <a id="back-top" href="#back-top" class="go-top" data-original-title="" title="" style="display: inline;"><i
+                class="fa fa-angle-up"></i></a>
+
+    </div>
+</body>
+
+</html>
