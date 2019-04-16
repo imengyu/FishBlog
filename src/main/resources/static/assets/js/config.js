@@ -1,5 +1,6 @@
 var blog_api_address = "/api/v1/";
-var image_center_address = 'https://images.imyzc.com/';
+//var image_center_address = 'https://images.imyzc.com/';
+var image_center_address = 'http://images.localhost.com/';
 var localDebug = true;
 var https = false;
 

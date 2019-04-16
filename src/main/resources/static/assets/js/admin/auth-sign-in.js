@@ -16,6 +16,7 @@ var authCode = {
     FAIL_NO_PRIVILEGE: -9
 }
 var verifyed = false;
+var loginSending = false;
 
 function initVerifyCode(){
     $('#valid_panel').slideVerify({
@@ -75,6 +76,19 @@ function login(){
 	var psw = $('#log_psw').val();
 	var url = blog_api_address + "auth";
 
+    if(loginSending) return;
+	
+	loginSending = true;
+	$('#logon_form').fadeOut(200, function(){
+		$('#log_sending').fadeIn();
+	})
+
+	var reshowLog = function(){
+		$('#logon_form').fadeIn(200, function(){
+			$('#log_sending').fadeOut();
+		})
+	}
+
 	if(isNullOrEmpty(userName)){
 		$('#log_usrname').addClass('is-invalid');
 		return;
@@ -106,6 +120,7 @@ function login(){
 				else location.href = '/admin/';
 			} else {
 				resetVerifyCode();
+				reshowLog();
 				var extendCode = data.extendCode;
 				if(extendCode == authCode.FAIL_NOUSER_FOUND)
 					swal("登录失败", "用户不存在", 'error')
@@ -116,7 +131,7 @@ function login(){
 				else swal("登录失败", data.message, 'error')
 			}
         },
-        error: function(jqXHR, errMsg) { resetVerifyCode(); swal("登录失败", "请求失败 : " + errMsg, 'error') }
+        error: function(jqXHR, errMsg) { resetVerifyCode(); reshowLog(); swal("登录失败", "请求失败 : " + errMsg, 'error') }
     })
 }
 function loginGithub(){

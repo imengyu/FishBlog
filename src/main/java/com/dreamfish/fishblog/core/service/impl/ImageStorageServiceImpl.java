@@ -4,6 +4,7 @@ import com.dreamfish.fishblog.core.entity.PostMedia;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
+import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.repository.PostMediaRepository;
 import com.dreamfish.fishblog.core.service.ImageStorageService;
 import com.dreamfish.fishblog.core.utils.Result;
@@ -47,7 +48,8 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     private PostMediaRepository postMediaRepository = null;
     @Autowired
     private PostMapper postMapper = null;
-
+    @Autowired
+    private UserMapper userMapper = null;
 
     /**
      * 读取图像并返回缩略图
@@ -100,6 +102,44 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     }
 
     /**
+     * 删除文章媒体库的图片
+     * @param postId 文章 ID
+     * @param hash 图片 md5 值
+     * @return 返回操作结果
+     * @throws IOException 文件不存在保存异常
+     */
+    @Override
+    public Result deleteImageForPost(Integer postId, String hash) throws IOException {
+
+        //文章检查
+        if(postMapper.isPostIdExists(postId) == null)
+            return Result.failure(ResultCodeEnum.NOT_FOUNT,"文章 ID " + postId + " 未找到");
+
+        //验证用户权限
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        Integer currentUserId = PublicAuth.authGetUseId(request);
+        Integer postAuthorId =  postMapper.getPostAuthorId(postId);
+        if(currentUserId.intValue() != postAuthorId && (PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, UserPrivileges.PRIVILEGE_MANAGE_MEDIA_CENTER) < AuthCode.SUCCESS))
+            return Result.failure(ResultCodeEnum.FORIBBEN,"无权限管理此文章媒体库");
+
+        Integer count = postMediaRepository.countByHash(hash);
+        if(count == 0)
+            return Result.failure(ResultCodeEnum.NOT_FOUNT,"资源 HASH " + hash + " 未找到");
+
+        //删除记录
+        postMediaRepository.deleteByPostIdAndHash(postId, hash);
+
+        boolean deleted = false;
+        if(count == 1){//引用只有1，删除文件
+            File imageFile = new File(bulidImageResourcePath(hash, ""));
+            if(imageFile.exists())
+                deleted = imageFile.delete();
+        }
+
+        return Result.success(deleted);
+    }
+
+    /**
      * 上传图片
      * @param file 文件
      * @return 返回操作结果
@@ -114,7 +154,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
         //检查文件类型
         String contentType = file.getContentType();
-        if (!contentType.contains("image/jpeg") && !contentType.contains("image/jpg"))
+        if (contentType == null || (!contentType.contains("image/jpeg") && !contentType.contains("image/jpg")))
             return Result.failure(ResultCodeEnum.UPLOAD_ERROR,"IMG_FORMAT_ERROR");
 
         String md5 = FileUtils.getMd5ByFile(file);
@@ -174,6 +214,42 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     }
 
     /**
+     * 上传用户头像
+     * @param file 文件
+     * @param userId 用户 ID
+     * @return 返回操作结果
+     * @throws IOException 文件不存在保存异常
+     */
+    @Override
+    public Result uploadImageForUserHead(MultipartFile file, Integer userId) throws IOException {
+
+        //验证用户权限
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        Integer currentUserId = PublicAuth.authGetUseId(request);
+        if(currentUserId.intValue() != userId)
+            return Result.failure(ResultCodeEnum.FORIBBEN,"无权限修改用户头像");
+
+        //检查文件是否为空
+        if (file == null || file.isEmpty() || StringUtils.isBlank(file.getOriginalFilename()))
+            return Result.failure(ResultCodeEnum.UPLOAD_ERROR,"IMG_EMPTY");
+        //检查文件类型
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.contains("image/jpeg") && !contentType.contains("image/jpg"))
+            return Result.failure(ResultCodeEnum.UPLOAD_ERROR,"IMG_FORMAT_ERROR");
+
+        //保存文件
+        String md5 = FileUtils.getMd5ByFile(file);
+        String fileType = FileUtils.getFileTypeFormName(file.getOriginalFilename());
+        String filePath = bulidImageResourcePath(md5, fileType);
+        if(!new File(filePath).exists())
+            FileUtils.saveToFile(file, filePath);
+
+        //设置用户头像字段
+        userMapper.updateUserHead(userId, md5);
+        return Result.success(md5);
+    }
+
+    /**
      * 获取文章的媒体库资源
      * @param postId 文章 ID
      * @param pageIndex 页数
@@ -195,7 +271,8 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             return Result.failure(ResultCodeEnum.FORIBBEN,"无权限管理此文章媒体库");
 
         //读取
-        return Result.success(postMediaRepository.findAll(PageRequest.of(pageIndex, pageSize)));
+        return Result.success(postMediaRepository.findByPostId(postId, PageRequest.of(pageIndex, pageSize)));
+        //return Result.success(postMediaRepository.findAll(PageRequest.of(pageIndex, pageSize)));
     }
 
 
@@ -214,6 +291,6 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 
     private String bulidImageResourcePath(String hash, String type){
-        return imagesStoragePath + "/" + hash + "." + type;
+        return imagesStoragePath + "/" + hash + (type.equals("") ? "" : ("." + type));
     }
 }

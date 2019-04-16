@@ -7,15 +7,22 @@ import com.dreamfish.fishblog.core.config.ConstConfig;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.entity.UserExtened;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
+import com.dreamfish.fishblog.core.service.ImageStorageService;
 import com.dreamfish.fishblog.core.service.UserService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
+import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
+import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
+import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
 
 @RequestMapping(ConstConfig.API_PUBLIC)
 @Controller
@@ -28,6 +35,12 @@ public class UserController {
     @GetMapping("/user/{userId}")
     @ResponseBody
     public Result getUser(@PathVariable("userId") Integer userId) {
+        if(userId == 0){
+            int currentUserId = PublicAuth.authGetUseId(ContextHolderUtils.getRequest());
+            if(currentUserId >= AuthCode.SUCCESS)
+                userId = currentUserId;
+            else return Result.failure(ResultCodeEnum.NOT_FOUNT);
+        }
         UserExtened user = userService.findUser(userId);
         if(user!=null) return Result.success(user);
         else return Result.failure(ResultCodeEnum.NOT_FOUNT);

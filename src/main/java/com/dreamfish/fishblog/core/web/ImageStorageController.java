@@ -2,6 +2,7 @@ package com.dreamfish.fishblog.core.web;
 
 import com.dreamfish.fishblog.core.annotation.RequestAuth;
 import com.dreamfish.fishblog.core.annotation.RequestPrivilegeAuth;
+import com.dreamfish.fishblog.core.config.ConstConfig;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.service.ImageStorageService;
@@ -15,12 +16,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/api/v1/images")
+@RequestMapping(ConstConfig.API_PUBLIC)
 public class ImageStorageController {
 
     @Autowired
@@ -29,7 +31,7 @@ public class ImageStorageController {
     private ImageStorageService imageStorageService = null;
 
     //读取 JPG 图片(可选调整大小)(默认无后缀)
-    @GetMapping(value = "/{hash}")
+    @GetMapping(value = "/images/{hash}")
     public void getDefJpegImageSizeable(
             @PathVariable("hash")
                     String hash,
@@ -39,7 +41,7 @@ public class ImageStorageController {
         getJpegImageSizeable(hash, param);
     }
     //删除图片
-    @DeleteMapping("/{hash}")
+    @DeleteMapping("/images/{hash}")
     @ResponseBody
     @RequestAuth(value = User.LEVEL_WRITER)
     public Result deleteImage(
@@ -51,7 +53,7 @@ public class ImageStorageController {
     }
 
     //读取 JPG 图片(可选调整大小)
-    @GetMapping(value = "/{hash}.jpg")
+    @GetMapping(value = "/images/{hash}.jpg")
     public void getJpegImageSizeable(
             @PathVariable("hash")
                     String hash,
@@ -72,7 +74,7 @@ public class ImageStorageController {
     }
 
     //读取 PNG 图片(可选调整大小)
-    @GetMapping(value = "/{hash}.png")
+    @GetMapping(value = "/images/{hash}.png")
     @RequestAuth(value = User.LEVEL_WRITER)
     public void getPngImageSizeable(
             @PathVariable("hash")
@@ -95,7 +97,7 @@ public class ImageStorageController {
     //=================================
 
     //上传图片
-    @PostMapping("")
+    @PostMapping("/images")
     @ResponseBody
     @RequestAuth(User.LEVEL_WRITER)
     @RequestPrivilegeAuth(UserPrivileges.PRIVILEGE_MANAGE_MEDIA_CENTER)
@@ -107,8 +109,18 @@ public class ImageStorageController {
         else return Result.failure(ResultCodeEnum.BAD_REQUEST);
     }
 
+    //上传用户头像
+    @PostMapping("/user/{userId}/head")
+    @ResponseBody
+    @RequestAuth(User.LEVEL_WRITER)
+    public Result uploadUserHeadImage(
+            @RequestParam(value = "file") @NotNull MultipartFile imageFile,
+            @PathVariable("userId") Integer userId) throws IOException {
+        return imageStorageService.uploadImageForUserHead(imageFile, userId);
+    }
+
     //获取文章存储库的图片
-    @GetMapping("/post/{postId}/{pageIndex}/{pageSize}")
+    @GetMapping("/images/post/{postId}/{pageIndex}/{pageSize}")
     @ResponseBody
     @RequestAuth(value = User.LEVEL_WRITER)
     public Result ugetImageForPost(
@@ -119,7 +131,7 @@ public class ImageStorageController {
     }
 
     //为文章上传图片
-    @PostMapping("/post/{postId}")
+    @PostMapping("/images/post/{postId}")
     @ResponseBody
     @RequestAuth(value = User.LEVEL_WRITER)
     public Result uploadImageForPost(
@@ -128,5 +140,13 @@ public class ImageStorageController {
         return imageStorageService.uploadImageForPost(imageFile, postId);
     }
 
-
+    //为文章删除图片
+    @DeleteMapping("/images/post/{postId}/{hash}")
+    @ResponseBody
+    @RequestAuth(value = User.LEVEL_WRITER)
+    public Result deleteImageForPost(
+            @PathVariable("postId") Integer postId,
+            @PathVariable("hash") String hash) throws IOException {
+        return imageStorageService.deleteImageForPost(postId, hash);
+    }
 }

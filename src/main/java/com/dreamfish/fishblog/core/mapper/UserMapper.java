@@ -54,6 +54,10 @@ public interface UserMapper {
     void delUser(@Param("id") int id);
 
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
+    @Update("UPDATE fish_users SET headimg=#{newHead} WHERE id=#{id}")
+    void updateUserHead(@Param("id") int id, @Param("newHead") String newHead);
+
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET id=#{newId} WHERE id=#{id}")
     void updateUserId(@Param("id") int id, @Param("newId") int newId);
 

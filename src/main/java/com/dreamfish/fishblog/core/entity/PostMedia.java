@@ -20,7 +20,7 @@ public class PostMedia implements Serializable {
     private Integer postId;
     private String hash;
     private String type;
-
+    private String title;
 
     public Integer getId() {
         return id;
@@ -52,5 +52,13 @@ public class PostMedia implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="梦想小鱼的博客,ALONE SPACE,DreamFish,梦想小鱼的个人分享博客,梦想小鱼的个人分享平台,梦想小鱼">
+    <meta name="description" content="梦想小鱼的个人分享博客-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
+    <title>用户简介 - ALONE SPACE</title>
+    <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
+    <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
+    <!--Debug only-->
+    <script type="text/javascript" src="/assets/libs/vue.js/vue.js"></script>
+    <script type="text/javascript">
+        setLoaderCSS(new Array(
+            "/assets/libs/bootstrap/css/bootstrap.min.css",
+            "/assets/libs/font-awesome/css/font-awesome.min.css",
+            "yzc-blog.min.css",
+            "/assets/libs/owl.carousel/css/owl.carousel.css",
+            "/assets/libs/owl.carousel/css/owl.theme.css",
+            "/assets/libs/owl.carousel/css/owl.transitions.css"));
+        setLoaderJS(new Array(
+            "/assets/libs/jquery/jquery.min.js",
+            "/assets/libs/popper/popper.min.js",
+            /*"/assets/libs/vue.js/vue.min.js",*/
+            "/assets/libs/bootstrap/js/bootstrap.min.js",
+            "config.js", "utils.min.js", "string-hlp.min.js", "blog-user.min.js",
+            "/assets/libs/scrollReveal/scrollReveal.js",
+            "/assets/libs/owl.carousel/js/owl.carousel.min.js"));
+    </script>
+    <!--Baidu tongji-->
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?b817302b643ad43baed860443308c8d1";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    <style>.user-head{position:absolute;width:100px;height:100px;top:80px;left:50%;margin-left:-50px;background-color:#efeff4;border-radius:50%;padding:18px}.user-head img{width:64px;height:64px}</style>
+</head>
+
+<body class="not-load">
+
+    <!--Header-->
+    <header id="header-minimum">
+        <div class="container main-menu main-menu-white" style="padding-top: 40px; padding-bottom: 30px;">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div class="nav-header-text">
+                    <span class="logo"></span>
+                    <a href="/">Alone space</a>
+                </div>
+                <button type="button" id="mobile-nav-toggle">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <nav id="nav-menu-container" class="nav-menu-container">
+                    <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;">
+                        <li><a href="https://www.imyzc.com">主页</a></li>
+                        <li><a href="https://www.imyzc.com/storehouse">我的仓库</a></li>
+                        <li><a href="/">博客主页</a></li>
+                        <li><a href="/archives/">所有文章</a></li>
+                        <li><a href="https://www.imyzc.com/about.html">关于我</a></li>
+                    </ul>
+                </nav><!-- #nav-menu-container -->
+            </div>
+        </div>
+    </header>
+    <!--Main-->
+    <article id="main" class="sm-padding bg-grey-no-border">
+        <div class="container">
+            <div class="row">
+                <div v-if="currentUserLoadStatus=='loaded'" class="container">
+                    <div class="row justify-content-center align-items-center">
+                        <div class="col-sm-12 col-md-7 col-lg-5">
+                            <div class="blog-side-content mt-3 no-display-sm no-display-md">
+                                <div class="blog-side-head mb-3">
+                                    <div class="author" :style="'background: url('+getUserCardBackground()+') center center no-repeat;'"><img :src="getUserHead()" alt="head-img"
+                                            class="img-responsive mt-3"></div>
+                                    <div class="author_name">
+                                        <a v-if="currentUser.gender == '男'"><i class="fa fa-mars mr-2 text-primary"></i></a>
+                                        <a v-if="currentUser.gender == '女'"><i class="fa fa-venus mr-2" style="color: #f76fe5"></i></a>
+                                        <a :href="currentUser.home"
+                                            target="_blank">{{ currentUser.friendlyName }}</a><span
+                                            v-if="currentUser.level==1">博主</span></div>
+                                    <p v-html="currentUser.introduction"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div v-else-if="currentUserLoadStatus=='loading'"
+                    style="max-width: 400px;margin: 0 auto; padding: 10px">
+                    <div class="simple-loading-center">
+                        <div class="simple-loading-container">
+                            <span class="simple-loading"></span>
+                            <p>拼命加载中</p>
+                        </div>
+                    </div>
+                </div>
+                <div v-else-if="currentUserLoadStatus=='failed'" style="max-width: 400px;margin: 0 auto; padding: 10px">
+                    <div
+                        class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column">
+                        <i class=" fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
+                        <p class="text-secondary mt-2"><span class="h4">404</span><br />
+                            页面加载失败了（T-T）<br />{{ currentUserLoadError }}</p>
+                        <button type="button" class="btn btn-primary" onclick="location.href='/'">返回首页</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    <footer>
+        <div class="row align-items-center  justify-content-center mt-3">
+            <p class="text-secondary">Copyright © 2019 Dreamfish.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -15,6 +15,8 @@ import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -138,10 +140,13 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     public void deleteUserInternal(int userId) { userRepository.deleteById(userId); }
     @Override
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0.id")
     public UserExtened addUserInternal(UserExtened user) { return userRepository.saveAndFlush(user); }
     @Override
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     public UserExtened updateUserInternal(UserExtened user) { return userRepository.saveAndFlush(user); }
 
     /**
@@ -158,6 +163,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0.id")
     public Result updateUser(UserExtened user) {
 
         HttpServletRequest request = ContextHolderUtils.getRequest();
@@ -175,7 +181,7 @@ public class UserServiceImpl implements UserService {
         user.setPasswd(userOld.getPasswd());
         user.setName(userOld.getName());
 
-        return Result.success();
+        return Result.success(updateUserInternal(user));
     }
 
     /**

@@ -61,22 +61,6 @@ public class AdminPageController {
         return view;
     }
 
-    @GetMapping("/user/change-passwd/")
-    @RequestAuth(value = User.LEVEL_WRITER, redirectTo = "/sign-in/")
-    public String changecPassword()  { return "admin/auth-change-passwd"; }
-    @GetMapping("/user/rec-passwd/")
-    public String recPassword()  { return "admin/auth-rec-passwd"; }
-    @PostMapping("/user/rec-passwd/send/")
-    public ModelAndView recPasswordSend()  {
-        ModelAndView view = new ModelAndView("admin/auth-sign-out");
-
-
-
-
-        view.addObject("logout_stat", "发送找回密码信息成功");
-        view.addObject("logout_msg", "我们已经成功向您提供的地址发送了一封找回密码的信息，它会引导您恢复密码，请注意查收");
-        return view;
-    }
 
     @GetMapping("/admin/")
     @RequestAuth(value = User.LEVEL_WRITER, redirectTo = "/sign-in/")

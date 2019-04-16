@@ -38,7 +38,8 @@ Vue.component('common-table', {
     },
     template: '<div class="position-relative table-responsive" :id="\'common-table-\' + _uid">\
 <div v-if="loadedStatus == \'loading\'" class="full position-absolute blur-none">\
-<div id="loading-center-absolute"><span id="loading-simple-roll"></span></div>\
+<div id="log_sending" class="simple-loading-center" style="display:none;height:250px;">\
+<div class="simple-loading-container"><span class="simple-loading"></span></div>\
 </div>\
 <table :class="\'table\' + (loadedStatus == \'loading\' ? \' blur-lower\' : \'\')">\
 <thead>\

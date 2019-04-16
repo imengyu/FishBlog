@@ -25,7 +25,7 @@
                             <div class="btn-inline text-center">
                                 <img style="width:80px;height:80px;border-radius:50%;padding:10px" :src="getUserHead()">
                                 <br />
-                                <input type="file" name="avatar" id="avatar" accept="image/jpg, image/jpeg" aria-hidden="true" style="display: none;">
+                                <input type="file" name="avatar" id="avatar" accept="image/jpg, image/jpeg" aria-hidden="true" style="display: none;" v-on:change="changeHead(true)">
                                 <a href="javascript:;" class="mt-2" style="font-size:14px" v-on:click="changeHead()">更换头像</a>
                             </div>
                         </div>
@@ -65,8 +65,24 @@
                             <input type="text" class="form-control" id="userEmail" v-model="currentUser.home">
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userIntroduction" class="mt-2">您的个人简介</label>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <textarea rows="3" class="form-control" id="userIntroduction" v-model="currentUser.introduction"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userCardBackground" class="mt-2">名片背景</label>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <input type="text" class="form-control" id="userCardBackground" v-model="currentUser.cardBackground">
+                        </div>
+                    </div>
 
-                    <button type="button" class="btn btn-primary mt-3" v-on:click="submit()">修改设置</button>
+                    <button type="button" class="btn btn-primary mt-3" v-on:click="submit()">修改信息</button><button type="button" class="btn btn-secondary mt-3 ml-2" onclick="location.href='/user/change-passwd/' ">修改密码</button>
                 </form>
 
             </div>

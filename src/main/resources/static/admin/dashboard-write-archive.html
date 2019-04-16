@@ -23,7 +23,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="contact-tab" data-toggle="tab" href="#marchive-tab-images" role="tab"
-                            aria-controls="marchives-tab-images" aria-selected="false">文章图片</a>
+                            aria-controls="marchives-tab-images" aria-selected="false" v-on:click="loadMediaCenter()">文章图片</a>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -255,7 +255,31 @@
 
                     </div>
                     <div class="tab-pane fade" role="tabpanel" id="marchive-tab-images">
+                        <div v-if="isNew" class="text-center text-secondary mt-3 mb-2">
+                            <p>请先保存文章，然后才能使用媒体库功能</p>
+                        </div><div v-else-if="mediaCenterLoadStatus=='loaded'">
+                            <common-image-list ref="mediaCenterList"
+                                v-bind:items="mediaCenterItems" 
+                                v-bind:loaded-status="mediaCenterLoadStatus"
+                                v-bind:null-text="'当前文章还没有图片资源，点击下方按钮添加'"
+                                v-bind:image-width="'170px'"
+                                v-bind:image-width="'100px'"
+                                v-on:add-click="mediaListAdd"
+                                v-on:delete-click="mediaListDelete">
 
+                            </common-image-list>
+                            <common-pagination ref="tablePaginationMediaCenterList" v-bind:current-page="mediaCenterPageCurrent"
+                                v-bind:all-page="mediaCenterPageAll" v-on:item-click="mediaCenterListPagerClick"
+                                v-on:page-size-changed="mediaCenterListPageSizeChanged">
+                            </common-pagination>
+
+
+                            <input type="file" name="uploadImage" id="uploadImage" accept="image/jpg, image/jpeg" aria-hidden="true" style="display: none;" v-on:change="changeUploadImage(true)">
+                            <button v-if="" type="button" class="btn btn-success mr-2"
+                                v-on:click="uploadImage()"><i class="fa fa-plus"></i> 添加图片</button>
+                        </div><div v-else-if="mediaCenterLoadStatus=='failed'">
+                            <div class="text-center mt-3 mb-3"><i class="fa fa-times mr-3 text-danger"></i>加载失败</div>
+                        </div>
                     </div>
                 </div>
                 <form class="form-inline mt-3 d-flex justify-content-end">

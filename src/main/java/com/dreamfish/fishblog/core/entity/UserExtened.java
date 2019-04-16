@@ -30,6 +30,8 @@ public class UserExtened implements Serializable {
     private Integer privilege;
     private Integer oldLevel;
     private String gender;
+    private String introduction;
+    private String cardBackground;
 
     public String getHeadimg() { return headimg; }
     public String getFriendlyName() {
@@ -61,7 +63,19 @@ public class UserExtened implements Serializable {
     public String getGender() {
         return gender;
     }
+    public String getIntroduction() {
+        return introduction;
+    }
+    public String getCardBackground() {
+        return cardBackground;
+    }
 
+    public void setCardBackground(String cardBackground) {
+        this.cardBackground = cardBackground;
+    }
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
     public void setGender(String gender) {
         this.gender = gender;
     }

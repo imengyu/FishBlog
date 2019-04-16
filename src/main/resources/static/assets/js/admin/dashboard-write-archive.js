@@ -4,6 +4,7 @@ appendLoaderJS("/assets/libs/editormd/js/editormd.min.js");
 appendLoaderCSS("/assets/libs/editormd/css/editormd.min.css");
 appendLoaderJS("/assets/js/components/common-table.min.js");
 appendLoaderJS("/assets/js/components/common-pagination.min.js");
+appendLoaderJS("/assets/js/components/common-image-list.min.js");
 
 var main;
 
@@ -91,6 +92,12 @@ function initApp() {
             archiveClass: '',
             archiveContent: '',
             archiveShowLastModifyDate: true,
+
+            mediaCenterItems: null,
+            mediaCenterLoadStatus: 'notload',
+            mediaCenterPageCurrent: 1,
+            mediaCenterPageAll: 1,
+            mediaCenterPageSize: 10,
 
             mdEditor: null,
         },
@@ -355,6 +362,25 @@ function initApp() {
                     });
                 }
             },
+            loadMediaCenter(force) {
+                if (!main.isNew && (main.mediaCenterLoadStatus != 'loaded' || force)) {
+                    main.tableCommentAllLoadStatus = 'loading';
+
+                    var url = blog_api_address + "images/post/" + main.archiveId + "/" + (main.mediaCenterPageCurrent - 1) + "/" + main.mediaCenterPageSize;
+                    //Load comments
+                    $.ajax({
+                        url: url,
+                        success: function (response) {
+                            if (response.success) {
+                                main.mediaCenterItems = response.data.content;
+                                main.mediaCenterPageCurrent = response.data.number + 1;
+                                main.mediaCenterPageAll = response.data.totalPages;
+                                main.mediaCenterLoadStatus = 'loaded';
+                            } else main.mediaCenterLoadStatus = 'failed';
+                        }, error: function (xhr, err) {main.mediaCenterLoadStatus = 'failed';}
+                    });
+                }
+            },
 
             //评论列表事件
             tableGenItemIds(selItems){
@@ -438,6 +464,43 @@ function initApp() {
                     });
                 }
             },
+            
+
+
+            //媒体库事件
+            mediaListAdd(item){
+
+            },
+            mediaListDelete(item){
+                Swal.fire({
+                    type: 'warning', title: '真的要放删除这张图片吗', text: "它将会彻底删除", confirmButtonColor: '#d33', confirmButtonText: '确定',
+                    showCancelButton: true, cancelButtonColor: '#3085d6',
+                    cancelButtonText: "取消", focusCancel: true, reverseButtons: true
+                }).then((isConfirm) => {
+                    if (isConfirm.value) {
+
+                        toast('已将文章恢复为修改前状态', 'success')
+                    }
+                });
+            },
+            //
+            mediaCenterListPagerClick(item) {
+                if (main.mediaCenterPageCurrent != item) {
+                    main.mediaCenterPageCurrent = item;
+                    main.loadMediaCenter(true);
+                }
+            },
+            mediaCenterListPageSizeChanged(newv) {
+                if (main.mediaCenterPageSize != newv) {
+                    main.mediaCenterPageSize = newv;
+                    main.mediaCenterLoadStatus = 'notload'
+                    main.loadMediaCenter();
+                }
+            },
+            changeUploadImage(){
+
+            },
+            uploadImage(){ $('#uploadImage').click() },
 
             //
             //
@@ -561,7 +624,7 @@ function initApp() {
             //保存修改
             saveChange(st) {
                 Swal.fire({
-                    type: 'question', title: '您真的要现在提交修改吗', text: "", confirmButtonColor: '#3085d6', confirmButtonText: '立即发布',
+                    type: 'question', title: '您真的要现在保存修改吗', text: "", confirmButtonColor: '#3085d6', confirmButtonText: '保存',
                     showCancelButton: true, cancelButtonColor: '#999', cancelButtonText: "再改改", focusCancel: true, reverseButtons: true
                 }).then((isConfirm) => {
                     if (isConfirm.value) {
