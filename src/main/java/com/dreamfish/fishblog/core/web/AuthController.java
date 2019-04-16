@@ -171,7 +171,7 @@ public class AuthController {
             @RequestParam(value = "error", required = false) String error,
             @RequestParam(value = "error_description", required = false) String error_description
     ) {
-        return Result.failure("400", error + " : " + error_description);
+        return Result.failure("400", error, error_description);
     }
     //Github 登录验证回调
     @GetMapping(value = "/githubAuthCallback/{postId}", name = "Github 登录验证回调")

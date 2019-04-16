@@ -22,7 +22,12 @@
                             <label for="userEmail" class="mt-2">头像</label>
                         </div>
                         <div class="form-group col-md-9">
-                            <img style="width:80px;height:80px;border-radius:50%;padding:10px" :src="getUserHead()">
+                            <div class="btn-inline text-center">
+                                <img style="width:80px;height:80px;border-radius:50%;padding:10px" :src="getUserHead()">
+                                <br />
+                                <input type="file" name="avatar" id="avatar" accept="image/jpg, image/jpeg" aria-hidden="true" style="display: none;">
+                                <a href="javascript:;" class="mt-2" style="font-size:14px" v-on:click="changeHead()">更换头像</a>
+                            </div>
                         </div>
                     </div>
 

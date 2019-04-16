@@ -114,6 +114,7 @@ public interface PostMapper {
     @Select("SELECT id,title,url_name,preview_text,keywords FROM fish_posts WHERE status=1 AND post_class LIKE %${sclass}% ORDER BY post_date DESC LIMIT #{maxCount}")
     List<PostUrl> findAbstractTitlesWithClass(@Param("sclass") String sclass, @Param("maxCount") Integer maxCount);
 
-
+    @Select("select id from `fish_posts` where id=#{id} limit 1")
+    Integer isPostIdExists(@Param("id") int id);
 
 }

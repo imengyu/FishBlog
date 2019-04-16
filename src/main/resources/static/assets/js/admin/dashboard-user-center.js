@@ -36,6 +36,9 @@ function initApp() {
         methods: {
             isCurrentUrlAndActive: function (page) { return isCurrentUrlAndActive(page) },
 
+            changeHead(){
+                $('#avatar').click();
+            },
             setGender(m){
                 if(m) {
                     main.currentUser.gender = '男';

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Pattern;
 import java.awt.image.BufferedImage;
@@ -23,12 +22,11 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/api/v1/images")
 public class ImageStorageController {
+
     @Autowired
-    private HttpServletRequest request;
+    private HttpServletResponse response = null;
     @Autowired
-    private HttpServletResponse response;
-    @Autowired
-    private ImageStorageService imageStorageService;
+    private ImageStorageService imageStorageService = null;
 
     //读取 JPG 图片(可选调整大小)(默认无后缀)
     @GetMapping(value = "/{hash}")
@@ -44,7 +42,6 @@ public class ImageStorageController {
     @DeleteMapping("/{hash}")
     @ResponseBody
     @RequestAuth(value = User.LEVEL_WRITER)
-    @RequestPrivilegeAuth(value = UserPrivileges.PRIVILEGE_MANAGE_MEDIA_CENTER)
     public Result deleteImage(
             @PathVariable("hash") String hash,
             @RequestParam(value = "type", required = false, defaultValue = "jpg")
@@ -73,6 +70,7 @@ public class ImageStorageController {
             else response.setStatus(404);
         }
     }
+
     //读取 PNG 图片(可选调整大小)
     @GetMapping(value = "/{hash}.png")
     @RequestAuth(value = User.LEVEL_WRITER)
@@ -99,7 +97,8 @@ public class ImageStorageController {
     //上传图片
     @PostMapping("")
     @ResponseBody
-    @RequestAuth(value = User.LEVEL_WRITER)
+    @RequestAuth(User.LEVEL_WRITER)
+    @RequestPrivilegeAuth(UserPrivileges.PRIVILEGE_MANAGE_MEDIA_CENTER)
     public Result uploadImage(
             @RequestParam(value = "file", required = false) MultipartFile imageFile,
             @RequestParam(value = "url", required = false) String imageUrl) throws IOException {
@@ -107,4 +106,27 @@ public class ImageStorageController {
         else if(imageUrl!=null) return imageStorageService.uploadImageByUrl(imageUrl);
         else return Result.failure(ResultCodeEnum.BAD_REQUEST);
     }
+
+    //获取文章存储库的图片
+    @GetMapping("/post/{postId}/{pageIndex}/{pageSize}")
+    @ResponseBody
+    @RequestAuth(value = User.LEVEL_WRITER)
+    public Result ugetImageForPost(
+            @PathVariable("postId") Integer postId,
+            @PathVariable("pageIndex") Integer pageIndex,
+            @PathVariable("pageSize") Integer pageSize) {
+        return imageStorageService.getImageForPost(postId, pageIndex, pageSize);
+    }
+
+    //为文章上传图片
+    @PostMapping("/post/{postId}")
+    @ResponseBody
+    @RequestAuth(value = User.LEVEL_WRITER)
+    public Result uploadImageForPost(
+            @RequestParam(value = "file", required = false) MultipartFile imageFile,
+            @PathVariable("postId") Integer postId) throws IOException {
+        return imageStorageService.uploadImageForPost(imageFile, postId);
+    }
+
+
 }

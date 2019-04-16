@@ -589,9 +589,14 @@ Sidebar Open Button - Show or Hide Sidebar
                         position: relative;
                         border-radius: 8px;
                         
-                        &:hover, &.active {
+                        &:hover {
                             color: #fff;
-                            background: rgb(46, 122, 239);
+                            background: #5290ec;
+                            .side-icon { color: #fff; }
+                        }
+                        &.active {
+                            color: #fff;
+                            background: #2e7aef;
                             .side-icon { color: #fff; }
                         }
                     }

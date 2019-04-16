@@ -36,6 +36,7 @@ function initBase(){
         setTimeout(function(){$('.side-area').show();}, 400)
     }
     $('.side-panel .side-has-children ul').css('display', 'none');
+    $('.side-panel .side-has-children ul li a.active').parent().parent().attr('style', '').parent().addClass('side-child-open');
     $('.side-panel li.side-has-children').click(function(e){
         if (!container.is(e.target) && container.has(e.target).length === 0) {
             $(this).toggleClass('side-child-open');
@@ -65,7 +66,7 @@ function initAuthInfo(){
                 else location.href = '/sign-in/?redirect_url='+ encodeURI(location.href) + '&error=RequestLogin';
             }
         }, error: function (xhr, err) { 
-            document.write('连接服务器异常：' + err);
+            swal('连接服务器异常', '请检查您的连接？', 'error');
         }
     });
 }
