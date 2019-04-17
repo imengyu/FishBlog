@@ -5,22 +5,26 @@
                 <div class="row">
                     <div class="col-sm-6 col-md-3 col-lg-3 number">
                         <p class="text-secondary">今日 PV / 昨日 PV</p>
-                        <span v-if="statData" class="text-black">{{ statData.todayPv + '/' + statData.yesterdayPv }}</span>
+                        <span v-if="statData"
+                            class="text-black">{{ statData.pvToday + ' / ' + statData.pvYesterday }}</span>
                         <span v-else class="text-warning">无数据</span>
                     </div>
                     <div class="col-sm-6 col-md-3 col-lg-3 number">
                         <p class="text-secondary">今日 IP / 昨日 IP</p>
-                        <span v-if="statData" class="text-black">{{ statData.todayIp + '/' + statData.yesterdayIp }}</span>
+                        <span v-if="statData"
+                            class="text-black">{{ statData.ipToday + ' / ' + statData.ipYesterday }}</span>
                         <span v-else class="text-warning">无数据</span>
                     </div>
                     <div class="col-sm-6 col-md-3 col-lg-3 number">
-                        <p class="text-secondary">新评论 / 新文章</p>
-                        <span v-if="statData" class="text-black">{{ statData.newComment + '/' + statData.newArchiveCont }}</span>
+                        <p class="text-secondary">新评论 / 昨日评论</p>
+                        <span v-if="statData"
+                            class="text-black">{{ statData.commentToday + ' / ' + statData.commentYesterday }}</span>
                         <span v-else class="text-warning">无数据</span>
                     </div>
                     <div class="col-sm-6 col-md-3 col-lg-3 number">
                         <p class="text-secondary">用户数 / 作者数</p>
-                        <span v-if="statData" class="text-black">{{ statData.visitorCount + '/' + statData.userCount }}</span>
+                        <span v-if="statData"
+                            class="text-black">{{ statData.visitorCount + ' / ' + statData.authorCount }}</span>
                         <span v-else class="text-warning">无数据</span>
                     </div>
                 </div>
@@ -31,21 +35,54 @@
         <div class="col">
             <div class="box">
                 <h5 class="box-title no-underline">近一月浏览量走势</h5>
-                <div class="text-secondary text-center mt2 mb-1">无数据</div>
+                <canvas v-if="dayLog" id="chartDayLog" style="width:100%; height:200px;"></canvas>
+                <div v-else class="text-secondary text-center mt2 mb-2">无数据</div>
             </div>
         </div>
     </div>
     <div class="row justify-content-start mt-3">
         <div class="col-sm-12 col-md-6">
             <div class="box">
-                <h5 class="box-title no-underline">TOP 10 浏览网站</h5>
-                <div class="text-secondary text-center mt2 mb-1">无数据</div>
+                <h5 class="box-title no-underline">TOP 10 浏览文章</h5>
+                <div v-if="topTenArchives">
+                    <div v-for="(post, index) in topTenArchives">
+                        <span class="badge badge-pill badge-primary mr-2">{{index+1}}</span><a :href="getPostUrl(post)"
+                            target="_blank">{{ post.title }}</a><span
+                            class="float-right text-primary">{{post.viewCount}}</span>
+                    </div>
+                </div>
+                <div v-else class="text-secondary text-center mt2 mb-2">无数据</div>
             </div>
         </div>
         <div class="col-sm-12 col-md-6">
             <div class="box">
-                <h5 class="box-title no-underline">TOP 10 访问页面</h5>
-                <div class="text-secondary text-center mt2 mb-1">无数据</div>
+                <h5 class="box-title no-underline">今日 TOP 10 访问页面</h5>
+                <div v-if="topTenPage">
+                    <div v-for="(page, index) in topTenPage">
+                        <span class="badge badge-pill badge-primary mr-2">{{index+1}}</span> {{ page.url }} <span
+                            class="float-right text-primary">{{page.count}}</span>
+                    </div>
+                    <div class="mt-2" >
+                        <a href="javascript:;" v-on:click="showFullPageLog=true;loadFullPageStat();tableAllScrollTo()">更多数据</a>
+                    </div>
+                </div>
+                <div v-else class="text-secondary text-center mt2 mb-2">无数据</div>
+
+            </div>
+        </div>
+    </div>
+    <div v-if="showFullPageLog" id="full_log_stat" class="row justify-content-start mt-3">
+        <div class="col">
+            <div class="box">
+                <h5 class="box-title no-underline">完整页面访问统计</h5>
+                <common-table ref="tableAll" v-bind:columns="tableAllColumns" v-bind:items="tableAllDatas"
+                    v-bind:show-check-boxes="true" v-bind:loaded-status="tableAllLoadStatus"
+                    v-bind:null-text="'当前没有访问数据'" v-on:retry-load="loadFullPageStat(true)">
+                </common-table>
+                <common-pagination ref="tablePaginationAll" v-bind:current-page="tableAllPageCurrent"
+                    v-bind:all-page="tableAllPageAll" v-on:item-click="tableAllPagerClick"
+                    v-on:page-size-changed="tableAllPageSizeChanged">
+                </common-pagination>
             </div>
         </div>
     </div>

@@ -43,6 +43,9 @@ public interface UserMapper {
     @Select("SELECT level FROM fish_users WHERE id = #{id}")
     Integer getUserLevelById(@Param("id") Integer id);
 
+    @Select("SELECT passwd FROM fish_users WHERE id = #{id}")
+    String getUserPasswordById(@Param("id") Integer id);
+
     @Select("SELECT id,headimg,level FROM fish_users")
     List<User> getAllUserHeads();
 
@@ -52,6 +55,9 @@ public interface UserMapper {
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Delete("DELETE FROM fish_users WHERE id = #{id}")
     void delUser(@Param("id") int id);
+
+    @Update("UPDATE fish_users SET passwd=#{passwd} WHERE id=#{id}")
+    void updateUserPassword(@Param("id") int id, @Param("passwd") String passwd);
 
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET headimg=#{newHead} WHERE id=#{id}")

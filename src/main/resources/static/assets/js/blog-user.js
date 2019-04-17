@@ -9,8 +9,8 @@ var main = new Vue({
         loadUser: function () {
             var currentUserId = getQueryString('user');
             if (currentUserId == null) currentUserId = getLastUrlAgrs(location.href).arg;
-            if(!isNumber(currentUserId)) currentUserId = '0';
-            var url = blog_api_address + "user/" + currentUserId;
+            if(!isNumber(currentUserId) || currentUserId == 'user') currentUserId = '0';
+            var url = address_blog_api + "user/" + currentUserId;
             $.ajax({
                 url: url,
                 success: function (response) {

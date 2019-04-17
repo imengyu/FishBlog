@@ -8,23 +8,23 @@
     <meta name="description" content="梦想小鱼的个人分享博客-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
     <title>更改密码 - ALONE SPACE</title>
     <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
+    <script type="text/javascript" src="/assets/js/config.js"></script>
     <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
     <script type="text/javascript">
         setLoaderCSS(new Array(
             "/assets/libs/bootstrap/css/bootstrap.min.css",
             "/assets/libs/font-awesome/css/font-awesome.min.css",
             "yzc-blog.min.css",
-            "/assets/libs/owl.carousel/css/owl.carousel.css",
-            "/assets/libs/owl.carousel/css/owl.theme.css",
-            "/assets/libs/owl.carousel/css/owl.transitions.css"));
+            "/assets/libs/sweetalert2/css/sweetalert2.min.css"));
         setLoaderJS(new Array(
             "/assets/libs/jquery/jquery.min.js",
             "/assets/libs/popper/popper.min.js",
-            "/assets/libs/jquery/jquery.min.js",
+            "/assets/libs/vue.js/vue.js",
             "/assets/libs/bootstrap/js/bootstrap.min.js",
-            "config.js", "utils.min.js",
-            "/assets/libs/scrollReveal/scrollReveal.js",
-            "/assets/libs/owl.carousel/js/owl.carousel.min.js"));
+            "/assets/libs/compress/md5.min.js",
+            "utils.min.js", "string-hlp.min.js",
+            "/assets/js/admin/auth-change-passwd.js",
+            "/assets/libs/sweetalert2/js/sweetalert2.min.js",));
     </script>
     <!--Baidu tongji-->
     <script>
@@ -36,25 +36,7 @@
             s.parentNode.insertBefore(hm, s);
         })();
     </script>
-    <style>
-        .logon-icon {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            top: 80px;
-            left: 50%;
-            margin-left: -50px;
-            background-color: #efeff4;
-            border-radius: 50%;
-            padding: 18px;
-        }
-
-        .logon-icon img {
-            width: 64px;
-            height: 64px;
-
-        }
-    </style>
+    <style>.logon-icon{position:absolute;width:100px;height:100px;top:10px;left:50%;margin-left:-50px;background-color:#efeff4;border-radius:50%;padding:18px}.logon-icon img{width:64px;height:64px}</style>
 </head>
 
 <body class="not-load">
@@ -65,19 +47,24 @@
             <div class="row align-items-center justify-content-between d-flex">
                 <div class="nav-header-text">
                     <span class="logo"></span>
-                    <a href="../../">Alone space</a>
+                    <a href="/">Alone space</a>
                 </div>
                 <button type="button" id="mobile-nav-toggle">
                     <i class="fa fa-bars"></i>
                 </button>
                 <nav id="nav-menu-container" class="nav-menu-container">
                     <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;">
-                        <li><a href="https://www.imyzc.com">主页</a></li>
-                        <li><a href="https://www.imyzc.com/storehouse">我的仓库</a></li>
                         <li><a href="/">博客主页</a></li>
                         <li><a href="/archives/">所有文章</a></li>
                         <li class="menu-active"><a>博客后台</a></li>
-                        <li><a href="https://www.imyzc.com/about.html">关于我</a></li>
+                        <li class="nav-user" data-toggle="dropdown" data-reference="current_user_menu">
+                            <img class="current-user-head" src="/images/default/head-default.png">
+                            <span class="current-user-name text-black">用户名<i class="text-black"></i></span>
+                        </li>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a href="/user/" class="dropdown-item"><i class="fa fa-user-o"></i> 账号信息</a>
+                            <a href="/sign-out/" class="dropdown-item"><i class="fa fa-sign-out"></i> 退出登录</a>
+                        </div>
                     </ul>
                 </nav><!-- #nav-menu-container -->
             </div>
@@ -86,39 +73,65 @@
     <!--Main-->
     <article id="main" class="sm-padding bg-grey-no-border">
         <div class="container">
-            <div class="row">
-                <div style="max-width:400px;min-width:270px;margin: 0 auto; padding: 10px">
-                    <div class="text-center mt-4">
-                        <div class="logon-icon"><img src="/images/logo/big_icon.png"></div>
-                        <p class="h2" style="margin-top: 110px">更改密码</p>
-                        <p class="text-secondary">更改 <span class="text-primary" id="change_user_name"></span> 的密码</p>
-                    </div>
-                    <form class="" method="post" action="send/">
-                        <div class="form-group">
-                            <input class="flat" type="password" id="change_old" name="change_old" placeholder="旧密码">
-                            <div class="invalid-feedback">请输入旧密码</div>
-                        </div>
-                        <div class="form-group">
-                            <input class="flat" type="password" id="change_new" name="change_new" placeholder="新密码">
-                            <div class="invalid-feedback">请输入新密码</div>
-                            <div class="password-type p-2" id="password-type" style="display:none;">
-                                <p id="password-type-len" class="m-0"><i class="fa fa-times"></i>
-                                    长度不在8-20位之间</p>
-                                <p id="password-type-char" class="m-0"><i class="fa fa-times"></i>
-                                    必须包含数字、字母和特殊符号</p>
-                                <p id="password-type-noeqname" class="m-0"><i class="fa fa-times"></i>
-                                    不可以与用户名相同</p>
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 col-lg-4" style="padding:20px">
+                    <div v-if="currentAddSuccess">
+                        <div class="box full text-center d-flex justify-content-center align-items-center flex-column">
+                            <i class="fa fa-check-circle-o text-success" aria-hidden="true"
+                                style="font-size: 3.5em"></i>
+                            <p class="text-secondary mt-2">修改密码成功<br /><span class="text-secondary">请牢记您的新密码</span></p>
+                            <div>
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="location.href='/'">返回主页</button>
+                                <button type="button ml-2" class="btn btn-primary"
+                                    onclick="location.href='/admin/user-center/'">修改个人信息</button>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <input class="flat" type="password" id="change_new2" name="change_new2"
-                                placeholder="再输入一次新密码">
-                            <div class="invalid-feedback">请再输入一次新密码</div>
+                    </div>
+                    <div  v-else>
+                        <div class="text-center mt-4">
+                            <div class="logon-icon"><img src="/images/logo/big_icon.png"></div>
+                            <p class="h2" style="margin-top: 110px;margin-bottom: 20px">更改密码</p>
+                            <p class="text-secondary">更改 <span id="change_username">{{currentUserName}}</span> 的密码</p>
                         </div>
-                        <div class="form-group">
-                            <button type="button" class="flat-btn flat-btn-black mb-2 mt-3 btn-block">更改密码</button>
-                        </div>
-                    </form>
+                        <form method="post">
+                            <div class="form-group">
+                                <input :class="'flat' + validPassWord0()" type="password" id="change_old" name="change_old"
+                                    placeholder="旧密码" v-model="currentAddUserPasswordOld">
+                                <div class="invalid-feedback">请输入旧密码</div>
+                            </div>
+                            <div class="form-group">
+                                <input :class="'flat' + validPassWord1()" type="password" id="change_new" name="change_new"
+                                    placeholder="新密码" v-model="currentAddUserPassword">
+                                <div v-if="currentAddUserPassword==''" class="invalid-feedback">请输入新密码</div>
+                                <div class="password-type p-2" id="password_type" style="display:none">
+                                    <p v-if="validPassWord1Len()" class="m-0 text-danger"><i class="fa fa-times"></i>
+                                        长度在8-20位之间</p>
+                                    <p v-else class="m-0 text-success"><i class="fa fa-check"></i>
+                                        长度在8-20位之间</p>
+                                    <p v-if="validPassWord1Char()" class="m-0 text-danger"><i class="fa fa-times"></i>
+                                        必须包含数字、字母或特殊符号其中的两种</p>
+                                    <p v-else class="m-0 text-success"><i class="fa fa-check"></i>
+                                        必须包含数字、字母或特殊符号其中的两种</p>
+                                    <p v-if="validPassWord1UserName()" class="m-0 text-danger"><i class="fa fa-times"></i>
+                                        不可以与用户名相同或包含用户名</p>
+                                    <p v-else class="m-0 text-success"><i class="fa fa-check"></i>
+                                        不可以与用户名相同或包含用户名</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input :class="'flat' + validPassWord2()" type="password" id="change_new2"
+                                    name="change_new2" v-model="currentAddUserPassword2" placeholder="再输入一次新密码">
+                                <div v-if="currentAddUserPassword2==''" class="invalid-feedback">请再输入一次新密码</div>
+                                <div v-if="currentAddUserPassword!=currentAddUserPassword2" class="invalid-feedback">
+                                    两次密码不一致，请重新输入</div>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="flat-btn flat-btn-black mb-2 mt-3 btn-block"
+                                    v-on:click="submitChange()">更改密码</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

@@ -111,7 +111,7 @@ function initApp() {
                 if (main.tableUsersLoadStatus != 'loaded' || force) {
                     main.tableUsersLoadStatus = 'loading';
 
-                    var url = blog_api_address + "users/" + (main.tableUsersPageCurrent - 1) + "/" + main.tableUsersPageSize;
+                    var url = address_blog_api + "users/" + (main.tableUsersPageCurrent - 1) + "/" + main.tableUsersPageSize;
                     //Load comments
                     $.ajax({
                         url: url,
@@ -159,7 +159,7 @@ function initApp() {
                         if (isConfirm.value) {
 
                             $.ajax({
-                                url: blog_api_address + 'user/' + item.id,
+                                url: address_blog_api + 'user/' + item.id,
                                 type: 'delete',
                                 success: function (response) {
                                   main.tableUsersLoadStatus = 'loaded';
@@ -182,7 +182,7 @@ function initApp() {
                     }).then((isConfirm) => {
                         if (isConfirm.value) {
                             $.ajax({
-                                url: blog_api_address + 'user/' + item.id + '/ban',
+                                url: address_blog_api + 'user/' + item.id + '/ban',
                                 type: 'post',
                                 success: function (response) {
                                   main.tableUsersLoadStatus = 'loaded';
@@ -204,7 +204,7 @@ function initApp() {
                     }).then((isConfirm) => {
                         if (isConfirm.value) {
                             $.ajax({
-                                url: blog_api_address + 'user/' + item.id + '/unban',
+                                url: address_blog_api + 'user/' + item.id + '/unban',
                                 type: 'post',
                                 success: function (response) {
                                   main.tableUsersLoadStatus = 'loaded';
@@ -291,7 +291,7 @@ function initApp() {
             },
             savePrivilege(){
                 $.ajax({
-                    url: blog_api_address + 'user/' + main.currentEditPrvUser.id + '/privilege',
+                    url: address_blog_api + 'user/' + main.currentEditPrvUser.id + '/privilege',
                     type: 'post',
                     dataType: 'json',
                     data: JSON.stringify({ privilege: main.currentEditPrvUser.privilege }),

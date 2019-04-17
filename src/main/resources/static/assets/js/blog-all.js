@@ -12,7 +12,7 @@ var main = new Vue({
   },
   methods: {
     loadPosts: function () {
-      var url = blog_api_address + "posts/page/" + this.currentPostPage + "/15?sortBy=date";
+      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/15?sortBy=date";
       var oldScrollTop = $('body,html').scrollTop();
 
       this.contentMainLoading = true;

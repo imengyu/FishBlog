@@ -109,6 +109,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
      * @throws IOException 文件不存在保存异常
      */
     @Override
+    @CacheEvict(value = "blog-image-cache", key = "'image-center-'+#postId")
     public Result deleteImageForPost(Integer postId, String hash) throws IOException {
 
         //文章检查
@@ -137,6 +138,33 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         }
 
         return Result.success(deleted);
+    }
+
+    /**
+     * 更新文章图片
+     * @param postId 文章 ID
+     * @param hash 资源HASH
+     * @param media 参数
+     * @return 返回操作结果
+     * @throws IOException 文件不存在保存异常
+     */
+    @Override
+    @CacheEvict(value = "blog-image-cache", key = "'image-center-'+#postId")
+    public Result updateImageForPost(Integer postId, String hash, PostMedia media) throws IOException {
+
+        //验证用户权限
+        Result authResult = authForPostMediaCenter(postId);
+        if(authResult != null) return authResult;
+
+        if(!hash.equals(media.getHash()))
+            return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "hash 不相等");
+        if(postId.intValue() != media.getPostId())
+            return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "postId 不相等");
+
+        PostMedia oldMedia = postMediaRepository.findByPostIdAndHash(postId, hash);
+        media.setId(oldMedia.getId());
+        media.setPostId(postId);
+        return Result.success(postMediaRepository.saveAndFlush(media));
     }
 
     /**
@@ -179,15 +207,9 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     @CacheEvict(value = "blog-image-cache", key = "'image-center-'+#postId")
     public Result uploadImageForPost(MultipartFile file, Integer postId) throws IOException {
 
-        if(postMapper.isPostIdExists(postId) == null)
-            return Result.failure(ResultCodeEnum.NOT_FOUNT,"文章 ID " + postId + " 未找到");
-
         //验证用户权限
-        HttpServletRequest request = ContextHolderUtils.getRequest();
-        Integer currentUserId = PublicAuth.authGetUseId(request);
-        Integer postAuthorId =  postMapper.getPostAuthorId(postId);
-        if(currentUserId.intValue() != postAuthorId && (PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, UserPrivileges.PRIVILEGE_MANAGE_MEDIA_CENTER) < AuthCode.SUCCESS))
-            return Result.failure(ResultCodeEnum.FORIBBEN,"无权限管理此文章媒体库");
+        Result authResult = authForPostMediaCenter(postId);
+        if(authResult != null) return authResult;
 
         //检查文件是否为空
         if (file == null || file.isEmpty() || StringUtils.isBlank(file.getOriginalFilename()))
@@ -260,15 +282,9 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     @Cacheable(value = "blog-image-cache", key = "'image-center-'+#postId")
     public Result getImageForPost(Integer postId, Integer pageIndex, Integer pageSize) {
 
-        if(postMapper.isPostIdExists(postId) == null)
-            return Result.failure(ResultCodeEnum.NOT_FOUNT,"文章 ID " + postId + " 未找到");
-
         //验证用户权限
-        HttpServletRequest request = ContextHolderUtils.getRequest();
-        Integer currentUserId = PublicAuth.authGetUseId(request);
-        Integer postAuthorId =  postMapper.getPostAuthorId(postId);
-        if(currentUserId.intValue() != postAuthorId && (PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, UserPrivileges.PRIVILEGE_MANAGE_MEDIA_CENTER) < AuthCode.SUCCESS))
-            return Result.failure(ResultCodeEnum.FORIBBEN,"无权限管理此文章媒体库");
+        Result authResult = authForPostMediaCenter(postId);
+        if(authResult != null) return authResult;
 
         //读取
         return Result.success(postMediaRepository.findByPostId(postId, PageRequest.of(pageIndex, pageSize)));
@@ -289,7 +305,20 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         return Result.failure(ResultCodeEnum.NOT_IMPLEMENTED);
     }
 
+    private Result authForPostMediaCenter(Integer postId){
+        //验证权限
+        if(postMapper.isPostIdExists(postId) == null)
+            return Result.failure(ResultCodeEnum.NOT_FOUNT,"文章 ID " + postId + " 未找到");
 
+        //验证用户权限
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        Integer currentUserId = PublicAuth.authGetUseId(request);
+        Integer postAuthorId =  postMapper.getPostAuthorId(postId);
+        if(currentUserId.intValue() != postAuthorId && (PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, UserPrivileges.PRIVILEGE_MANAGE_MEDIA_CENTER) < AuthCode.SUCCESS))
+            return Result.failure(ResultCodeEnum.FORIBBEN,"无权限管理此文章媒体库");
+
+        return null;
+    }
     private String bulidImageResourcePath(String hash, String type){
         return imagesStoragePath + "/" + hash + (type.equals("") ? "" : ("." + type));
     }

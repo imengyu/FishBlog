@@ -67,7 +67,7 @@ function initApp() {
                 var t = toast('正在提交中...', 'loading', -1);
 
                 $.ajax({
-                    url: blog_api_address + 'users',
+                    url: address_blog_api + 'users',
                     type: 'post',
                     dataType: 'json',
                     data: JSON.stringify({ 

@@ -30,7 +30,7 @@ var main = new Vue({
       $('title').text('文章归档 ' + this.currentDateShow + ' - ALONE SPACE');
     },
     loadDatePosts: function(){
-      var url = blog_api_address + "posts/page/" + this.currentPostPage + "/10?sortBy=date&byDate=" + this.contentLoadDateY + "-" + this.contentLoadDateM;
+      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/10?sortBy=date&byDate=" + this.contentLoadDateY + "-" + this.contentLoadDateM;
       var oldScrollTop = $('body,html').scrollTop();
       this.currentDateShow =  this.contentLoadDateY + " 年 " + this.contentLoadDateM + " 月 发表的文章";
       this.contentMainLoading = true;

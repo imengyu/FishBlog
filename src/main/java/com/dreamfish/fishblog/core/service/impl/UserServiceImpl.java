@@ -1,5 +1,6 @@
 package com.dreamfish.fishblog.core.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dreamfish.fishblog.core.annotation.RequestAuth;
 import com.dreamfish.fishblog.core.annotation.RequestPrivilegeAuth;
 import com.dreamfish.fishblog.core.entity.User;
@@ -155,7 +156,35 @@ public class UserServiceImpl implements UserService {
      * @param newId 用户新 ID
      */
     @Override
-    public void updateUserId(Integer oldId, Integer newId) {  userMapper.updateUserId(oldId, newId); }
+    public void updateUserId(Integer oldId, Integer newId) { userMapper.updateUserId(oldId, newId); }
+
+    /**
+     * 更新 用户密码
+     * @param passwords 密码参数
+     * @return 返回是否成功
+     */
+    @Override
+    public Result updateUserPassword(Integer userId, JSONObject passwords) {
+
+        //验证是否是当前用户
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        Integer currentUserId = PublicAuth.authGetUseId(request);
+        if(currentUserId.intValue() != userId)
+            return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(), "试图执行未授权操作");
+
+        String oldPassword = passwords.getString("oldPassword");
+        String newPassword = passwords.getString("newPassword");
+
+        if(StringUtils.isBlank(oldPassword) || StringUtils.isBlank(newPassword))
+            return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "密码参数为空");
+
+        String oldPasswordReal = userMapper.getUserPasswordById(userId);
+        if(!oldPassword.equals(oldPasswordReal))
+            return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "旧密码错误");
+
+        userMapper.updateUserPassword(userId, newPassword);
+        return Result.success();
+    }
 
     /**
      * 更新用户信息

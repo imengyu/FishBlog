@@ -494,6 +494,8 @@ Sidebar Open Button - Show or Hide Sidebar
     position: relative;
     height: 100%;
     background-color: rgb(46, 50, 62);
+    background-image: url(/images/background/dashboard-bg.png);
+    background-repeat: no-repeat;
     border:none;
     
     .dashboard-area {
@@ -550,7 +552,7 @@ Sidebar Open Button - Show or Hide Sidebar
             z-index: 200;
             transition: 0.4s;
 
-            background-color: rgba(46, 50, 62, 0.76);
+            //background-color: rgba(46, 50, 62, 0.76);
 
             font-size: 16px;
             padding: 10px;

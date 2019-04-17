@@ -620,15 +620,17 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 
 .image-list { position: relative; padding: 10px; }
 
-.image-list .image-item { position: relative; display: inline-block; border: #000 1px solid; padding: 5px; }
+.image-list .image-item { position: relative; display: inline-block; background-color: #fff; border-radius: 5px; overflow: hidden; margin-right: 10px; -webkit-box-shadow: 8px 14px 38px rgba(39, 44, 49, 0.06), 1px 3px 8px rgba(39, 44, 49, 0.03); box-shadow: 8px 14px 38px rgba(39, 44, 49, 0.06), 1px 3px 8px rgba(39, 44, 49, 0.03); }
 
-.image-list .image-item img { max-width: 100%; height: auto; }
+.image-list .image-item .image-host { max-width: 100%; height: auto; overflow: hidden; }
 
-.image-list .image-item:hover { border: #6195FF 1px solid; }
+.image-list .image-item .image-host img { width: 100%; height: auto; -webkit-transition: all 0.6s; transition: all 0.6s; }
 
-.image-list .image-item .image-box { padding: 5px 1px 1px 1px; }
+.image-list .image-item .image-host img:hover { -webkit-transform: scale(1.4); transform: scale(1.4); }
 
-.image-list .image-item .image-box label { vertical-align: middle; }
+.image-list .image-item .image-box { padding: 10px 15px 15px 15px; }
+
+.image-list .image-item .image-box label { vertical-align: middle; margin-bottom: 0; }
 
 .image-list .image-item .image-box a { margin-left: 7px; float: right; font-size: 16px; }
 
@@ -1560,7 +1562,7 @@ Sidebar Open Button - Show or Hide Sidebar
   .sidebar-open-button-mobile { display: none; } }
 
 /*New Dashborad*/
-.dashboard { position: relative; height: 100%; background-color: #2e323e; border: none; }
+.dashboard { position: relative; height: 100%; background-color: #2e323e; background-image: url(/images/background/dashboard-bg.png); background-repeat: no-repeat; border: none; }
 
 .dashboard .dashboard-area { position: absolute; bottom: 0; left: 0; right: 0; /* side area */ /* content area */ /* side area open */ }
 
@@ -1578,7 +1580,7 @@ Sidebar Open Button - Show or Hide Sidebar
 
 @media (max-width: 576px) { .dashboard .dashboard-area .side-area-switch:after { text-shadow: 5px 0px 5px rgba(39, 44, 49, 0.1); } }
 
-.dashboard .dashboard-area .side-area { display: inline-block; overflow: hidden; overflow-y: scroll; position: absolute; max-height: 100%; top: 0; left: 0; bottom: 0; z-index: 200; -webkit-transition: 0.4s; transition: 0.4s; background-color: rgba(46, 50, 62, 0.76); font-size: 16px; padding: 10px; }
+.dashboard .dashboard-area .side-area { display: inline-block; overflow: hidden; overflow-y: scroll; position: absolute; max-height: 100%; top: 0; left: 0; bottom: 0; z-index: 200; -webkit-transition: 0.4s; transition: 0.4s; font-size: 16px; padding: 10px; }
 
 @media (min-width: 992px) { .dashboard .dashboard-area .side-area { width: 280px; left: -280px; } }
 

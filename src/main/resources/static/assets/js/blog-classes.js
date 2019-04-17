@@ -22,7 +22,7 @@ var main = new Vue({
       }
     },
     loadClassPosts: function(){
-      var url = blog_api_address + "posts/page/" + this.currentPostPage + "/10?sortBy=date&byClass=" + this.contentLoadClass;
+      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/10?sortBy=date&byClass=" + this.contentLoadClass;
       var oldScrollTop = $('body,html').scrollTop();
       this.contentMainLoading = true;
       $.ajax({
@@ -46,7 +46,7 @@ var main = new Vue({
       });
     },
     loadCurrentClassInfo: function(){
-      var classes_url = blog_api_address + "class/" + this.contentLoadClass;
+      var classes_url = address_blog_api + "class/" + this.contentLoadClass;
       $.get(classes_url, function (response) {
         if (response.success) {
           main.contentClass = response.data;

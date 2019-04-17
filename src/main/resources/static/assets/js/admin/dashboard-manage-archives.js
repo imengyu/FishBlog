@@ -238,7 +238,7 @@ function initApp() {
                     if (isConfirm.value) {
 
                         $.ajax({
-                            url: blog_api_address + '/post/' + itemId,
+                            url: address_blog_api + '/post/' + itemId,
                             type: 'delete',
                             success: function (response) {
                               main.tableAllLoadStatus = 'loaded';
@@ -271,7 +271,7 @@ function initApp() {
                     if (isConfirm.value) {
 
                         $.ajax({
-                            url: blog_api_address + '/posts',
+                            url: address_blog_api + '/posts',
                             type: 'delete',
                             data: JSON.stringify(delPosts),
                             contentType: "application/json; charset=utf-8",
@@ -378,7 +378,7 @@ function initApp() {
                     main.tableAllAnyDeleted = false;
                     main.tableAllLoadStatus = 'loading';
                     $.ajax({
-                        url: blog_api_address + '/posts/page/' + (main.tableAllPageCurrent - 1) + '/' + main.tableAllPageSize + '?sortBy=date&byStatus=all&byUser=' + (main.tableAllShowAllUserArchive ? '0' : main.currentUser.id),
+                        url: address_blog_api + 'posts/page/' + (main.tableAllPageCurrent - 1) + '/' + main.tableAllPageSize + '?sortBy=date&byStatus=all&byUser=' + (main.tableAllShowAllUserArchive ? '0' : main.currentUser.id),
                         success: function (response) {
                           main.tableAllLoadStatus = 'loaded';
                           if (response.success) {
@@ -392,7 +392,7 @@ function initApp() {
                     main.tablePublishAnyDeleted = false;
                     main.tablePublishLoadStatus = 'loading';
                     $.ajax({
-                        url: blog_api_address + '/posts/page/' + (main.tablePublishPageCurrent - 1) + '/' + main.tablePublishPageSize + '?sortBy=date&byStatus=publish&byUser=' + main.currentUser.id,
+                        url: address_blog_api + 'posts/page/' + (main.tablePublishPageCurrent - 1) + '/' + main.tablePublishPageSize + '?sortBy=date&byStatus=publish&byUser=' + main.currentUser.id,
                         success: function (response) {
                           main.tablePublishLoadStatus = 'loaded';
                           if (response.success) {
@@ -406,7 +406,7 @@ function initApp() {
                     main.tableDraftAnyDeleted = false;
                     main.tableDraftLoadStatus = 'loading';
                     $.ajax({
-                        url: blog_api_address + '/posts/page/' + (main.tableDraftPageCurrent - 1) + '/' + main.tableDraftPageSize + '?sortBy=date&byStatus=draft&byUser=' + main.currentUser.id,
+                        url: address_blog_api + 'posts/page/' + (main.tableDraftPageCurrent - 1) + '/' + main.tableDraftPageSize + '?sortBy=date&byStatus=draft&byUser=' + main.currentUser.id,
                         success: function (response) {
                           main.tableDraftLoadStatus = 'loaded';
                           if (response.success) {

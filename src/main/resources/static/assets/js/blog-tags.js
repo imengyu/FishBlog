@@ -22,8 +22,8 @@ var main = new Vue({
       this.loadTagPosts();
     },
     loadTagPosts: function(){
-      var url = blog_api_address + "posts/page/" + this.currentPostPage + "/20?sortBy=date&onlyTag=" + this.contentLoadTag;
-      var tags_url = blog_api_address + "tags";
+      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/20?sortBy=date&onlyTag=" + this.contentLoadTag;
+      var tags_url = address_blog_api + "tags";
       var oldScrollTop = $('body,html').scrollTop();
       this.contentMainLoading = true;
       $.ajax({

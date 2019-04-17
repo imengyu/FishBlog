@@ -16,7 +16,13 @@
                             <div class="invalid-feedback">请输入用户友好名字 ！</div>
                         </div>
                     </div>
-                    
+
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userCardBackground" class="mt-2">用户组</label>
+                        </div>
+                        <div class="form-group col-md-9" v-html="getLevelCurrentUser()"></div>
+                    </div>
                     <div class="form-row">
                         <div class="form-group col-md-3 text-right-md">
                             <label for="userEmail" class="mt-2">头像</label>
@@ -81,7 +87,15 @@
                             <input type="text" class="form-control" id="userCardBackground" v-model="currentUser.cardBackground">
                         </div>
                     </div>
-
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-right-md">
+                            <label for="userCardBackground" class="mt-2">我的权限</label>
+                        </div>
+                        <div class="form-group col-md-9" v-html="getPrivilegeCurrentUser()">
+                            
+                        </div>
+                    </div>
+                    
                     <button type="button" class="btn btn-primary mt-3" v-on:click="submit()">修改信息</button><button type="button" class="btn btn-secondary mt-3 ml-2" onclick="location.href='/user/change-passwd/' ">修改密码</button>
                 </form>
 

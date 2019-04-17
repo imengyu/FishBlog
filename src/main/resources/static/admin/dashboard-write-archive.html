@@ -262,10 +262,12 @@
                                 v-bind:items="mediaCenterItems" 
                                 v-bind:loaded-status="mediaCenterLoadStatus"
                                 v-bind:null-text="'当前文章还没有图片资源，点击下方按钮添加'"
-                                v-bind:image-width="'170px'"
-                                v-bind:image-width="'100px'"
+                                v-bind:image-width="'250px'"
                                 v-on:add-click="mediaListAdd"
-                                v-on:delete-click="mediaListDelete">
+                                v-on:delete-click="mediaListDelete"
+                                v-on:show-click="mediaListShowBig"
+                                v-on:edit-click="mediaListEditTitle"
+                                v-on:copylink-click="mediaListCopyLink">
 
                             </common-image-list>
                             <common-pagination ref="tablePaginationMediaCenterList" v-bind:current-page="mediaCenterPageCurrent"
@@ -273,10 +275,36 @@
                                 v-on:page-size-changed="mediaCenterListPageSizeChanged">
                             </common-pagination>
 
+                            <div class="modal fade" id="editMediaImageDlg" tabindex="-1" role="dialog" aria-label="editMediaImageDlgTitle" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <p class="h5 modal-title" id="editMediaImageDlgTitle">编辑图片标题</p>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="关闭">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form v-if="mediaCenterCurrentEditItem">
+                                                <div class="form-group">
+                                                    <label for="medial_title">图片标题：</label>
+                                                    <input type="text" class="form-control" id="medial_title" name="medial_title" v-model="mediaCenterCurrentEditItem.title">
+                                                    <div class="invalid-feedback">图片标题</div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="mediaListEditTitleSave()">保存</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <input type="file" name="uploadImage" id="uploadImage" accept="image/jpg, image/jpeg" aria-hidden="true" style="display: none;" v-on:change="changeUploadImage(true)">
                             <button v-if="" type="button" class="btn btn-success mr-2"
                                 v-on:click="uploadImage()"><i class="fa fa-plus"></i> 添加图片</button>
+                            <input type="text" name="copyText" id="copyText" aria-hidden="true" style="opacity:0;">
+                            <input type="file" name="uploadImage" id="uploadImage" accept="image/jpg, image/jpeg" aria-hidden="true" style="display: none;" v-on:change="changeUploadImage(true)">
                         </div><div v-else-if="mediaCenterLoadStatus=='failed'">
                             <div class="text-center mt-3 mb-3"><i class="fa fa-times mr-3 text-danger"></i>加载失败</div>
                         </div>

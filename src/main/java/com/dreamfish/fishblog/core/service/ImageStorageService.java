@@ -1,5 +1,6 @@
 package com.dreamfish.fishblog.core.service;
 
+import com.dreamfish.fishblog.core.entity.PostMedia;
 import com.dreamfish.fishblog.core.utils.Result;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,6 +14,7 @@ public interface ImageStorageService {
     Result getImageForPost(Integer postId, Integer pageIndex, Integer pageSize);
     Result deleteImage(String hash, String type) throws IOException;
     Result deleteImageForPost(Integer postId, String hash) throws IOException;
+    Result updateImageForPost(Integer postId, String hash, PostMedia media) throws IOException;
     Result uploadImage(MultipartFile file) throws IOException;
     Result uploadImageForPost(MultipartFile file, Integer postId) throws IOException;
     Result uploadImageForUserHead(MultipartFile file, Integer userId) throws IOException;

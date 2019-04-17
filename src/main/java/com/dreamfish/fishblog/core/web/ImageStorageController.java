@@ -3,6 +3,7 @@ package com.dreamfish.fishblog.core.web;
 import com.dreamfish.fishblog.core.annotation.RequestAuth;
 import com.dreamfish.fishblog.core.annotation.RequestPrivilegeAuth;
 import com.dreamfish.fishblog.core.config.ConstConfig;
+import com.dreamfish.fishblog.core.entity.PostMedia;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.service.ImageStorageService;
@@ -140,6 +141,16 @@ public class ImageStorageController {
         return imageStorageService.uploadImageForPost(imageFile, postId);
     }
 
+    //为文章图片设置标题
+    @PutMapping("/images/post/{postId}/{hash}")
+    @ResponseBody
+    @RequestAuth(value = User.LEVEL_WRITER)
+    public Result updateImageForPost(
+            @PathVariable("postId") Integer postId,
+            @PathVariable("hash") String hash,
+            @RequestBody PostMedia media) throws IOException {
+        return imageStorageService.updateImageForPost(postId, hash, media);
+    }
     //为文章删除图片
     @DeleteMapping("/images/post/{postId}/{hash}")
     @ResponseBody

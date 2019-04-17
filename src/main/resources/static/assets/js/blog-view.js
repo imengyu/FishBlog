@@ -27,7 +27,7 @@ var main = new Vue({
             if (currentPostPage == null) currentPostPage = getLastUrlAgrs(location.href).arg;
             this.currentPostIdOrName = currentPostPage;
             if (!isNullOrEmpty(this.currentPostIdOrName) && currentPostPage != 'post') {
-                var url = blog_api_address + "post/" + this.currentPostIdOrName;
+                var url = address_blog_api + "post/" + this.currentPostIdOrName;
                 this.isLoading = true;
                 $.ajax({
                     url: url,
@@ -243,7 +243,7 @@ var main = new Vue({
         updateViewCount: function(){
             setTimeout(function () {
                 if(document.referrer!=document.location.toString())
-                    $.get(blog_api_address + "post/updateViewCount?id=" + main.currentPostId);
+                    $.get(address_blog_api + "post/updateViewCount?id=" + main.currentPostId);
             },1500)
         },
 

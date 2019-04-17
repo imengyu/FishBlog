@@ -74,7 +74,7 @@ function initErrorInfo(){
 function login(){
 	var userName = $('#log_usrname').val();
 	var psw = $('#log_psw').val();
-	var url = blog_api_address + "auth";
+	var url = address_blog_api + "auth";
 
     if(loginSending) return;
 	
@@ -84,6 +84,7 @@ function login(){
 	})
 
 	var reshowLog = function(){
+		loginSending = false;
 		$('#logon_form').fadeIn(200, function(){
 			$('#log_sending').fadeOut();
 		})
@@ -142,7 +143,7 @@ function loginGithub(){
 		focusConfirm: true, //聚焦到确定按钮
 		showCloseButton: true,//右上角关闭
 	})
-	location.href = 'https://github.com/login/oauth/authorize?client_id=d31012693b9ba3773cde&scope=user&redirect_uri=' + encodeURI(getCurrentFullHost() + blog_api_address + 'auth/githubAuthCallback/user');
+	location.href = 'https://github.com/login/oauth/authorize?client_id=d31012693b9ba3773cde&scope=user&redirect_uri=' + encodeURI(getCurrentFullHost() + address_blog_api + 'auth/githubAuthCallback/user');
 }
 function loginWeiXin(){
 	swal("暂不支持微信登录", "敬请期待", "info");

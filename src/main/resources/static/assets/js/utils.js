@@ -67,13 +67,13 @@ function getPostPrefix(prefixId){
 }
 function getImageUrlFormHash(str){
   if(str && str.indexOf('http') == 0) return str;
-  else if(str) return image_center_address + str + ".jpg";
+  else if(str) return address_image_center + str + ".jpg";
   else return str;
 }
 function getImageUrlFormHashWithType(hash, type){
   var ftype = type ? type : 'jpg';
   if(hash && hash.indexOf('http') == 0) return hash;
-  else if(hash) return image_center_address + hash + "." + ftype;
+  else if(hash) return address_image_center + hash + "." + ftype;
   else return hash;
 }
 function getPostRealUrl(post){

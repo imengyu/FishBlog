@@ -81,7 +81,7 @@ public class UserController {
     public Result deleteUser(@PathVariable("userId") @NonNull Integer userId){ return userService.deleteUser(userId); }
 
 
-    //用户信息修改
+    //用户修改
     @PutMapping("/user/{userId}")
     @ResponseBody
     public Result updateUser(@RequestBody UserExtened user){ return userService.updateUser(user); }
@@ -94,6 +94,11 @@ public class UserController {
     public Result banUser(@PathVariable("userId") Integer userId) {
         return userService.userUpdateBan(userId, true);
     }
+
+    //用户修改密码
+    @PostMapping("/user/{userId}/password")
+    @ResponseBody
+    public Result updateUserPassword(@PathVariable("userId") Integer userId, @RequestBody JSONObject user){ return userService.updateUserPassword(userId, user); }
 
     //封禁用户
     @PostMapping("/user/{userId}/unban")

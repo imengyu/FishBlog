@@ -1,6 +1,5 @@
 package com.dreamfish.fishblog.core.repository;
 
-import com.dreamfish.fishblog.core.entity.Post;
 import com.dreamfish.fishblog.core.entity.PostSimple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

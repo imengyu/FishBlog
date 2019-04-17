@@ -2,15 +2,13 @@ var main;
 
 function initAuthInfoEnd(user) {
     main.userInfoLoaded = true;
-    if (user && (getUserHasPrivilege(user, userPrivileges.manageUsers) || user.level == userLevels.admin)) {
-        if (user.level == userLevels.admin || (user.privilege & userPrivileges.manageAllArchives) != 0)
-            main.userHasManagePrivilege = true;
+    if (user){
         main.currentUser = user;
         setTimeout(function () {
             if (user.gender == "男") {
                 $('#radioMale').prop('checked', true);
             } else if (user.gender == "女") {
-                $('#radioFemale').prop('checked', false);
+                $('#radioFemale').prop('checked', true);
             }
         }, 500)
     } else
@@ -43,10 +41,12 @@ function initApp() {
             uploadFile() {
                 var avatar = document.getElementById("avatar");
                 var fileObj = avatar.files[0]; // js 获取文件对象
-                var url = blog_api_address + 'user/' + main.currentUser.id + '/head';
+                var url = address_blog_api + 'user/' + main.currentUser.id + '/head';
+                var t = toast('正在上传...', 'loading', -1);
 
                 //上传成功响应
                 var uploadComplete = function (evt) {
+                    toastClose(t);
                     //服务断接收完文件返回的结果
                     var data = JSON.parse(evt.target.responseText);
                     if (data.success) {
@@ -58,6 +58,7 @@ function initApp() {
                 }
                 //上传失败
                 var uploadFailed = function uploadFailed(evt) {
+                    toastClose(t);
                     toast('上传头像失败！请检查您的网络', 'error', 5000);
                 }
 
@@ -95,7 +96,7 @@ function initApp() {
                 var t = toast('正在提交中...', 'loading', -1);
 
                 $.ajax({
-                    url: blog_api_address + 'user/' + main.currentUser.id + '',
+                    url: address_blog_api + 'user/' + main.currentUser.id + '',
                     type: 'put',
                     dataType: 'json',
                     data: JSON.stringify(main.currentUser),
@@ -113,7 +114,33 @@ function initApp() {
                 });
 
             },
+            getLevelCurrentUser(){
 
+                var html = '';
+                var user = main.currentUser;
+                if(user.level == userLevels.admin) html = '<span class="tag-post-prefix bg-danger">管理员</span>';
+                else if(user.level == userLevels.writer) html = '<span class="tag-post-prefix bg-primary">作者</span>';
+                else if(user.level == userLevels.guest) html = '<span class="tag-post-prefix bg-success">游客</span>';
+                else if(user.level == 0) html = '<span class="tag-post-prefix bg-secondary">已封禁</span>';
+                return html;
+            },
+            getPrivilegeCurrentUser(){
+
+                var html = '';
+                var user = main.currentUser;
+
+                if(user.level == userLevels.admin){
+                    html += '<div class="tag-mgr-item bg-dark text-white cursor-pointer pr-3">管理员拥有所有权限</div>';
+                }else{
+                    if(getUserHasPrivilege(user, userPrivileges.manageAllArchives)) html += '<div class="tag-mgr-item bg-danger text-white cursor-pointer pr-3">管理所有文章权限</div>';
+                    if(getUserHasPrivilege(user, userPrivileges.manageClassAndTags)) html += '<div class="tag-mgr-item bg-primary text-white cursor-pointer pr-3">管理分类标签权限</div>';
+                    if(getUserHasPrivilege(user, userPrivileges.manageMediaCenter)) html += '<div class="tag-mgr-item bg-info text-white cursor-pointer pr-3">管理媒体库权限</div>';
+                    if(getUserHasPrivilege(user, userPrivileges.manageUsers)) html += '<div class="tag-mgr-item bg-dark text-white cursor-pointer pr-3">管理其他用户权限</div>';
+                    if(getUserHasPrivilege(user, userPrivileges.gaintPrivilege)) html += '<div class="tag-mgr-item bg-primary text-white cursor-pointer pr-3">授予用户权限权限</div>';
+                    if(getUserHasPrivilege(user, userPrivileges.globalSettings)) html += '<div class="tag-mgr-item bg-warning text-white cursor-pointer pr-3">修改系统设置权限</div>';
+                }
+                return html;
+            },
 
         }
     });

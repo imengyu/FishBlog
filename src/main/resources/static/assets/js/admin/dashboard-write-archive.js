@@ -5,6 +5,7 @@ appendLoaderCSS("/assets/libs/editormd/css/editormd.min.css");
 appendLoaderJS("/assets/js/components/common-table.min.js");
 appendLoaderJS("/assets/js/components/common-pagination.min.js");
 appendLoaderJS("/assets/js/components/common-image-list.min.js");
+appendLoaderJS("/assets/libs/BigPicture/BigPicture.min.js");
 
 var main;
 
@@ -98,6 +99,9 @@ function initApp() {
             mediaCenterPageCurrent: 1,
             mediaCenterPageAll: 1,
             mediaCenterPageSize: 10,
+
+            mediaCenterCurrentEditItem: null,
+            mediaCenterCurrentEditItemOldTitle: '',
 
             mdEditor: null,
         },
@@ -279,7 +283,7 @@ function initApp() {
                     main.archiveLoadStatus = 'loading';
 
                     //下载文章完整内容
-                    var url = blog_api_address + "post/" + currentPostPage + "?authPrivate=true";
+                    var url = address_blog_api + "post/" + currentPostPage + "?authPrivate=true";
                     $.ajax({
                         url: url,
                         success: function (response) {
@@ -321,7 +325,7 @@ function initApp() {
             loadClasses(fromAuto) {
                 this.classesLoading = true;
                 setTimeout(function () {
-                    $.get(blog_api_address + "classes", function (response) {
+                    $.get(address_blog_api + "classes", function (response) {
                         if (response.success) {
                             main.contentClasses = response.data;
                             main.classesLoading = false;
@@ -333,7 +337,7 @@ function initApp() {
             loadTags(fromAuto) {
                 this.tagsLoading = true;
                 setTimeout(function () {
-                    $.get(blog_api_address + "tags", function (response) {
+                    $.get(address_blog_api + "tags", function (response) {
                         if (response.success) {
                             main.contentTags = response.data;
                             main.tagsLoading = false;
@@ -347,7 +351,7 @@ function initApp() {
                 if (!main.isNew && (main.tableCommentAllLoadStatus != 'loaded' || force)) {
                     main.tableCommentAllLoadStatus = 'loading';
 
-                    var url = blog_api_address + "post/" + main.archiveId + "/comments/" + (main.tableCommentAllPageCurrent - 1) + "/" + main.tableCommentAllPageSize;
+                    var url = address_blog_api + "post/" + main.archiveId + "/comments/" + (main.tableCommentAllPageCurrent - 1) + "/" + main.tableCommentAllPageSize;
                     //Load comments
                     $.ajax({
                         url: url,
@@ -366,7 +370,7 @@ function initApp() {
                 if (!main.isNew && (main.mediaCenterLoadStatus != 'loaded' || force)) {
                     main.tableCommentAllLoadStatus = 'loading';
 
-                    var url = blog_api_address + "images/post/" + main.archiveId + "/" + (main.mediaCenterPageCurrent - 1) + "/" + main.mediaCenterPageSize;
+                    var url = address_blog_api + "images/post/" + main.archiveId + "/" + (main.mediaCenterPageCurrent - 1) + "/" + main.mediaCenterPageSize;
                     //Load comments
                     $.ajax({
                         url: url,
@@ -414,7 +418,7 @@ function initApp() {
                     }).then((isConfirm) => {
                         if (isConfirm.value) {
 
-                            var url = blog_api_address + "post/" + main.archiveId + "/comments/" + item.id;
+                            var url = address_blog_api + "post/" + main.archiveId + "/comments/" + item.id;
                             $.ajax({
                                 url: url,
                                 type: 'delete',
@@ -443,7 +447,7 @@ function initApp() {
                         cancelButtonText: "取消", focusCancel: true, reverseButtons: true
                     }).then((isConfirm) => {
                         if (isConfirm.value) {
-                            var url = blog_api_address + "post/" + main.archiveId + "/comments";
+                            var url = address_blog_api + "post/" + main.archiveId + "/comments";
                             $.ajax({
                                 url: url,
                                 type: 'delete',
@@ -468,21 +472,94 @@ function initApp() {
 
 
             //媒体库事件
-            mediaListAdd(item){
+            mediaListAdd(link, title){
+               
+                if(!title)title='';
+                if(main.archiveType == 'markdown'){
+                    $('#marchives-tab li:first-child a').tab('show')
 
+                    var objStart = '!['+title+']('+ link+' "'+title+'")'
+                    if(main.mdEditor.cm.somethingSelected()){
+                        var old = main.mdEditor.cm.getSelection();
+                        main.mdEditor.cm.replaceSelection(objStart + old);
+                    }
+                    else main.mdEditor.cm.replaceSelection(objStart);
+                    setTimeout(function(){
+                        main.mdEditor.cm.refresh();
+                    },300)
+                    
+                }else if(main.archiveType == 'html'){
+
+                    $('#marchives-tab li:first-child a').tab('show')
+                    main.$refs.fishHtmlEditor.insertOrReplace('<div class="pgc-img"><img src="'+link+'" alt="'+title+'"><p class="pgc-img-caption">'+title+'</p></div>', null, false, true)
+                    
+                }else toast('纯文本文章无法插入图片哦！','info', 5000);
+            },
+            mediaListEditTitle(item){
+                this.mediaCenterCurrentEditItem = item;
+                this.mediaCenterCurrentEditItemOldTitle = item.title;
+                $('#editMediaImageDlg').modal('show');
+            },
+            mediaListEditTitleSave(){
+                if(this.mediaCenterCurrentEditItem) {
+
+                    $.ajax({
+                        url: address_blog_api + "images/post/" + main.archiveId + '/' + main.mediaCenterCurrentEditItem.hash,
+                        type: "put",
+                        data: JSON.stringify(main.mediaCenterCurrentEditItem),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (dataObj) {
+                            if (dataObj.success) {
+                                //重新刷新返回的数据
+                                main.mediaCenterCurrentEditItem = dataObj.data;
+                                toast('更新图片标题成功！','success');
+                            }
+                            else swal("抱歉！上传失败了!", "提交时发生了错误 " + dataObj.message, "error");
+                        },
+                        error: function (e) { swal("抱歉！上传失败了!", "提交时发生了错误 " + e.statusText, "error"); }
+                    });
+
+                    this.mediaCenterCurrentEditItem = null;
+                }
+            },
+            mediaListShowBig(el, item){
+                BigPicture({
+                    el: el.get(0),
+                    imgSrc: getImageUrlFormHashWithType(item.hash, item.type)
+                });
             },
             mediaListDelete(item){
                 Swal.fire({
-                    type: 'warning', title: '真的要放删除这张图片吗', text: "它将会彻底删除", confirmButtonColor: '#d33', confirmButtonText: '确定',
+                    type: 'warning', title: '真的要删除这张图片吗', html: "它将会彻底删除，<br/>注意：在文章中的图片引用需要您<span class=\"text-primary\">手动</span>删除", confirmButtonColor: '#d33', confirmButtonText: '确定',
                     showCancelButton: true, cancelButtonColor: '#3085d6',
                     cancelButtonText: "取消", focusCancel: true, reverseButtons: true
                 }).then((isConfirm) => {
                     if (isConfirm.value) {
-
-                        toast('已将文章恢复为修改前状态', 'success')
+                        $.ajax({
+                            url: address_blog_api + "images/post/" + main.archiveId + '/' + item.hash,
+                            type: "delete",
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (dataObj) {
+                                if (dataObj.success) {
+                                    main.loadMediaCenter(true);
+                                    toast('删除图片成功！','success');
+                                }
+                                else swal("抱歉！删除失败了!", "提交时发生了错误 " + dataObj.message, "error");
+                            },
+                            error: function (e) { swal("抱歉！删除失败了!", "提交时发生了错误 " + e.statusText, "error"); }
+                        });
                     }
                 });
             },
+            mediaListCopyLink(link){
+                $('#copyText').val(link).focus().select();
+	            if (document.execCommand('copy', false, null)) {
+                    toast('复制链接成功！您可以直接在文章中粘贴使用', 'success', 4500);
+	            }else toast('无法复制链接，您可以右键点击图片，选择复制图片链接', 'error', 7500);
+            },
+
             //
             mediaCenterListPagerClick(item) {
                 if (main.mediaCenterPageCurrent != item) {
@@ -498,7 +575,39 @@ function initApp() {
                 }
             },
             changeUploadImage(){
+                var uploadImage = document.getElementById("uploadImage");
+                var fileObj = uploadImage.files[0]; // js 获取文件对象
+                var url = address_blog_api + 'images/post/' + main.archiveId;
+                var t = toast('正在上传...', 'loading', -1);
 
+                //上传成功响应
+                var uploadComplete = function (evt) {
+                    toastClose(t);
+                    //服务断接收完文件返回的结果
+                    var data = JSON.parse(evt.target.responseText);
+                    if (data.success) {
+                        //设置 新返回的 图片 hash 值
+                        main.loadMediaCenter(true);
+                        toast('上传图片成功！', 'success', 5000);
+                    }
+                    else toast('上传图片失败！' + data.message + ' ( ' + data.extendCode + ' )', 'error', 5000);
+                }
+                //上传失败
+                var uploadFailed = function uploadFailed(evt) {
+                    toastClose(t);
+                    toast('上传图片失败！请检查您的网络', 'error', 5000);
+                }
+
+                var form = new FormData(); // FormData 对象
+                form.append("file", fileObj); // 文件对象
+
+                xhr = new XMLHttpRequest();  // XMLHttpRequest 对象
+                xhr.open("post", url, true); //post方式，url为服务器请求地址，true 该参数规定请求是否异步处理。
+                xhr.onload = uploadComplete; //请求完成
+                xhr.onerror = uploadFailed; //请求失
+                xhr.send(form); //开始上传，发送form数据
+
+                uploadImage.value = '';
             },
             uploadImage(){ $('#uploadImage').click() },
 
@@ -558,7 +667,7 @@ function initApp() {
 
                     //提交
                     if (main.isNew) {
-                        var url = blog_api_address + "post";
+                        var url = address_blog_api + "post";
                         //POST 新的条目
                         $.ajax({
                             url: url,
@@ -583,7 +692,7 @@ function initApp() {
                             error: function (e) { successCallback(false); swal("抱歉！发表失败了!", "提交时发生了错误 " + e.statusText, "error"); }
                         });
                     } else {
-                        var url = blog_api_address + "post/" + main.archiveId;
+                        var url = address_blog_api + "post/" + main.archiveId;
                         //PUT 更新条目
                         $.ajax({
                             url: url,

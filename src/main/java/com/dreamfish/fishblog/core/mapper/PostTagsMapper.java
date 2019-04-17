@@ -49,10 +49,6 @@ public interface PostTagsMapper {
 
     /**
      * 更新文章标签
-     * @param id 文章标签 ID
-     * @param name 文章标签名字
-     * @param color 文章标签颜色，例如 FFFFFF
-     * @return
      */
     @Update("UPDATE fish_post_tags SET name =#{tag.name},color=#{tag.color} where id=#{tag.id}")
     void updateTag(@Param("tag") PostTag tag);

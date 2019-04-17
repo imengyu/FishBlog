@@ -19,6 +19,7 @@ var loadedJsCount = 0;
 var loadingJsIndex = 0;
 var loadedCssCount = 0;
 
+var localDebug = false;
 var uidz = 1123493;
 var uidg = 15;
 
@@ -232,6 +233,9 @@ function loaderFinish(click) {
         //Init blog
         blogInitnaize();
 
+        //发送用户浏览页面数据PV
+        sendStat();
+
         //Call back
         loaderCallcallbacks(loader_finish_callback);
         
@@ -435,6 +439,31 @@ function blogInitnaize() {
     */
 }
 
+//PV更新
+function isStatExclude(path){
+    for(var expath in excludeStatPath){
+        if(path.indexOf(excludeStatPath[expath]) == 0) return true;
+    }
+}
+function sendStat(){
+    if(sendStats){
+        if(document.referrer!=document.location.toString() && !isStatExclude(location.pathname)){
+
+            $.ajax({
+                url: address_blog_api + 'stat',
+                type: 'post',
+                dataType: 'json',
+                data: JSON.stringify({ "url": document.location.toString() }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                  main.tableUsersLoadStatus = 'loaded';
+                  if (!response.success) toast('发送计数数据失败 : ' + response.message, 'error', 5000);
+                }, error: function (xhr, err) {toast('发送计数数据失败 : ' + err, 'error', 5000); }
+            });
+        }
+    }
+}
 
 //===============
 

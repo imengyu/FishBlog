@@ -225,24 +225,37 @@
 
         position: relative;
         display: inline-block;
-        border: #000 1px solid;
-        padding: 5px;
+        background-color: #fff;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-right: 10px;
+    
+        @include dirty-shadow;
 
-        img {
+        .image-host {
+
             max-width: 100%;
             height: auto;
-        }
+            overflow: hidden;
 
-        &:hover {
-            border: $highlight-color 1px solid;
+            img {
+                width: 100%;
+                height: auto;
+                transition: all 0.6s;
+    
+                &:hover {
+                    transform: scale(1.4);
+                }
+            }
         }
 
         .image-box{
 
-            padding: 5px 1px 1px 1px;
+            padding: 10px 15px 15px 15px;
 
             label {
                 vertical-align: middle;
+                margin-bottom: 0;
             }
 
             a {

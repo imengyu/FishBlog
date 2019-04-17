@@ -3,17 +3,15 @@ package com.dreamfish.fishblog.core.utils.request;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class IpUtil {
     /**
      * 获取用户IP地址
      * @param request 请求
-     * @return
+     * @return 返回用户IP地址
      */
     public static String getIpAddr(HttpServletRequest request) {
-        String ipAddress = null;
+        String ipAddress;
         try {
             ipAddress = request.getHeader("x-forwarded-for");
             if (StringUtils.isEmpty(ipAddress) || "unknown".equalsIgnoreCase(ipAddress)) {

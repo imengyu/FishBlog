@@ -107,7 +107,7 @@ function initApp() {
             loadTags() {
                 this.tagsLoading = true;
                 setTimeout(function () {
-                    $.get(blog_api_address + "tags", function (response) {
+                    $.get(address_blog_api + "tags", function (response) {
                         if (response.success) {
                             main.contentTags = response.data;
                             main.tagsLoading = false;
@@ -120,7 +120,7 @@ function initApp() {
                 if (main.tableClassesLoadStatus != 'loaded' || force) {
                     main.tableClassesLoadStatus = 'loading';
 
-                    var url = blog_api_address + "classes/" + (main.tableClassesPageCurrent - 1) + "/" + main.tableClassesPageSize;
+                    var url = address_blog_api + "classes/" + (main.tableClassesPageCurrent - 1) + "/" + main.tableClassesPageSize;
                     //Load comments
                     $.ajax({
                         url: url,
@@ -145,7 +145,7 @@ function initApp() {
                 if (isDlg) {                  
                     if(isNullOrEmpty(main.currentAddTagName)) return;
                     $('#addTagDlg').modal('hide');
-                    var url = blog_api_address + "tag";
+                    var url = address_blog_api + "tag";
                     //POST 新的条目
                     $.ajax({
                         url: url,
@@ -187,7 +187,7 @@ function initApp() {
                 if (isDlg) {
                     if(isNullOrEmpty(main.currentAddTagName)) return;
                     $('#addTagDlg').modal('hide');
-                    var url = blog_api_address + "tag/" + id;
+                    var url = address_blog_api + "tag/" + id;
                     //PUT 新的条目
                     $.ajax({
                         url: url,
@@ -241,7 +241,7 @@ function initApp() {
                     cancelButtonText: "取消", focusCancel: true, reverseButtons: true
                 }).then((isConfirm) => {
                     if (isConfirm.value) {
-                        var url = blog_api_address + "tag/" + id;
+                        var url = address_blog_api + "tag/" + id;
                         $.ajax({
                             url: url,
                             type: "delete",
@@ -273,7 +273,7 @@ function initApp() {
                         || isNullOrEmpty(main.currentAddClassUrlName)
                     ) return;
                     $('#addClassDlg').modal('hide');
-                    var url = blog_api_address + "class";
+                    var url = address_blog_api + "class";
                     //POST 新的条目
                     $.ajax({
                         url: url,
@@ -320,7 +320,7 @@ function initApp() {
                 if (isDlg) {
                     if(isNullOrEmpty(main.currentAddClassTitle)) return;
                     $('#addClassDlg').modal('hide');
-                    var url = blog_api_address + "class/" + id;
+                    var url = address_blog_api + "class/" + id;
                     //PUT 新的条目
                     $.ajax({
                         url: url,
@@ -380,7 +380,7 @@ function initApp() {
                     cancelButtonText: "取消", focusCancel: true, reverseButtons: true
                 }).then((isConfirm) => {
                     if (isConfirm.value) {
-                        var url = blog_api_address + "class/" + id;
+                        var url = address_blog_api + "class/" + id;
                         $.ajax({
                             url: url,
                             type: "delete",
@@ -407,7 +407,7 @@ function initApp() {
                     if (isConfirm.value) {
 
                         $.ajax({
-                            url: blog_api_address + '/classes',
+                            url: address_blog_api + '/classes',
                             type: 'delete',
                             data: JSON.stringify(delPosts),
                             contentType: "application/json; charset=utf-8",

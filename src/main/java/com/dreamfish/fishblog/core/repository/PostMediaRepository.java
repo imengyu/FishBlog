@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Repository
@@ -30,6 +31,7 @@ public interface PostMediaRepository extends JpaRepository<PostMedia, Integer> {
      * @param postId 文章 ID
      * @param hash HASH
      */
+    @Transactional
     void deleteByPostIdAndHash(Integer postId, String hash);
 
     /**
@@ -39,4 +41,12 @@ public interface PostMediaRepository extends JpaRepository<PostMedia, Integer> {
      * @return 返回分页数据
      */
     Page<PostMedia> findByPostId(Integer postId, Pageable pageable);
+
+    /**
+     * 查找指定文章的指定hash资源
+     * @param postId 文章 ID
+     * @param hash 资源hash
+     * @return 返回记录
+     */
+    PostMedia findByPostIdAndHash(Integer postId, String hash);
 }

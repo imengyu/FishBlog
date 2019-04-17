@@ -1,8 +1,12 @@
-var blog_api_address = "/api/v1/";
-//var image_center_address = 'https://images.imyzc.com/';
-var image_center_address = 'http://images.localhost.com/';
-var localDebug = true;
-var https = false;
+//URLs
+//静态路径
+
+var address_blog_api = "/api/v1/"; //后端api地址，可选择前端与后端分离，可以处于不同主机上，但是服务器需要设置跨域
+var address_image_center = 'https://images.imyzc.com/'; //图片静态读取路径，推荐使用nginx开一个新子站专门存放图片
+//var address_image_center = 'http://images.localhost.com/';
+
+//Constracts
+//常量
 
 var partPositions = {
     viewAll: "/archives/",
@@ -32,3 +36,16 @@ var archiveStatus = {
     PRIVATE: 0,
     DRAFT: 2,
 }
+
+var excludeStatPath = [
+    '/sign-in/',
+    '/sign-out/',
+    '/admin/',
+]
+
+//Settings
+//设置
+
+var sendStats = true; // 是否发送用户浏览数据
+var anonymousComment = true; // 允许匿名评论
+

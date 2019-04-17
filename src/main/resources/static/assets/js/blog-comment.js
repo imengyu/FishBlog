@@ -35,6 +35,7 @@ Vue.component('commenter', {
             isEditing: true,
             currentPreviewItem: null,
             currentEditComment: "",
+            loginGithubContentTipShowed: false,
 
             allCommentPage: 0,
             currentCommentPage: 0,
@@ -78,7 +79,7 @@ Vue.component('commenter', {
             if(last_cm_mail_notify != null && last_cm_mail_notify == 'true') $('#comment_replyformail').prop("checked", 'checked');
              
             var main = this;
-            var url = blog_api_address + "auth/auth-test";
+            var url = address_blog_api + "auth/auth-test";
             $.ajax({
                 url: url,
                 success: function (response) {
@@ -114,7 +115,7 @@ Vue.component('commenter', {
                 $('[data-toggle="tooltip"]').tooltip();
             }
 
-            var url = blog_api_address + "post/" + this.currentPostId + "/comments/" + this.currentCommentPage + "/15";
+            var url = address_blog_api + "post/" + this.currentPostId + "/comments/" + this.currentCommentPage + "/15";
            
             //Load comments
             $.ajax({
@@ -271,7 +272,7 @@ Vue.component('commenter', {
                 "commentContent": base64.encode(content)
             };
 
-            var url = blog_api_address + "post/" + id + "/comments";
+            var url = address_blog_api + "post/" + id + "/comments";
             $.ajax({
                 url: url,
                 type: "post",
@@ -335,7 +336,7 @@ Vue.component('commenter', {
                 main.requestingUserInfo[id] = true;
                 main.requestingUserInfoCount++;
                 $.ajax({
-                    url: blog_api_address + "user/" + id,
+                    url: address_blog_api + "user/" + id,
                     success: function (response) {
                         main.requestingUserInfo[id] = undefined;
                         main.requestingUserInfoCount--;
@@ -354,6 +355,11 @@ Vue.component('commenter', {
         //https://github.com/login/oauth/access_token?client_id=d31012693b9ba3773cde&client_secret=9dad579e417de46aed7ceecc091545f72473d7e1&code=1225aee7f0dbe322007f
         //https://blog.imyzc.com/githubAuthCallback?code=1225aee7f0dbe322007f
         loginGithub(){
+            if(!this.loginGithubContentTipShowed && !isNullOrEmpty(this.currentEditComment)){
+                swal('登录之前请先复制您的评论内容哦', '因为登录会刷新页面，所以您需要先复制您的评论内容，稍后登录完成以后再粘贴', 'warning');
+                this.loginGithubContentTipShowed = true;
+                return;
+            }
             Swal.fire({
                 title: '登录中',
                 type: 'info',
@@ -361,7 +367,7 @@ Vue.component('commenter', {
                 focusConfirm: true, //聚焦到确定按钮
                 showCloseButton: true,//右上角关闭
             })
-            location.href = 'https://github.com/login/oauth/authorize?client_id=d31012693b9ba3773cde&scope=user&redirect_uri=' + encodeURI(getCurrentFullHost() + blog_api_address + 'auth/githubAuthCallback/' + (this.currentPostIdOrName ? this.currentPostIdOrName : this.currentPostId));
+            location.href = 'https://github.com/login/oauth/authorize?client_id=d31012693b9ba3773cde&scope=user&redirect_uri=' + encodeURI(getCurrentFullHost() + address_blog_api + 'auth/githubAuthCallback/' + (this.currentPostIdOrName ? this.currentPostIdOrName : this.currentPostId));
         },
         quitLogin(){
             Swal.fire({
@@ -371,7 +377,7 @@ Vue.component('commenter', {
                 focusConfirm: true, //聚焦到确定按钮
                 showCloseButton: true,//右上角关闭
             })
-            location.href = getCurrentFullHost() + blog_api_address + 'auth/auth-end?redirect_uri=' + encodeURI(location.href);
+            location.href = getCurrentFullHost() + address_blog_api + 'auth/auth-end?redirect_uri=' + encodeURI(location.href);
         },
         aboutMe(){
             location.href = getCurrentFullHost() + '/user/' + this.authedUserId + '/';
@@ -393,7 +399,7 @@ Vue.component('commenter', {
                 reverseButtons: true  // 是否 反转 两个按钮的位置 默认是  左边 确定  右边 取消
             }).then((isConfirm) => {
                 if (isConfirm.value) {
-                    var url = blog_api_address + "post/" + main.currentPostId + "/comments/" + id;
+                    var url = address_blog_api + "post/" + main.currentPostId + "/comments/" + id;
                     $.ajax({
                         url: url,
                         type: 'delete',
@@ -410,6 +416,9 @@ Vue.component('commenter', {
                 }
             });
         },
+        anonymousCanComment(){
+            return anonymousComment;
+        }, 
     },
     template: '<div><div id="comment_area">\
 <h3 class= "no-anchor btn-inline" id="comment-start"> 说点什么吧</h3>\
@@ -489,7 +498,8 @@ Vue.component('commenter', {
 <div class="col-md-6 col-sm-12 mb-2 text-right">\
 <button type="button" class="flat-round flat-btn mr-1" v-on:click="facesClick" id="comment-faces" data-toggle="tooltip" title="添加表情"><i class="fa fa-smile-o" style="font-size: 20px"></i></button>\
 &nbsp;<button type="button" class="flat-btn flat-btn-black" v-on:click="previewItem">{{ isEditing ? \'预览\' : \'编辑\' }}</button>\
-&nbsp;<button type="button" class="flat-btn flat-btn-black" v-on:click="submitComment"><i class="fa fa-send"></i> 提交评论</button>\
+&nbsp;<button v-if="anonymousCanComment()" type="button" class="flat-btn flat-btn-black" v-on:click="submitComment"><i class="fa fa-send"></i> 提交评论</button>\
+&nbsp;<button v-else type="button" class="flat-btn flat-btn-black btn-disable" v-on:click="submitComment" disable>登录才可以评论哦</button>\
 </div>\
 </div>\
 </form>\

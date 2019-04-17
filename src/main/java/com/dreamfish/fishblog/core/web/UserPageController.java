@@ -16,7 +16,6 @@ public class UserPageController {
     public String userPage() { return "blog-user"; }
 
     @GetMapping("/user/change-passwd/")
-    @RequestAuth(value = User.LEVEL_WRITER, redirectTo = "/sign-in/")
     public String changecPassword()  { return "admin/auth-change-passwd"; }
     @GetMapping("/user/rec-passwd/")
     public String recPassword()  { return "admin/auth-rec-passwd"; }

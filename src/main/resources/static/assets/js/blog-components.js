@@ -20,9 +20,9 @@ Vue.component('side-area', {
         loadAll() {
             var main = this;
 
-            var tags_url = blog_api_address + "tags?maxCount=15";
-            var classes_url = blog_api_address + "classes?maxCount=5";
-            var dates_url = blog_api_address + "month?maxCount=5";
+            var tags_url = address_blog_api + "tags?maxCount=15";
+            var classes_url = address_blog_api + "classes?maxCount=5";
+            var dates_url = address_blog_api + "month?maxCount=5";
 
             $.get(tags_url, function (response) {
                 if (response.success) {
@@ -49,7 +49,7 @@ Vue.component('side-area', {
         },
         loadMoreTags() {
             var main = this;
-            $.get(blog_api_address + "tags", function (response) {
+            $.get(address_blog_api + "tags", function (response) {
                 if (response.success) {
                     main.contentTags = response.data;
                     main.contentAllTagsLoaded = true;
@@ -59,7 +59,7 @@ Vue.component('side-area', {
         },
         loadMoreDates() {
             var main = this;
-            $.get(blog_api_address + "month", function (response) {
+            $.get(address_blog_api + "month", function (response) {
                 if (response.success) {
                     main.contentDates = response.data;
                     main.contentAllDatesLoaded = true;
@@ -68,7 +68,7 @@ Vue.component('side-area', {
         },
         loadMoreClasses() {
             var main = this;
-            $.get(blog_api_address + "classes", function (response) {
+            $.get(address_blog_api + "classes", function (response) {
                 if (response.success) {
                     main.contentClasses = response.data;
                     main.contentAllClassesLoaded = true;

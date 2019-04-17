@@ -1,5 +1,6 @@
 package com.dreamfish.fishblog.core.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dreamfish.fishblog.core.entity.UserExtened;
 import com.dreamfish.fishblog.core.utils.Result;
 
@@ -16,6 +17,7 @@ public interface UserService {
     UserExtened updateUserInternal(UserExtened user);
     void updateUserId(Integer oldId, Integer newId);
 
+    Result updateUserPassword(Integer userId, JSONObject passwords);
     Result updateUser(UserExtened user);
     Result userUpdateBan(int userId, boolean ban);
     Result userUpdatePrivilege(int userId, int newPrivilege);

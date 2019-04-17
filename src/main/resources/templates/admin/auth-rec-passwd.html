@@ -13,18 +13,12 @@
         setLoaderCSS(new Array(
             "/assets/libs/bootstrap/css/bootstrap.min.css",
             "/assets/libs/font-awesome/css/font-awesome.min.css",
-            "yzc-blog.min.css",
-            "/assets/libs/owl.carousel/css/owl.carousel.css",
-            "/assets/libs/owl.carousel/css/owl.theme.css",
-            "/assets/libs/owl.carousel/css/owl.transitions.css"));
+            "yzc-blog.min.css"));
         setLoaderJS(new Array(
             "/assets/libs/jquery/jquery.min.js",
             "/assets/libs/popper/popper.min.js",
-            "/assets/libs/jquery/jquery.min.js",
             "/assets/libs/bootstrap/js/bootstrap.min.js",
-            "config.js", "utils.min.js",
-            "/assets/libs/scrollReveal/scrollReveal.js",
-            "/assets/libs/owl.carousel/js/owl.carousel.min.js"));
+            "config.js", "utils.min.js"));
     </script>
     <!--Baidu tongji-->
     <script>
@@ -36,25 +30,7 @@
             s.parentNode.insertBefore(hm, s);
         })();
     </script>
-    <style>
-         .logon-icon {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            top: 80px;
-            left: 50%;
-            margin-left: -50px;
-            background-color: #efeff4;
-            border-radius: 50%;
-            padding: 18px;
-        }
-
-        .logon-icon img {
-            width: 64px;
-            height: 64px;
-
-        }
-    </style>
+    <style>.logon-icon{position:absolute;width:100px;height:100px;top:80px;left:50%;margin-left:-50px;background-color:#efeff4;border-radius:50%;padding:18px}.logon-icon img{width:64px;height:64px}</style>
 </head>
 
 <body class="not-load">
@@ -65,7 +41,7 @@
             <div class="row align-items-center justify-content-between d-flex">
                 <div class="nav-header-text">
                     <span class="logo"></span>
-                    <a href="../../">Alone space</a>
+                    <a href="/">Alone space</a>
                 </div>
                 <button type="button" id="mobile-nav-toggle">
                     <i class="fa fa-bars"></i>
@@ -93,7 +69,7 @@
                         <p class="h2" style="margin-top: 110px">找回密码</p>
                         <p class="text-secondary">请输入您注册该账号时使用的邮箱或手机号，我们将会把找回密码信息发送给您，请注意查收</p>
                     </div>
-                    <form \method="post" action="send/">
+                    <form method="post" action="send/">
                         <div class="form-group">
                             <input class="flat" type="text" id="rec_info" name="rec_info" placeholder="邮箱或手机号" required>
                             <div class="invalid-feedback">请输入您的找回密码信息</div>

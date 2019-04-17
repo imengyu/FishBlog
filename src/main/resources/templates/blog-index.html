@@ -8,6 +8,7 @@
     <meta name="description" content="梦想小鱼的个人分享博客-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
     <title>ALONE SPACE</title>
     <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
+    <script type="text/javascript" src="/assets/js/config.js"></script>
     <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
     <script type="text/javascript">
         setLoaderCSS(new Array(
@@ -22,7 +23,7 @@
             "/assets/libs/popper/popper.min.js",
             "/assets/libs/jquery/jquery.min.js",
             "/assets/libs/bootstrap/js/bootstrap.min.js",
-            "config.js","utils.min.js",
+            "utils.min.js",
             "/assets/libs/scrollReveal/scrollReveal.js",
             "/assets/libs/owl.carousel/js/owl.carousel.min.js"));
     </script>
@@ -46,7 +47,7 @@
             <div class="row align-items-center justify-content-between d-flex">
                 <div class="nav-header-text">
                     <span class="logo"></span>
-                    <a href="../../">Alone space</a>
+                    <a href="/">Alone space</a>
                 </div>
                 <button type="button" id="mobile-nav-toggle">
                     <i class="fa fa-bars"></i>
@@ -95,7 +96,7 @@
             setLoaderEndCallback(function () {
                 //Load archives
                 $.ajax({
-                    url: blog_api_address + "posts?maxCount=12&sortBy=view",
+                    url: address_blog_api + "posts?maxCount=12&sortBy=view",
                     success: function (response) {
                         if (response.success) {
                             $('#main-loading-center-absolute').fadeOut();

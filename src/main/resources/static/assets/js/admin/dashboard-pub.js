@@ -47,7 +47,7 @@ function initBase(){
 }
 function initAuthInfo(){
     $.ajax({
-        url: blog_api_address + 'auth/auth-test',
+        url: address_blog_api + 'auth/auth-test',
         type: 'get',
         contentType: "application/json; charset=utf-8",
         success: function (response) {
