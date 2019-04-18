@@ -9,7 +9,6 @@ import java.util.List;
 public interface StatMapper {
 
 
-
     /**
      * 更新 指定 状态数据
      * @param statKey 指定状态数据名称
@@ -62,7 +61,7 @@ public interface StatMapper {
     List<StatDay> getStatDayLogMonthThisMonth();
 
     @Insert("INSERT INTO fish_stat_daylog (date,ip,pv,comment,tag) VALUES(NOW(),#{ip},#{pv},#{comment},0)")
-    void addDayLog(@Param("pv") Integer pv, @Param("pv") Integer ip, @Param("pv") Integer comment);
+    void addDayLog(@Param("pv") Integer pv, @Param("ip") Integer ip, @Param("comment") Integer comment);
     @Delete("DELETE FROM fish_stat_daylog WHERE TO_DAYS(NOW())-TO_DAYS(date)>#{outdays}")
     void deleteDayLog(@Param("outdays") Integer outdays);
 
@@ -70,10 +69,6 @@ public interface StatMapper {
     @Select("select id,url_name,view_count,title from `fish_posts` WHERE status=1 ORDER BY view_count DESC limit #{maxCount}")
     List<StatTopPost> getStatTodayTopPost(@Param("maxCount") Integer maxCount);
 
-
     @Delete("DELETE FROM fish_stat_ip")
     void clearIpTable();
-
-
-
 }
