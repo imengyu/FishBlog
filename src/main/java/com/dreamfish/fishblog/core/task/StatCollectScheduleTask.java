@@ -23,7 +23,7 @@ public class StatCollectScheduleTask {
     /**
      * 每天 23:55:00 刷新PV/IP数据，以及其他数据
      */
-    @Scheduled(cron = "23 55 0 * * ?")
+    @Scheduled(cron = "0 55 23 * * ?")
     private void updateStatData() {
 
         //添加今日新的记录
