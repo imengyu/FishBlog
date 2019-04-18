@@ -1,7 +1,5 @@
 package com.dreamfish.fishblog.core.service.impl;
 
-import com.dreamfish.fishblog.core.annotation.RequestAuth;
-import com.dreamfish.fishblog.core.annotation.RequestPrivilegeAuth;
 import com.dreamfish.fishblog.core.entity.Post;
 import com.dreamfish.fishblog.core.entity.PostSimple;
 import com.dreamfish.fishblog.core.entity.User;
@@ -12,7 +10,6 @@ import com.dreamfish.fishblog.core.mapper.PostSimpleMapper;
 import com.dreamfish.fishblog.core.repository.PostSimpleRepository;
 import com.dreamfish.fishblog.core.service.PostSimpleService;
 import com.dreamfish.fishblog.core.utils.Result;
-import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
@@ -26,7 +23,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -162,7 +158,7 @@ public class PostSimpleServiceImpl implements PostSimpleService {
                 if(!"none".equals(onlyTag)) return postSimpleRepository.findByStatusAndAuthorIdAndTagsLike(byStatusVal, byUser, "%-" + onlyTag + "-%", pageable);
                 else if(!"0-0".equals(byDate)) return postSimpleRepository.findByStatusAndAuthorIdAndPostDateLike(byStatusVal, byUser, byDate + "%", pageable);
                 else if(!"none".equals(byClass)) return postSimpleRepository.findByStatusAndAuthorIdAndPostClassLike(byStatusVal , byUser,byClass + ":%", pageable);
-                else return postSimpleRepository.findByStatus(byStatusVal, pageable);
+                else return postSimpleRepository.findByStatusAndAuthorId(byStatusVal, byUser, pageable);
 
             }else{
                 if(byStatusVal != Post.POST_STATUS_PUBLISH){

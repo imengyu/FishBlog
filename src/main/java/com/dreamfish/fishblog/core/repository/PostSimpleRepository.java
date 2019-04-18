@@ -45,6 +45,7 @@ public interface PostSimpleRepository extends JpaRepository<PostSimple, Integer>
     Page<PostSimple> findByStatusAndPostDateLike(Integer status, String postDate, Pageable pageable);
     Page<PostSimple> findByStatusAndPostClassLike(Integer status, String postClass, Pageable pageable);
 
+    Page<PostSimple> findByStatusAndAuthorId(Integer status, Integer authorId, Pageable pageable);
     Page<PostSimple> findByStatusAndAuthorIdAndTagsLike(Integer status, Integer authorId, String tag, Pageable pageable);
     Page<PostSimple> findByStatusAndAuthorIdAndPostDateLike(Integer status, Integer authorId, String postDate, Pageable pageable);
     Page<PostSimple> findByStatusAndAuthorIdAndPostClassLike(Integer status, Integer authorId, String postClass, Pageable pageable);
