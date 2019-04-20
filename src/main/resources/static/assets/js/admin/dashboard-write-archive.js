@@ -191,6 +191,9 @@ function initApp() {
             gotoManageClasses() {
                 gotoPage('manage-classes', false);
             },
+            goView(){
+                window.open(getPostRealUrl(archiveObject));
+            },
 
             //设置类型
             setArchiveType(type) {
@@ -655,7 +658,16 @@ function initApp() {
                 this.archiveObject.content = base64.encode(this.archiveContent);
                 //设置一些初始值
                 if (main.isNew) {
-                    if(isNullOrEmpty(this.archiveObject.urlName)) genPostUrlName();          
+                    if(isNullOrEmpty(this.archiveObject.urlName)) genPostUrlName(); 
+                    if(main.currentUser) {
+                        //设置作者id
+                        main.archiveObject.authorId = main.currentUser.id;
+                        //设置作者名字 
+                        if(!isNullOrEmpty(main.currentUser.friendlyName))
+                            main.archiveObject.author = main.currentUser.friendlyName;
+                        else if(!isNullOrEmpty(main.currentUser.name))
+                            main.archiveObject.author = main.currentUser.name;
+                    }      
                 }
                 //修改文章状态
                 if(targetStatus!=-1){

@@ -43,4 +43,11 @@ public interface PostCommentMapper {
     @Delete("DELETE FROM fish_comments WHERE id=#{id}")
     void deleteComment(@Param("id") Integer id);
 
+    /**
+     * 删除评论
+     * @param id 评论 ID
+     * @return
+     */
+    @Delete("DELETE FROM fish_comments WHERE post_id=#{id}")
+    void deleteCommentByPostId(@Param("id") Integer id);
 }

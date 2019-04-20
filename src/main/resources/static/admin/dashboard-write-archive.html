@@ -149,12 +149,17 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="from-group">
+                                <div class="from-group form-inline">
                                     <div class="custom-control custom-checkbox mt-1">
                                         <input type="checkbox" class="custom-control-input"
                                             id="archive-add-last-modify-date" v-model="archiveShowLastModifyDate">
                                         <label class="custom-control-label"
                                             for="archive-add-last-modify-date">自动添加修改日期</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox ml-3" title="取消勾选此项以后，用户将不能从文章列表中看到这篇文章（但是依然可以看这篇文章）">
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="archive-add-last-modify-date" v-model="archiveObject.showInList">
+                                        <label class="custom-control-label" for="archive-add-last-modify-date">显示在文章列表中</label>
                                     </div>
                                 </div>
                                 <div class="form-group form-inline">
@@ -169,6 +174,7 @@
                                 <div class="form-group col-md-6">
                                     <label for="archive-class">文章所属分类</label>
                                     <select id="archive-class" class="form-control" v-model="archiveClass">
+                                        <option value="">(不分类)</option>
                                         <option v-for="cls in contentClasses" :value="cls.urlName + ':' + cls.title">
                                             {{ cls.title }}
                                         </option>
@@ -207,7 +213,7 @@
                                             v-on:click="loadTags(false)"><i class="fa fa-refresh"></i></i></a>
                                     </label>
                                     <div class="tags" v-if="contentTags && !tagsLoading">
-                                        <div v-for="tag in contentTags" class="tag-mgr-item clickable"
+                                        <div v-for="tag in contentTags" class="tag-mgr-item clickable pr-2"
                                             :style="'background-color:#' + tag.color" v-on:click="addTag(tag.id)">
                                             {{ tag.name }} </div>
                                     </div>
@@ -256,7 +262,7 @@
                     </div>
                     <div class="tab-pane fade" role="tabpanel" id="marchive-tab-images">
                         <div v-if="isNew" class="text-center text-secondary mt-3 mb-2">
-                            <p>请先保存文章，然后才能使用媒体库功能</p>
+                            <p>请先保存文章（可以先保存到草稿），然后才能使用媒体库功能</p>
                         </div><div v-else-if="mediaCenterLoadStatus=='loaded'">
                             <common-image-list ref="mediaCenterList"
                                 v-bind:items="mediaCenterItems" 
@@ -311,6 +317,8 @@
                     </div>
                 </div>
                 <form class="form-inline mt-3 d-flex justify-content-end">
+                    <button v-if="getArchiveCanUnPublish()" type="button" class="btn btn-link mr-2"
+                        v-on:click="goView()"><i class="fa fa-eye "></i> 转到文章页面</button>
                     <button v-if="getArchiveCanPublish()" type="button" class="btn btn-success mr-2"
                         v-on:click="publish()"><i class="fa fa-paper-plane-o "></i> 发布文章</button>
                     <button v-if="getArchiveCanUnPublish()" type="button" class="btn btn-success mr-2"

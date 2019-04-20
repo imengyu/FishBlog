@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="keywords" content="梦想小鱼的博客,文章标签,ALONE SPACE,DreamFish,梦想小鱼的个人分享博客,梦想小鱼的个人分享平台,梦想小鱼">
     <meta name="description" content="梦想小鱼的个人分享博客-查看文章-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
-    <title>查看文章 - ALONE SPACE</title>
+    <title>查看文章</title>
     <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
     <script type="text/javascript" src="/assets/js/config.js"></script>
     <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
@@ -20,6 +20,7 @@
             "/assets/libs/highlightjs/css/vs2015.css",
             "/assets/libs/sweetalert2/css/sweetalert2.min.css"));
         setLoaderJS(new Array(
+            address_blog_api + "settings.js",
             "/assets/libs/popper/popper.min.js",
             "/assets/libs/jquery/jquery.min.js",
             "/assets/libs/bootstrap/js/bootstrap.min.js", 
@@ -59,22 +60,15 @@
             <div class="container main-menu main-menu-white" style="padding-top: 40px; padding-bottom: 30px;">
                 <div class="row align-items-center justify-content-between d-flex">
                     <div class="nav-header-text">
-                        <span class="logo"></span>
-                        <a href="/">Alone space</a>
+                        <span class="logo" id="header-logo"></span>
+                        <a href="/" id="header-title"></a>
                     </div>
-                    <button type="button" id="mobile-nav-toggle">
-                        <i class="fa fa-bars"></i>
-                    </button>
+                    <button type="button" class="icon-menu" id="mobile-nav-toggle"></button>
                     <nav id="nav-menu-container" class="nav-menu-container">
-                        <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;">
-                            <li><a href="https://www.imyzc.com">主页</a></li>
-                            <li><a href="https://www.imyzc.com/storehouse">我的仓库</a></li>
-                            <li><a href="/">博客主页</a></li>
-                            <li><a href="/archives/">所有文章</a></li>
-                            <li class="menu-active"><a>浏览文章</a></li>
-                            <li><a href="https://www.imyzc.com/about.html">关于我</a></li>
+                        <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
+                            <li class="menu-active"><a>文章视图</a></li>
                         </ul>
-                    </nav><!-- #nav-menu-container -->
+                    </nav>
                 </div>
             </div>
             <div v-if="isLoaded && postContent.headimg" class="bg-img"
@@ -215,46 +209,7 @@
                 </div>
             </div>
         </article>
-
-        <!--Tip-->
-        <div v-if="isLoaded" class="half bg-grey-no-border pt-4">
-            <span class="half-bg bg-footer" style="z-index:100;top:60%;height:40%"></span>
-            <div class="hello-vue">
-                <span @mouseenter="message = 'Powered by Vue.js'"
-                    @mouseleave="message = 'Hello Vue.js !'">{{ message }}</span>
-            </div>
-        </div>
     </div>
-
-    <!--Footer-->
-    <footer id="footer">
-        <ul class="icons">
-            <li><a href="javascript:void(0)" id="footer_qq" class="icon fa fa-qq"><span class="label">QQ</span></a>
-            </li>
-            <li><a href="javascript:void(0)" id="footer_weixin" class="icon fa fa-weixin text-success"><span
-                        class="label">Weixin</span></a></li>
-            <li class="pr-0"><a href="https://github.com/717021" id="footer_github" class="icon fa fa-github text-dark"
-                    data-original-title="" title=""><span class="label">Github</span></a></li>
-        </ul>
-        <ul class="copyright">
-            <li><i class="fa fa-copyright" aria-hidden="true"></i> 2019. All rights reserved</li>
-            <li>Design by <a class="link" href="https://www.imyzc.com//about.html">DreamFish</a></li>
-        </ul>
-        <ul class="copyright copyright-line">
-            <li><a href="https://www.imyzc.com/support-browser.html" target="_blank" class="badge badge-pill badge-dark">推荐使用 Microsoft
-                    Edge
-                    或 Chrome 浏览器浏览本页面</a></li>
-        </ul>
-        <ul class="copyright">
-            <li><a class="link" href="https://www.miitbeian.gov.cn">浙ICP备18051956号-1</a></li>
-            <li>
-                <a class="jgwab" target="_blank"
-                    href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33080202000390">
-                    <p><i></i>浙公网安备 33080202000390号</p>
-                </a>
-            </li>
-        </ul>
-    </footer>
 
     <style>#comment_content{font-family:"Merriweather","Emoji",Georgia,serif;line-height:2rem}#comment_host{margin-top:15px;margin-bottom:10px}.faces li:not(.note){cursor:pointer}#comment-loading{text-align:center;height:50px}#comment-more i{transition:transform .3s ease}</style>
 

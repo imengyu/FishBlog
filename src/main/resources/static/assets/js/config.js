@@ -1,12 +1,7 @@
-//URLs
-//静态路径
-
-var address_blog_api = "/api/v1/"; //后端api地址，可选择前端与后端分离，可以处于不同主机上，但是服务器需要设置跨域
-var address_image_center = 'https://images.imyzc.com/'; //图片静态读取路径，推荐使用nginx开一个新子站专门存放图片
-//var address_image_center = 'http://images.localhost.com/';
-
 //Constracts
 //常量
+
+var address_blog_api = "/api/v1/"; //后端api地址，可选择前端与后端分离，可以处于不同主机上，但是服务器需要设置跨域
 
 var partPositions = {
     viewAll: "/archives/",
@@ -37,15 +32,84 @@ var archiveStatus = {
     DRAFT: 2,
 }
 
+
+//用户浏览数据排除路径
 var excludeStatPath = [
     '/sign-in/',
     '/sign-out/',
     '/admin/',
 ]
 
-//Settings
-//设置
+//网站Logo和标题
+var siteName = 'ALONE SPACE';
+var siteLogo = '';
+var siteLogoSize = {
+    width: '66px',
+    height: '26px'
+};
 
-var sendStats = true; // 是否发送用户浏览数据
-var anonymousComment = true; // 允许匿名评论
+//网站主菜单栏设置
+var menuConfig = [
+    {
+        name: '关于我',
+        url: '/archives/post/about/'
+    },
+    {
+        name: '所有文章',
+        url: '/archives/'
+    },
+    {
+        name: '归档',
+        url: '/archives/month/'
+    },
+    {
+        name: '主页',
+        url: '/'
+    },
+]
+//底部联系方式
+var socialConfig = [
+    {
+        icon: 'qq',
+        name: '我的 QQ',
+        tooltip: 'QQ 1501076885',
+        color: 'rgb(33,143,235)',
+        url: '#',
+    },
+    {
+        icon: 'weixin',
+        name: '我的微信',
+        tooltip: '<img src=\'/images/mmqrcode1543412167834.jpg\' alt=\'mmqrcode\' width=200 height=200/>',
+        color: 'rgb(0,184,4)',
+        url: '/images/mmqrcode1543412167834.jpg',
+    },
+    {
+        icon: 'github',
+        name: '我的 Github',
+        url: 'https://github.com/717021',
+        color: '#000'
+    },
+]
+//网站自定义生成设置
+var constConfig = {
+    autoFooter: true,
+    autoTitle: true,
+
+    footerShowLinks: [
+        {
+            name: '网站地图',
+            url: '/sitemap.html'
+        },
+        {
+            name: '网站后台',
+            url: '/sign-in/'
+        }
+    ],
+    icpRecord: '浙ICP备18051956号-1', //ICP 备案号
+    policeRecord: {
+        title: '浙公网安备 33080202000390号',
+        url: 'https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33080202000390'
+    }, //公安备案号
+}
+
 

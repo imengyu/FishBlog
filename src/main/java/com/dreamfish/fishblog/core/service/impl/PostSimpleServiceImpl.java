@@ -12,6 +12,7 @@ import com.dreamfish.fishblog.core.service.PostSimpleService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
+import com.dreamfish.fishblog.core.utils.log.ActionLog;
 import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,9 +135,9 @@ public class PostSimpleServiceImpl implements PostSimpleService {
                 if(authCode < AuthCode.SUCCESS) throw new NoPrivilegeException("无权限访问数据", 403);
 
                 //读取
-                if(!"none".equals(onlyTag)) return postSimpleRepository.findByTagsLike("%-" + onlyTag + "-%", pageable);
-                else if(!"0-0".equals(byDate)) return postSimpleRepository.findByPostDateLike(byDate + "%", pageable);
-                else if(!"none".equals(byClass)) return postSimpleRepository.findByPostClassLike(byClass + ":%", pageable);
+                if(!"none".equals(onlyTag)) return postSimpleRepository.findByTagsLikeAndShowInList("%-" + onlyTag + "-%", true, pageable);
+                else if(!"0-0".equals(byDate)) return postSimpleRepository.findByPostDateLikeAndShowInList(byDate + "%", true, pageable);
+                else if(!"none".equals(byClass)) return postSimpleRepository.findByPostClassLikeAndShowInList(byClass + ":%", true, pageable);
                 else return postSimpleRepository.findAll(pageable);
             }
         }else{
@@ -169,10 +170,10 @@ public class PostSimpleServiceImpl implements PostSimpleService {
                 }
 
                 //读取
-                if(!"none".equals(onlyTag)) return postSimpleRepository.findByStatusAndTagsLike(byStatusVal, "%-" + onlyTag + "-%", pageable);
-                else if(!"0-0".equals(byDate)) return postSimpleRepository.findByStatusAndPostDateLike(byStatusVal, byDate + "%", pageable);
-                else if(!"none".equals(byClass)) return postSimpleRepository.findByStatusAndPostClassLike(byStatusVal, byClass + ":%", pageable);
-                else return postSimpleRepository.findByStatus(byStatusVal, pageable);
+                if(!"none".equals(onlyTag)) return postSimpleRepository.findByStatusAndShowInListAndTagsLike(byStatusVal, true, "%-" + onlyTag + "-%", pageable);
+                else if(!"0-0".equals(byDate)) return postSimpleRepository.findByStatusAndShowInListAndPostDateLike(byStatusVal, true, byDate + "%", pageable);
+                else if(!"none".equals(byClass)) return postSimpleRepository.findByStatusAndShowInListAndPostClassLike(byStatusVal, true, byClass + ":%", pageable);
+                else return postSimpleRepository.findByStatusAndShowInList(byStatusVal, true, pageable);
             }
 
         }
@@ -201,6 +202,17 @@ public class PostSimpleServiceImpl implements PostSimpleService {
                     throw new NoPrivilegeException("无权限删除目标数据：ID " + id, 403);
             }
         }
+
+
+        //日志
+        StringBuilder idStrs = new StringBuilder("[");
+        for(Integer id : ids) {
+            idStrs.append(",");
+            idStrs.append(id);
+        }
+        idStrs.append("]");
+        ActionLog.logUserAction("删除文章组：" + idStrs.toString(), ContextHolderUtils.getRequest());
+
 
         //写入数据库进行删除
         postSimpleRepository.deleteByIdIn(ids);

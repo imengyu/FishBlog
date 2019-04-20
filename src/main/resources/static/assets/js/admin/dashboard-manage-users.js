@@ -32,6 +32,12 @@ function initApp() {
             tableUsersDatas: null,
             tableUsersColumns: [
                 {
+                    width: '32px',
+                    text: '',
+                    useSlot: true,
+                    slotName: 'userhead-slot',
+                },
+                {
                     width: '30px',
                     text: '#',
                     useData: 'name',
@@ -52,7 +58,7 @@ function initApp() {
                 },
                 {
                     width: 'auto',
-                    text: '用户友好名字',
+                    text: '友好名字',
                     useData: 'name',
                     dataName: 'friendlyName',
                 },
@@ -131,9 +137,14 @@ function initApp() {
                 location.href = '../new-user/';
             },
 
+            isUserCurrent(item){
+                if(this.currentUser && this.currentUser.id == item.id) return true;
+                return false;
+            },
+
             //Classes table
             tableUsersItemClick(item){
-                
+                window.open('/user/' + item.id);
             },
             tableUsersPagerClick(item){
                 if(main.tableUsersPageCurrent != item){
@@ -150,6 +161,10 @@ function initApp() {
             },
             tableUsersCustomItemClick(customerControlId, item){
                 if(customerControlId == 'del') {
+
+                    if(item.id == main.currentUser.id) toast('您不能注销自己', 'error', 3500);
+                    else if(item.level == userLevels.admin) toast('无法注销管理员', 'error', 3500);
+                    else 
                     Swal.fire({
                         type: 'warning', title: '您真的要注销此用户?',  text: "注意，此操作不能恢复！该用户将会被永久注销！",              
                         confirmButtonColor: '#d33', confirmButtonText: '确定注销',
@@ -174,7 +189,9 @@ function initApp() {
                     });
                 }
                 else if(customerControlId == 'edit-ban') {
-                    Swal.fire({
+                    if(item.id == main.currentUser.id) toast('您不能封禁自己', 'error', 3500);
+                    else if(item.level == userLevels.admin) toast('无法封禁管理员', 'error', 3500);
+                    else Swal.fire({
                         type: 'warning', title: '您真的要封禁用户?',  text: "该用户将会被封禁",              
                         confirmButtonColor: '#d33', confirmButtonText: '确定封禁',
                         showCancelButton: true, cancelButtonColor: '#3085d6', cancelButtonText: "取消",
@@ -221,8 +238,9 @@ function initApp() {
                     main.currentEditPrvUser = item;
                     main.currentEditPrvOld = item.privilege;
                    
-                    if(item.level == userLevels.admin) toast('无法对管理员设置权限', 'error', 3500);
-                    else if(item.level == userLevels.baned) toast('该用户已被封禁，无法设置权限', 'error', 3500);
+                    if(item.level == userLevels.baned) toast('该用户已被封禁，无法设置权限', 'error', 3500);
+                    else if(item.id == main.currentUser.id) toast('您不能对自己设置权限', 'error', 3500);
+                    else if(item.level == userLevels.admin) toast('无法设置管理员的权限', 'error', 3500);
                     else if(item.level == userLevels.guest) toast('游客无法设置权限', 'error', 3500);
                     else if(main.currentUser.privilege == 0) swal('您没有权限授予他人权限', '请类型管理员确认您是否有权限授予其他用户', 'error');
                     else if(item.level == userLevels.writer) $('#eeitPrivilegeModal').modal('show');
@@ -230,6 +248,10 @@ function initApp() {
                 
             },
 
+            getUserHead(user){
+                if (isNullOrEmpty(user.headimg)) return "/images/default/head-default.png"
+                else return getImageUrlFormHash(user.headimg);
+            },
             getPrivilegeCanUse(){
                 var html = '';
                 var user = main.currentUser;

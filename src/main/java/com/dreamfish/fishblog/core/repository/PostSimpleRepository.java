@@ -18,7 +18,7 @@ public interface PostSimpleRepository extends JpaRepository<PostSimple, Integer>
      * @param status 状态 id Post.POST_STATUS_*
      * @return
      */
-    List<PostSimple> findByStatus(Integer status);
+    List<PostSimple> findByStatusAndShowInList(Integer status, Boolean showInList);
 
     /**
      * 根据状态查询并排序
@@ -26,14 +26,14 @@ public interface PostSimpleRepository extends JpaRepository<PostSimple, Integer>
      * @param sort 排序
      * @return
      */
-    List<PostSimple> findByStatus(Integer status, Sort sort);
+    List<PostSimple> findByStatusAndShowInList(Integer status, Boolean showInList, Sort sort);
     /**
      * 根据状态查询并分页
      * @param status 状态 id Post.POST_STATUS_*
      * @param pageable 分页
      * @return
      */
-    Page<PostSimple> findByStatus(Integer status, Pageable pageable);
+    Page<PostSimple> findByStatusAndShowInList(Integer status, Boolean showInList, Pageable pageable);
     /**
      * 根据状态查询指定标签的文章并分页
      * @param status 状态 id Post.POST_STATUS_*
@@ -41,9 +41,9 @@ public interface PostSimpleRepository extends JpaRepository<PostSimple, Integer>
      * @param pageable 分页
      * @return
      */
-    Page<PostSimple> findByStatusAndTagsLike(Integer status, String tag, Pageable pageable);
-    Page<PostSimple> findByStatusAndPostDateLike(Integer status, String postDate, Pageable pageable);
-    Page<PostSimple> findByStatusAndPostClassLike(Integer status, String postClass, Pageable pageable);
+    Page<PostSimple> findByStatusAndShowInListAndTagsLike(Integer status, Boolean showInList, String tag, Pageable pageable);
+    Page<PostSimple> findByStatusAndShowInListAndPostDateLike(Integer status, Boolean showInList, String postDate, Pageable pageable);
+    Page<PostSimple> findByStatusAndShowInListAndPostClassLike(Integer status, Boolean showInList, String postClass, Pageable pageable);
 
     Page<PostSimple> findByStatusAndAuthorId(Integer status, Integer authorId, Pageable pageable);
     Page<PostSimple> findByStatusAndAuthorIdAndTagsLike(Integer status, Integer authorId, String tag, Pageable pageable);
@@ -56,9 +56,9 @@ public interface PostSimpleRepository extends JpaRepository<PostSimple, Integer>
      * @param pageable 分页
      * @return 返回目标数据
      */
-    Page<PostSimple> findByTagsLike(String tag, Pageable pageable);
-    Page<PostSimple> findByPostDateLike(String postDate, Pageable pageable);
-    Page<PostSimple> findByPostClassLike(String postClass, Pageable pageable);
+    Page<PostSimple> findByTagsLikeAndShowInList(String tag, Boolean showInList, Pageable pageable);
+    Page<PostSimple> findByPostDateLikeAndShowInList(String postDate, Boolean showInList, Pageable pageable);
+    Page<PostSimple> findByPostClassLikeAndShowInList(String postClass, Boolean showInList, Pageable pageable);
 
     Page<PostSimple> findByAuthorId(Integer authorId, Pageable pageable);
     Page<PostSimple> findByAuthorIdAndTagsLike(Integer authorId, String tag, Pageable pageable);

@@ -29,7 +29,7 @@ public interface PostClassificationService {
 
     List<PostDate> getDates();
     Map<String, Object> getDates(Integer startIndex, Integer maxCount);
-    List<PostDate> findDatesById(Integer id);
+    PostDate findDatesById(Integer id);
 
     PostDate addDate(PostDate postDate);
     void updateDate(PostDate postDate);

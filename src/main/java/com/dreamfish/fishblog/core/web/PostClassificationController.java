@@ -243,9 +243,9 @@ public class PostClassificationController {
     @ResponseBody
     public Result getDate(
             @PathVariable("id") Integer id){
-        List<PostDate> tags = postClassificationService.findDatesById(id);
-        if(tags.size()<1) return Result.failure(ResultCodeEnum.NOT_FOUNT);
-        return Result.success(tags.get(0));
+        PostDate date = postClassificationService.findDatesById(id);
+        if(date == null) return Result.failure(ResultCodeEnum.NOT_FOUNT);
+        return Result.success(date);
     }
     //更新时间组
     @PutMapping("/month/{id}")

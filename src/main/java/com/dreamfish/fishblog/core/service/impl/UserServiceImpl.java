@@ -9,6 +9,7 @@ import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.repository.UserRepository;
 import com.dreamfish.fishblog.core.service.UserService;
+import com.dreamfish.fishblog.core.utils.log.ActionLog;
 import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
@@ -49,6 +50,7 @@ public class UserServiceImpl implements UserService {
      * @return 用户实体
      */
     @Override
+    @Cacheable(value = "blog-user-cache", key = "'user_full_'+#p0")
     public UserExtened findUser(int id) {
         return userMapper.findByFullById(id);
     }
@@ -63,9 +65,13 @@ public class UserServiceImpl implements UserService {
 
         if (!userRepository.existsById(userId))
             return Result.failure(ResultCodeEnum.NOT_FOUNT);
-
         if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
             return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限删除指定用户");
+        if(userId == PublicAuth.authGetUseId(ContextHolderUtils.getRequest()))
+            return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无法删除自己");
+
+        //日志
+        ActionLog.logUserAction("注销用户：" + userId, ContextHolderUtils.getRequest());
 
         deleteUserInternal(userId);
         return Result.success();
@@ -94,7 +100,10 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByName(userName))
             return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST.getCode(),"指定用户名已存在");
 
-        return Result.success(addUserInternal(user));
+        UserExtened newUser = addUserInternal(user);
+        //日志
+        ActionLog.logUserAction("新建用户：" + newUser.getId() + " (" + newUser.getFriendlyName() + ")", ContextHolderUtils.getRequest());
+        return Result.success(newUser);
     }
 
     /**
@@ -109,10 +118,16 @@ public class UserServiceImpl implements UserService {
         if(ban) {
             if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
                 return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限对指定用户操作");
+            if(userId == PublicAuth.authGetUseId(ContextHolderUtils.getRequest()))
+                return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无法对自己进行操作");
+
+            ActionLog.logUserAction("封禁用户：" + userId, ContextHolderUtils.getRequest());
 
             userMapper.updateUserLevel(userId, User.LEVEL_LOCKED);
         }
         else {
+            ActionLog.logUserAction("解封用户：" + userId, ContextHolderUtils.getRequest());
+
             userMapper.updateUserLevelSetToOld(userId);
         }
         return Result.success();
@@ -131,9 +146,13 @@ public class UserServiceImpl implements UserService {
         HttpServletRequest request = ContextHolderUtils.getRequest();
         if(PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, newPrivilege) < AuthCode.SUCCESS)
             return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"当前用户无权限赋予其他用户权限");
+        if(userId == PublicAuth.authGetUseId(ContextHolderUtils.getRequest()))
+            return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无法对自己进行操作");
 
         if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
             return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限对指定用户操作");
+
+        ActionLog.logUserAction("更新用户权限：" + userId + " 新权限：" + newPrivilege, ContextHolderUtils.getRequest());
 
         userMapper.updateUsePrivilege(userId, newPrivilege);
         return Result.success();

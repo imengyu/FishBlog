@@ -12,6 +12,7 @@ import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.file.FileUtils;
+import com.dreamfish.fishblog.core.utils.log.ActionLog;
 import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import net.coobird.thumbnailator.Thumbnails;
@@ -97,7 +98,10 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         String path = bulidImageResourcePath(hash, type);
         File file = new File(path);
         if(!file.exists()) return Result.failure(ResultCodeEnum.NOT_FOUNT);
-        if(file.delete()) return Result.success();
+        if(file.delete()) {
+            ActionLog.logUserAction("删除图片资源 : " + hash, ContextHolderUtils.getRequest());
+            return Result.success();
+        }
         else return Result.failure(ResultCodeEnum.FORIBBEN);
     }
 
@@ -126,6 +130,8 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         Integer count = postMediaRepository.countByHash(hash);
         if(count == 0)
             return Result.failure(ResultCodeEnum.NOT_FOUNT,"资源 HASH " + hash + " 未找到");
+
+        ActionLog.logUserAction("删除文章图片资源 : " + postId + " : " + hash, request);
 
         //删除记录
         postMediaRepository.deleteByPostIdAndHash(postId, hash);
@@ -164,7 +170,11 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         PostMedia oldMedia = postMediaRepository.findByPostIdAndHash(postId, hash);
         media.setId(oldMedia.getId());
         media.setPostId(postId);
-        return Result.success(postMediaRepository.saveAndFlush(media));
+        media = postMediaRepository.saveAndFlush(media);
+
+        ActionLog.logUserAction("更新文章图片资源 : " + postId + " : " + hash, ContextHolderUtils.getRequest());
+
+        return Result.success(media);
     }
 
     /**
@@ -192,6 +202,8 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         //保存
         if(!new File(filePath).exists())
             FileUtils.saveToFile(file, filePath);
+
+        ActionLog.logUserAction("上传图片资源 : " + md5, ContextHolderUtils.getRequest());
 
         return Result.success(md5);
     }
@@ -232,6 +244,8 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         if(!postMediaRepository.existsByPostIdAndHash(postId, md5))
             newMedia =  postMediaRepository.saveAndFlush(newMedia);
 
+        ActionLog.logUserAction("上传文章图片资源 : " + postId + " : " + md5, ContextHolderUtils.getRequest());
+
         return Result.success(newMedia);
     }
 
@@ -265,6 +279,10 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         String filePath = bulidImageResourcePath(md5, fileType);
         if(!new File(filePath).exists())
             FileUtils.saveToFile(file, filePath);
+
+
+        ActionLog.logUserAction("更新用户头像资源 : " + userId + " : " + md5, ContextHolderUtils.getRequest());
+
 
         //设置用户头像字段
         userMapper.updateUserHead(userId, md5);

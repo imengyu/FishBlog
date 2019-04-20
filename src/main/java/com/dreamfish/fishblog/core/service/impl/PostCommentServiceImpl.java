@@ -11,6 +11,8 @@ import com.dreamfish.fishblog.core.repository.PostRepository;
 import com.dreamfish.fishblog.core.service.PostCommentService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
+import com.dreamfish.fishblog.core.utils.log.ActionLog;
+import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.request.IpUtil;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
@@ -80,11 +82,14 @@ public class PostCommentServiceImpl implements PostCommentService {
         postComment.setId(0);
         postComment.setAuthorIp(IpUtil.getIpAddr(request));
         postComment.setAuthorUa(request.getHeader("HTTP_USER_AGENT"));
+        postComment = postCommentRepository.save(postComment);
 
-        Result result = Result.success(postCommentRepository.save(postComment));
+        Result result = Result.success(postComment);
 
         //Update count post comment count
         postMapper.increasePostValue(postId,"comment_count");
+
+        ActionLog.logUserAction("创建评论 : " + postId + " : " + postComment.getId(), ContextHolderUtils.getRequest());
 
         return result;
     }
@@ -112,6 +117,7 @@ public class PostCommentServiceImpl implements PostCommentService {
         if(postUserId <= AuthCode.UNKNOW  && !authHasPrivilege) return Result.failure(ResultCodeEnum.FORIBBEN);
         if(authUserId.intValue() != postUserId.intValue() && !authHasPrivilege) return Result.failure(ResultCodeEnum.FORIBBEN);
 
+        ActionLog.logUserAction("删除评论 : " + postId + " : " +commentId, ContextHolderUtils.getRequest());
         postCommentMapper.deleteComment(commentId);
 
         //Update count post comment count
@@ -146,6 +152,8 @@ public class PostCommentServiceImpl implements PostCommentService {
         postComment.setAuthorIp(IpUtil.getIpAddr(request));
         postComment.setAuthorUa(request.getHeader("HTTP_USER_AGENT"));
 
+        ActionLog.logUserAction("更新评论 : " + postId + " : " + postComment.getId(), ContextHolderUtils.getRequest());
+
         return Result.success(postCommentRepository.save(postComment));
     }
 
@@ -170,6 +178,15 @@ public class PostCommentServiceImpl implements PostCommentService {
             int authCode = PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, UserPrivileges.PRIVILEGE_MANAGE_ALL_ARCHIVES);
             if (authCode < AuthCode.SUCCESS) throw new NoPrivilegeException("未授权操作", 403);
         }
+
+        //日志
+        StringBuilder idStrs = new StringBuilder("[");
+        for(Integer id : ids) {
+            idStrs.append(",");
+            idStrs.append(id);
+        }
+        idStrs.append("]");
+        ActionLog.logUserAction("删除评论组：" + postId + " : " + idStrs.toString(), ContextHolderUtils.getRequest());
 
         //写入数据库进行删除
         postCommentRepository.deleteByPostIdAndIdIn(postId, ids);

@@ -47,6 +47,7 @@ Vue.component('commenter', {
             authed: false,
             authedUserId: -1,
             authedUserInfo: null,
+            authedUserName: '',
             userInfos: null,
             requestingUserInfo: {},
             requestingUserInfoCount: 0,
@@ -88,6 +89,8 @@ Vue.component('commenter', {
                         main.authed = true;
                         main.authedUserInfo = response.data;
                         main.authedUserId = main.authedUserInfo.id;
+                        if(!isNullOrEmpty(main.authedUserInfo.friendlyName)) main.authedUserName = main.authedUserInfo.friendlyName;
+                        else main.authedUserName = main.authedUserInfo.name;
                         $("#comment-login-github").hide();
                         $("#comment_name").attr('readonly','readonly').attr('placeholder','');
                         $("#comment_email").attr('readonly','readonly').attr('placeholder','');
@@ -239,6 +242,10 @@ Vue.component('commenter', {
             var id =  main.currentPostId;
             var user_id = 0;
             if(main.authed && main.authedUserInfo) user_id = main.authedUserInfo.id;
+            else if(!anonymousComment){
+                swal("请先登录", "需要登录才能评论", "info");
+                return;
+            }
             var content = main.currentEditComment;
 
             if(main.authed == false  && isNullOrEmpty(name)){
@@ -422,7 +429,8 @@ Vue.component('commenter', {
     },
     template: '<div><div id="comment_area">\
 <h3 class= "no-anchor btn-inline" id="comment-start"> 说点什么吧</h3>\
-<div class="dropdown btn-inline float-right">\
+<div class="dropdown btn-inline float-right mb-2">\
+<div v-if="authed" style="margin-right:20px;display:inline-block;">{{ \'Hi，\' + authedUserName }}</div>\
 <img id="comment-user-head" class="rounded-circle" src="/images/default/head-default.png" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="display:none;width:54px;height:54px;" src="" />\
 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">\
 <a class="dropdown-item" href="javascript:void(0)" v-on:click="aboutMe">关于我</a>\
@@ -430,8 +438,8 @@ Vue.component('commenter', {
 </div>\
 </div>\
 <button type="button" class="flat flat-icon-btn float-right" data-toggle="tooltip" data-placement="left" title="使用 Github 登录" v-on:click="loginGithub" id="comment-login-github"><i class="fa fa-github" style="font-size:28px"></i></button>\
-<form ethod="post" id="comment_form" class="mt-4">\
-<div class="row">\
+<form ethod="post" id="comment_form" class="mt-3">\
+<div class="row" v-if="anonymousCanComment() && !authed" >\
 <div class="col-md-6">\
 <div class="form-group">\
 <input class="flat" type="text" name="comment_name" id="comment_name" placeholder="您的名字" required="required">\
@@ -498,8 +506,8 @@ Vue.component('commenter', {
 <div class="col-md-6 col-sm-12 mb-2 text-right">\
 <button type="button" class="flat-round flat-btn mr-1" v-on:click="facesClick" id="comment-faces" data-toggle="tooltip" title="添加表情"><i class="fa fa-smile-o" style="font-size: 20px"></i></button>\
 &nbsp;<button type="button" class="flat-btn flat-btn-black" v-on:click="previewItem">{{ isEditing ? \'预览\' : \'编辑\' }}</button>\
-&nbsp;<button v-if="anonymousCanComment()" type="button" class="flat-btn flat-btn-black" v-on:click="submitComment"><i class="fa fa-send"></i> 提交评论</button>\
-&nbsp;<button v-else type="button" class="flat-btn flat-btn-black btn-disable" v-on:click="submitComment" disable>登录才可以评论哦</button>\
+&nbsp;<button v-if="anonymousCanComment() || authed" type="button" class="flat-btn flat-btn-black" v-on:click="submitComment"><i class="fa fa-send"></i> 提交评论</button>\
+&nbsp;<button v-else type="button" class="flat-btn flat-btn-black btn-disable" v-on:click="submitComment" disable>登录后才可以评论哦</button>\
 </div>\
 </div>\
 </form>\

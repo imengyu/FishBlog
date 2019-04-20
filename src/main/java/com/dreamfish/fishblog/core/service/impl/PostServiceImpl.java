@@ -1,15 +1,19 @@
 package com.dreamfish.fishblog.core.service.impl;
 
 import com.dreamfish.fishblog.core.entity.Post;
+import com.dreamfish.fishblog.core.entity.PostDate;
 import com.dreamfish.fishblog.core.entity.PostTag;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
+import com.dreamfish.fishblog.core.mapper.PostCommentMapper;
+import com.dreamfish.fishblog.core.mapper.PostDatesMapper;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
 import com.dreamfish.fishblog.core.repository.PostRepository;
 import com.dreamfish.fishblog.core.service.PostService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
+import com.dreamfish.fishblog.core.utils.log.ActionLog;
 import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.request.RequestUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
@@ -22,7 +26,9 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +42,10 @@ public class PostServiceImpl implements PostService {
     private PostRepository postRepository = null;
     @Autowired
     private PostMapper postMapper = null;
+    @Autowired
+    private PostDatesMapper postDatesMapper = null;
+    @Autowired
+    private PostCommentMapper postCommentMapper = null;
 
     @Override
     @Cacheable(value = "blog-simple-reader-cache", key = "'post_'+#p0")
@@ -110,6 +120,8 @@ public class PostServiceImpl implements PostService {
             if(authCode < AuthCode.SUCCESS) return Result.failure(ResultCodeEnum.FORIBBEN);
         }
 
+        ActionLog.logUserAction("更新文章："+id, ContextHolderUtils.getRequest());
+
         return Result.success(postRepository.saveAndFlush(post));
     }
     @Override
@@ -119,7 +131,23 @@ public class PostServiceImpl implements PostService {
         }
     )
     public Result addPost(Post post) {
-        return Result.success(postRepository.saveAndFlush(post));
+        post = postRepository.saveAndFlush(post);
+
+        //日志
+        ActionLog.logUserAction("创建文章："+post.getId(), ContextHolderUtils.getRequest());
+
+        //添加对应归档项
+        Date now = new Date();
+        String nowDateStr = new SimpleDateFormat("yyyy-MM").format(now);
+        PostDate dateItem =  postDatesMapper.getDateByDate(nowDateStr);
+        if(dateItem == null){
+            dateItem = new PostDate();
+            dateItem.setCount(1);
+            dateItem.setDate(nowDateStr);
+            postDatesMapper.addDate(dateItem);
+        }else postDatesMapper.updateIncreaseDateCount(dateItem.getId());
+
+        return Result.success(post);
     }
     @Override
     @Caching(
@@ -140,6 +168,18 @@ public class PostServiceImpl implements PostService {
         }
 
         if(!postRepository.existsById(id)) return Result.failure(ResultCodeEnum.NOT_FOUNT);
+
+        //日志
+        ActionLog.logUserAction("删除文章："+id, ContextHolderUtils.getRequest());
+
+        //删除对应归档项
+        Date now = new Date();
+        PostDate dateItem =  postDatesMapper.getDateByDate( new SimpleDateFormat("yyyy-MM").format(now));
+        if(dateItem != null) postDatesMapper.updateDecreaseDateCount(dateItem.getId());
+
+        //删除对应所有的评论
+        postCommentMapper.deleteCommentByPostId(id);
+
         postMapper.deletePost(id);
         return Result.success();
     }

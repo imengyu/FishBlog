@@ -12,6 +12,8 @@ import com.dreamfish.fishblog.core.mapper.PostDatesMapper;
 import com.dreamfish.fishblog.core.mapper.PostTagsMapper;
 import com.dreamfish.fishblog.core.repository.PostClassRepository;
 import com.dreamfish.fishblog.core.service.PostClassificationService;
+import com.dreamfish.fishblog.core.utils.log.ActionLog;
+import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -61,16 +63,19 @@ public class PostClassificationServiceImpl implements PostClassificationService 
     @CacheEvict(value = "blog-tags-cache", allEntries = true)
     public PostTag addTag(PostTag postTag) {
         postTagsMapper.addTag(postTag);
+        ActionLog.logUserAction("创建标签："+postTag.getId(), ContextHolderUtils.getRequest());
         return postTag;
     }
     @Override
     @CacheEvict(value = "blog-tags-cache", allEntries = true)
     public void updateTag(PostTag postTag) {
         postTagsMapper.updateTag(postTag);
+        ActionLog.logUserAction("更新标签："+postTag.getId(), ContextHolderUtils.getRequest());
     }
     @Override
     @CacheEvict(value = "blog-tags-cache", allEntries = true)
     public void deleteTag(Integer id) {
+        ActionLog.logUserAction("删除标签："+id, ContextHolderUtils.getRequest());
         postTagsMapper.deleteTag(id);
     }
 
@@ -118,7 +123,7 @@ public class PostClassificationServiceImpl implements PostClassificationService 
     }
 
     @Override
-    public List<PostDate> findDatesById(Integer id) {
+    public PostDate findDatesById(Integer id) {
         return postDatesMapper.getDateById(id);
     }
 
@@ -143,16 +148,20 @@ public class PostClassificationServiceImpl implements PostClassificationService 
     @Override
     @CacheEvict(value = "blog-classes-cache", allEntries = true)
     public PostClass addClass(PostClass postClass) {
-        return postClassRepository.saveAndFlush(postClass);
+        postClass = postClassRepository.saveAndFlush(postClass);
+        ActionLog.logUserAction("创建分类："+postClass.getId(), ContextHolderUtils.getRequest());
+        return postClass;
     }
     @Override
     @CacheEvict(value = "blog-classes-cache", allEntries = true)
     public void updateClass(PostClass postClass) {
         postClassRepository.saveAndFlush(postClass);
+        ActionLog.logUserAction("更新分类："+postClass.getId(), ContextHolderUtils.getRequest());
     }
     @Override
     @CacheEvict(value = "blog-classes-cache", allEntries = true)
     public void deleteClass(Integer id) {
+        ActionLog.logUserAction("更新分类："+id, ContextHolderUtils.getRequest());
         postClassMapper.deleteClass(id);
     }
     @Override

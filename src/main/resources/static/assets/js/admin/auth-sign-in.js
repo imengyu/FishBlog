@@ -76,20 +76,8 @@ function login(){
 	var psw = $('#log_psw').val();
 	var url = address_blog_api + "auth";
 
-    if(loginSending) return;
+	if(loginSending) return;
 	
-	loginSending = true;
-	$('#logon_form').fadeOut(200, function(){
-		$('#log_sending').fadeIn();
-	})
-
-	var reshowLog = function(){
-		loginSending = false;
-		$('#logon_form').fadeIn(200, function(){
-			$('#log_sending').fadeOut();
-		})
-	}
-
 	if(isNullOrEmpty(userName)){
 		$('#log_usrname').addClass('is-invalid');
 		return;
@@ -103,7 +91,18 @@ function login(){
 		return;
 	}
 
-    $("#log_psw").val('');
+	loginSending = true;
+	$('#logon_form').fadeOut(200, function(){
+		$('#log_sending').fadeIn();
+	})
+
+	var reshowLog = function(){
+		loginSending = false;
+		$('#logon_form').fadeIn(200, function(){
+			$('#log_sending').fadeOut();
+		})
+	}
+
     $.ajax({
         type: "POST",
         url: url,
@@ -115,6 +114,7 @@ function login(){
         dataType: "json",
         success: function(data) {
             if (data.success) {
+				$("#log_psw").val('');
 				window.localStorage.setItem("last_user", $("#log_usrname").val());
 				var a = getQueryString('redirect_url');
     			if(!isNullOrEmpty(a))location.href = decodeURI(a);
@@ -123,12 +123,16 @@ function login(){
 				resetVerifyCode();
 				reshowLog();
 				var extendCode = data.extendCode;
-				if(extendCode == authCode.FAIL_NOUSER_FOUND)
-					swal("登录失败", "用户不存在", 'error')
+				if(extendCode == authCode.FAIL_NOUSER_FOUND){
+					$("#log_psw").val('');
+					swal("登录失败", "用户不存在。" + data.message, 'error')
+				}
 				else if(extendCode == authCode.FAIL_USER_LOCKED)
-					swal("登录失败", "该用户已被封禁，无法登录。请联系管理员解封", 'error')
-				else if(extendCode == authCode.FAIL_BAD_PASSWD)
-					swal("登录失败", "用户名或密码不正确", 'error')
+					swal("登录失败", "该用户已被封禁，无法登录。请联系管理员解封。" + data.message, 'error')
+				else if(extendCode == authCode.FAIL_BAD_PASSWD){		
+					$("#log_psw").val('');			
+					swal("登录失败", "用户名或密码不正确。" + data.message, 'error')
+				}
 				else swal("登录失败", data.message, 'error')
 			}
         },

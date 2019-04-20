@@ -1,6 +1,6 @@
 package com.dreamfish.fishblog.core.task;
 
-import com.dreamfish.fishblog.core.mapper.StatIpMapper;
+import com.dreamfish.fishblog.core.mapper.SettingsMapper;
 import com.dreamfish.fishblog.core.mapper.StatMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -20,34 +20,47 @@ public class StatCollectScheduleTask {
     @Autowired
     private StatMapper statMapper = null;
 
+    @Autowired
+    private SettingsMapper settingsMapper = null;
+
     /**
      * 每天 23:55:00 刷新PV/IP数据，以及其他数据
      */
     @Scheduled(cron = "0 55 23 * * ?")
     private void updateStatData() {
 
-        //添加今日新的记录
+        boolean collectStat = Boolean.parseBoolean(settingsMapper.getSetting("sendStats"));
 
-        Integer pv = statMapper.getStatIntData("pvToday");
-        Integer ip = statMapper.getStatIntData("ipToday");
-        Integer comment = statMapper.getStatIntData("commentToday");
+        if(collectStat) {
 
-        statMapper.addDayLog(pv, ip, comment);
+            //添加今日新的记录
 
-        //转移今日数据到昨日去
+            Integer pv = statMapper.getStatIntData("pvToday");
+            Integer ip = statMapper.getStatIntData("ipToday");
+            Integer comment = statMapper.getStatIntData("commentToday");
 
-        statMapper.updateStatInt("pvYesterday", pv);
-        statMapper.updateStatInt("ipYesterday", ip);
-        statMapper.updateStatInt("commentYesterday", comment);
+            statMapper.addDayLog(pv, ip, comment);
 
-        statMapper.updateStatInt("pvToday", 0);
-        statMapper.updateStatInt("ipToday", 0);
-        statMapper.updateStatInt("commentToday", 0);
+            //转移今日数据到昨日去
 
-        // 删除 时间比较长的数据
-        statMapper.deleteDayLog(30);
-        statMapper.clearIpTable();
+            statMapper.updateStatInt("pvYesterday", pv);
+            statMapper.updateStatInt("ipYesterday", ip);
+            statMapper.updateStatInt("commentYesterday", comment);
 
+            statMapper.updateStatInt("pvToday", 0);
+            statMapper.updateStatInt("ipToday", 0);
+            statMapper.updateStatInt("commentToday", 0);
+
+            // 删除 时间比较长的数据
+
+            Integer maxSaveStatDays = Integer.parseInt(settingsMapper.getSetting("maxStatSaveDays"));
+
+            statMapper.deleteDayLog(maxSaveStatDays);
+            statMapper.deleteStatPage(maxSaveStatDays);
+            statMapper.deleteActionLogs(maxSaveStatDays);
+            statMapper.clearIpTable();
+
+        }
     }
 }
 

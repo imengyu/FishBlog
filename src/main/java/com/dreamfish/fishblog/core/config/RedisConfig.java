@@ -44,6 +44,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         cacheNames.add("blog-images-cache");//图片缓存
         cacheNames.add("blog-user-cache");//用户信息缓存
         cacheNames.add("blog-bot-cache");//针对搜索引擎页面缓存
+        cacheNames.add("blog-settings-cache");//针对设置的缓存
 
         // 对每个缓存空间应用不同的配置
         Map<String, RedisCacheConfiguration> configMap = new HashMap<>();
@@ -58,6 +59,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         configMap.put("blog-images-cache", config.entryTtl(Duration.ofDays(15)));
         configMap.put("blog-user-cache", config.entryTtl(Duration.ofDays(10)));
         configMap.put("blog-bot-cache", config.entryTtl(Duration.ofDays(10)));
+        configMap.put("blog-settings-cache", config.entryTtl(Duration.ofDays(15)));
 
         RedisCacheManager cacheManager = RedisCacheManager.builder(connectionFactory)     // 使用自定义的缓存配置初始化一个cacheManager
                 .initialCacheNames(cacheNames)  // 注意这两句的调用顺序，一定要先调用该方法设置初始化的缓存名，再初始化相关的配置

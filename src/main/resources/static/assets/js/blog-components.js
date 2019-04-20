@@ -14,6 +14,7 @@ Vue.component('side-area', {
             allClassCount: 0,
             allDateCount: 0,
             allTagCount: 0,
+            bloggerInfo: null,
         }
     },
     methods: {
@@ -23,7 +24,13 @@ Vue.component('side-area', {
             var tags_url = address_blog_api + "tags?maxCount=15";
             var classes_url = address_blog_api + "classes?maxCount=5";
             var dates_url = address_blog_api + "month?maxCount=5";
+            var blogger_url = address_blog_api + "user/admin";
 
+            $.get(blogger_url, function (response) {
+                if (response.success) {
+                    main.bloggerInfo = response.data;
+                }
+            }, "json");
             $.get(tags_url, function (response) {
                 if (response.success) {
                     main.contentTagsLoaded = true;
@@ -94,15 +101,25 @@ Vue.component('side-area', {
             arr = str.split("-");
             return arr[0] + " 年 " + arr[1] + " 月";
         },
+        getImageUrl: function (str) {
+            return getImageUrlFormHash(str);
+        },
+        getUserCardBackground() {
+            if (!main.bloggerInfo || isNullOrEmpty(main.bloggerInfo.cardBackground)) return "/images/background/mebg.jpg"
+            else return getImageUrlFormHash(main.bloggerInfo.cardBackground);
+        },
     },
     template: '<div><div class="blog-side-content mt-3 no-display-sm no-display-md">\
-<div class="blog-side-head mb-3">\
-<div class="author">\
-<img class="img-responsive mt-3" src="/images/default/head-img.jpg" alt="head-img">\
+<div v-if="bloggerInfo" class="blog-side-head mb-3">\
+<div class="author" :style="\'background: url(\'+getUserCardBackground()+\') center center no-repeat;\'">\
+<img class="img-responsive mt-3" :src="getImageUrl(bloggerInfo.headimg)" alt="head-img">\
 </div>\
-<div class="author_name"><a href="https://www.imyzc.com/about.html" title="梦想的小鱼">DreamFish</a><span>博主</span>\
+<div class="author_name"><a :href="bloggerInfo.hone" :title="bloggerInfo.friendlyName">\
+<a v-if="bloggerInfo.gender == \'男\'"><i class="fa fa-mars mr-2 text-primary"></i></a>\
+<a v-if="bloggerInfo.gender == \'女\'"><i class="fa fa-venus mr-2" style="color: #f76fe5"></i></a>\
+DreamFish</a><span>博主</span>\
 </div>\
-<p>喜欢自己 快乐随意<br>I\'m an ugly man...</p>\
+<p>{{ bloggerInfo.introduction }}</p>\
 </div>\
 </div>\
 <div class="blog-side-content mt-3">\

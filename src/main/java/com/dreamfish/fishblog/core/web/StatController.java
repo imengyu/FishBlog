@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.dreamfish.fishblog.core.annotation.RequestAuth;
 import com.dreamfish.fishblog.core.config.ConstConfig;
 import com.dreamfish.fishblog.core.entity.User;
+import com.dreamfish.fishblog.core.service.LogService;
 import com.dreamfish.fishblog.core.service.StatService;
 import com.dreamfish.fishblog.core.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
+import java.util.Collections;
 
 @Controller
 @RequestMapping(ConstConfig.API_PUBLIC)
@@ -19,6 +21,8 @@ public class StatController {
 
     @Autowired
     private StatService statService = null;
+    @Autowired
+    private LogService logService = null;
 
     @PostMapping("/stat")
     @ResponseBody
@@ -47,6 +51,17 @@ public class StatController {
             @PathVariable("pageSize")
             @Min(value = 1, message = "页大小必须大于等于1")
                     Integer pageSize){ return statService.getStatIpPv(pageIndex, pageSize); }
+
+    @GetMapping("/stat/oplog/{pageIndex}/{pageSize}")
+    @RequestAuth(User.LEVEL_WRITER)
+    @ResponseBody
+    public Result getStatRunLogWithPageable(
+            @PathVariable("pageIndex")
+            @Min(value = 0, message = "页数必须大于等于0")
+                    Integer pageIndex,
+            @PathVariable("pageSize")
+            @Min(value = 1, message = "页大小必须大于等于1")
+                    Integer pageSize){ return logService.getLogsWithPageable(pageIndex, pageSize); }
 
     @GetMapping("/stat/topPage")
     @RequestAuth(User.LEVEL_WRITER)

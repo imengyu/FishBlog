@@ -21,12 +21,6 @@ import java.util.Collections;
 @Controller
 public class StaticPageController
 {
-    @GetMapping("/version")
-    @ResponseBody
-    public Result version() {
-        return Result.success(Collections.singletonMap("version", "1.1.3.0330" ));
-    }
-
     //request And response
 
     @Autowired
@@ -59,6 +53,11 @@ public class StaticPageController
     public ModelAndView  viewTags(@PathVariable("id") Integer id) {
         if (seacherEngineMode || RequestUtils.checkIsSearchEngines(request)) return postSearcherCacheService.genTagViewCache(id, response);
         else return new ModelAndView ("blog-tags");
+    }
+    @GetMapping("/archives/month/")
+    public ModelAndView  viewAllDates() {
+        if (seacherEngineMode || RequestUtils.checkIsSearchEngines(request)) return postSearcherCacheService.genArchivesViewCache();
+        else return new ModelAndView ("blog-all-dates");
     }
     @GetMapping("/archives/month/{year}/{month}/")
     public ModelAndView  viewDates(@PathVariable("year") Integer year, @PathVariable("month") Integer month) {

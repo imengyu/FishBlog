@@ -7,6 +7,7 @@ import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.service.AuthService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.StringUtils;
+import com.dreamfish.fishblog.core.utils.log.ActionLog;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
@@ -52,10 +53,14 @@ public class AuthServiceImpl implements AuthService {
             return AuthCode.FAIL_NOUSER_FOUND;
         }
         User user = users.get(0);
-        if(user.getLevel() == User.LEVEL_LOCKED) {
-            return AuthCode.FAIL_USER_LOCKED;
-        }
         if(passwd.equals(user.getPasswd())) {
+
+            if(user.getLevel() == User.LEVEL_LOCKED)
+                return AuthCode.FAIL_USER_LOCKED;
+
+            //日志
+            ActionLog.logUserAction(ActionLog.ACTION_LOGIN, user.getId(), user.getFriendlyName(), IpUtil.getIpAddr(request));
+
             HttpSession session = request.getSession();
             session.setMaxInactiveInterval(AUTH_TOKEN_DEFAULT_EXPIRE_TIME);
             session.setAttribute("currentLoggedUserId", user.getId());
@@ -166,6 +171,10 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void authClear(HttpServletRequest request) {
+
+        //日志
+        ActionLog.logUserAction(ActionLog.ACTION_LOGOUT, request);
+
         HttpSession session = request.getSession();
         session.removeAttribute("currentLoggedUserId");
         session.removeAttribute("currentLoggedUserName");

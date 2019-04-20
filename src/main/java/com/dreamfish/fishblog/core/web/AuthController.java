@@ -12,9 +12,11 @@ import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.request.HttpClient;
+import com.dreamfish.fishblog.core.utils.request.IpUtil;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import com.dreamfish.fishblog.core.utils.request.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 认证接口控制器
@@ -41,6 +44,9 @@ public class AuthController {
     @Autowired
     private UserService userService = null;
 
+    //Redis
+    @Autowired
+    private RedisTemplate<Object, Object> redis = null;
 
     //开始认证 登录
     @ResponseBody
@@ -49,6 +55,13 @@ public class AuthController {
             @RequestBody @NonNull
                     User user) {
 
+        String ip = IpUtil.getIpAddr(request);
+        String passwordErrCountKey = "password_error_count_" + ip + "_";
+
+        Integer passwordErrCount = (Integer) redis.opsForValue().get(passwordErrCountKey);
+        if (passwordErrCount != null && passwordErrCount > 3)
+            return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您的密码错误次数过多，请 15 分钟后再试！");
+
         Integer authCode = authService.authLogin(user.getName(), user.getPasswd(), request);
         if(authCode >= AuthCode.SUCCESS){
             String authToken = authService.genAuthToken(request);
@@ -56,7 +69,24 @@ public class AuthController {
                 CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, authToken, -1);
             return Result.success();
         }
-        else return Result.failure(ResultCodeEnum.FAILED_AUTH, String.valueOf(authCode));
+        else {
+
+            if (authCode != AuthCode.FAIL_USER_LOCKED) {
+                //设置或增加密码错误次数
+                if (passwordErrCount == null) {
+                    passwordErrCount = 1;
+                    redis.opsForValue().set(passwordErrCountKey, passwordErrCount, 900, TimeUnit.SECONDS);
+                } else {
+                    passwordErrCount++;
+                    redis.opsForValue().set(passwordErrCountKey, passwordErrCount, 900, TimeUnit.SECONDS);
+                }
+
+                if (passwordErrCount >= 4)
+                    return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您的密码错误次数过多，请 15 分钟后再试！", String.valueOf(authCode));
+                else return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您还可以尝试 " + (4 - passwordErrCount) + " 次", String.valueOf(authCode));
+
+            }else return Result.failure(ResultCodeEnum.FAILED_AUTH, authCode.toString());
+        }
     }
 
     //检测认证状态

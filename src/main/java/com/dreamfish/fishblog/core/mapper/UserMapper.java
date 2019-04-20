@@ -40,6 +40,12 @@ public interface UserMapper {
     @Select("SELECT headimg FROM fish_users WHERE id = #{id}")
     String getUserHeadById(@Param("id") Integer id);
 
+    @Select("SELECT name FROM fish_users WHERE id = #{id}")
+    String getUserNameById(@Param("id") Integer id);
+
+    @Select("SELECT friendly_name FROM fish_users WHERE id = #{id}")
+    String getUserFriendlyNameById(@Param("id") Integer id);
+
     @Select("SELECT level FROM fish_users WHERE id = #{id}")
     Integer getUserLevelById(@Param("id") Integer id);
 

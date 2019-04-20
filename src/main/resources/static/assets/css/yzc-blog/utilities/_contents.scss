@@ -179,6 +179,10 @@ a {
 	cursor: pointer;
 }
 
+.pc-fix-scrollbar {
+	@include pc-fix-scrollbar();
+}
+
 //table fix
 .table td, .table th {
     vertical-align: middle;

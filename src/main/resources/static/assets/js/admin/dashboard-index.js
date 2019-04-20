@@ -61,7 +61,7 @@ function initApp() {
                 $.get(address_blog_api + "stat/daylog", function (response) {
                     if (response.success){
                         main.dayLog = response.data;
-                        if(ain.dayLog) setTimeout(main.loadStatDayLogChart, 500);
+                        if(main.dayLog) setTimeout(main.loadStatDayLogChart, 500);
                     }
                 }, "json");
                 $.get(address_blog_api + "stat/topPage?maxCount=10", function (response) {

@@ -846,6 +846,10 @@
         @include prefix(transition, all 0.2s, webkit moz);
         @include prefix(animation, swal2-show .3s, webkit);
 
+        @media (max-width: 425px) {
+            max-width: 95%;
+        }
+
         max-width: 75%;
         padding: 12px;
         background-color: #fff;
@@ -865,10 +869,26 @@
         }
         .toast-text {
             display: inline-block;
-            padding: 0 20px 0 16px;
+            padding: 0 33px 0 16px;
             font-size: 16px;
             line-height: 16px;
             vertical-align: middle;
+        }
+        .toast-close {
+
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: inline-block;
+            vertical-align: middle;
+
+            
+            
+            @include size(15px, 15px);
+
+            background-size: 15px 15px;
+            background-repeat: no-repeat;
+            background-image: url(/assets/images/icon/ico-close.svg)
         }
     }
 }

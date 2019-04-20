@@ -6,8 +6,8 @@
                     <div
                         class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column">
                         <i class=" fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
-                        <p class="text-secondary mt-2"><span class="h4">403</span><br /> 您无权查看该页面</p>
-                        <button type="button" class="btn btn-primary">返回首页</button>
+                        <p class="text-secondary mt-2"><span class="h4">403</span><br /> 您无权管理其他用户</p>
+                        <button type="button" class="btn btn-primary" onclick="location.href = '../'">返回首页</button>
                     </div>
                 </div>
             </div><div v-else class="box">
@@ -17,8 +17,11 @@
                     v-bind:show-check-boxes="false" v-bind:loaded-status="tableUsersLoadStatus"
                     v-bind:null-text="'当前列表没有项目'" v-on:item-click="tableUsersItemClick"
                     v-on:item-customer-click="tableUsersCustomItemClick" v-on:retry-load="loadUsers(true)">
+                    <template slot="userhead-slot" slot-scope="itemData">
+                        <img class="rounded-circle" width="32px" height="32px" :src="getUserHead(itemData.item)">
+                    </template>
                     <template slot="marchives-slot" slot-scope="itemData">
-                        <div class="dropdown">
+                        <div class="dropdown" v-if="!isUserCurrent(itemData.item)">
                             <button class="btn btn-secondary" type="button" id="dropdownUserActionMenuButton"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-chevron-down"></i>
@@ -27,7 +30,7 @@
                                 aria-labelledby="dropdownUserActionMenuButton">
                                 <a class="dropdown-item" href="javascript:;"
                                     v-on:click="tableUsersCustomItemClick('edit-prv', itemData.item)"><i
-                                        class="fa fa-shield mr-2"></i>管理权限</a>
+                                        class="fa fa-shield mr-2"></i> 管理权限</a>
                                 <a v-if="itemData.item.level != 0" class="dropdown-item" href="javascript:;"
                                     v-on:click="tableUsersCustomItemClick('edit-ban', itemData.item)"><i
                                         class="fa fa-ban mr-2"></i>封禁用户</a><a v-else class="dropdown-item"
@@ -38,6 +41,9 @@
                                     v-on:click="tableUsersCustomItemClick('del', itemData.item)"><i
                                         class="fa fa-trash mr-2"></i>注销用户</a>
                             </div>
+                        </div>
+                        <div class="dropdown" v-else title="不能对自己进行操作哦！">
+                            <button type="button" class="btn btn-secondary" onclick="toast('不能对自己进行操作哦！','info',3500)">我</button>
                         </div>
                     </template>
                 </common-table>

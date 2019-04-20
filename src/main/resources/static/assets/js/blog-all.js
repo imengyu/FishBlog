@@ -13,7 +13,7 @@ var main = new Vue({
   methods: {
     loadPosts: function () {
       var url = address_blog_api + "posts/page/" + this.currentPostPage + "/15?sortBy=date";
-      var oldScrollTop = $('body,html').scrollTop();
+      $('#main').css('height', $('#main').height() + 'px');
 
       this.contentMainLoading = true;
       $.ajax({
@@ -26,14 +26,15 @@ var main = new Vue({
             else main.contentPosts = mergeJsonArray(main.contentPosts, response.data.content);
             main.contentPosts = main.resolvePostArr(main.contentPosts);
             main.currentPostPage++;
-            $('body,html').scrollTop(oldScrollTop);
           } else {
             main.contentMainLoadError = response.message;
             main.contentMainLoadFailed = true;
           }
+          $('#main').css('height', '');
         }, error: function (xhr, err) {
           main.contentMainLoadError = err;
           main.contentMainLoadFailed = true;
+          $('#main').css('height', '');
         }
       });
     },

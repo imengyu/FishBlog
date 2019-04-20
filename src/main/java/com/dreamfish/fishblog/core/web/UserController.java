@@ -11,10 +11,12 @@ import com.dreamfish.fishblog.core.service.ImageStorageService;
 import com.dreamfish.fishblog.core.service.UserService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
+import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -34,14 +36,18 @@ public class UserController {
     //获取单个用户信息
     @GetMapping("/user/{userId}")
     @ResponseBody
-    public Result getUser(@PathVariable("userId") Integer userId) {
-        if(userId == 0){
+    public Result getUser(@PathVariable("userId") String userId) {
+        int userIdInt = 0;
+        if("0".equals(userId) || "current".equals(userId)) {
             int currentUserId = PublicAuth.authGetUseId(ContextHolderUtils.getRequest());
             if(currentUserId >= AuthCode.SUCCESS)
-                userId = currentUserId;
+                userIdInt = currentUserId;
             else return Result.failure(ResultCodeEnum.NOT_FOUNT);
-        }
-        UserExtened user = userService.findUser(userId);
+        }else if("admin".equals(userId)) userIdInt = 1;
+        else if(StringUtils.isInteger(userId)) userIdInt = Integer.parseInt(userId);
+        else return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "userId 非数字");
+
+        UserExtened user = userService.findUser(userIdInt);
         if(user!=null) return Result.success(user);
         else return Result.failure(ResultCodeEnum.NOT_FOUNT);
     }

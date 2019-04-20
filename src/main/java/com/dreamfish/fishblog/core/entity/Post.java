@@ -57,6 +57,15 @@ public class Post implements Serializable {
     private String postNextTitle;
     @Transient
     private List<PostTag> postTagNames;
+    private Boolean showInList;
+
+    public Boolean getShowInList() {
+        return showInList;
+    }
+
+    public void setShowInList(Boolean showInList) {
+        this.showInList = showInList;
+    }
 
     public List<PostTag> getPostTagNames() {
         return postTagNames;

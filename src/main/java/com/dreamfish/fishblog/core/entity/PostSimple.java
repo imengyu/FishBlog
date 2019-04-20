@@ -31,7 +31,15 @@ public class PostSimple implements Serializable {
     private Integer commentCount;
     private String author;
     private Integer authorId;
+    private Boolean showInList;
 
+    public Boolean getShowInList() {
+        return showInList;
+    }
+
+    public void setShowInList(Boolean showInList) {
+        this.showInList = showInList;
+    }
 
     public Integer getAuthorId() {
         return authorId;

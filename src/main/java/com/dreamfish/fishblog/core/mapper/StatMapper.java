@@ -41,6 +41,8 @@ public interface StatMapper {
 
     @Insert("INSERT INTO fish_stat_pages (date,url,count) VALUES(NOW(),#{url},1)")
     void addStatPage(@Param("url") String url);
+    @Delete("DELETE FROM fish_stat_pages WHERE TO_DAYS(NOW())-TO_DAYS(date)>#{outdays}")
+    void deleteStatPage(@Param("outdays") Integer outdays);
 
     @Select("select id from `fish_stat_pages` where url=#{url} AND TO_DAYS(date)=TO_DAYS(NOW()) limit 1")
     Integer findTodatStatPage(@Param("url") String url);
@@ -51,6 +53,7 @@ public interface StatMapper {
     List<StatPage> getStatTopPage(@Param("date") String date, @Param("maxCount") Integer maxCount);
     @Select("select * from `fish_stat_pages` WHERE TO_DAYS(date)=TO_DAYS(NOW()) ORDER BY date DESC limit #{maxCount}")
     List<StatPage> getStatTodayTopPage(@Param("maxCount") Integer maxCount);
+
 
 
     @Select("select @rownum := @rownum +1 AS rowsnumber from `fish_stat_daylog` ORDER BY date ASC WHERE date=#{date}")
@@ -71,4 +74,7 @@ public interface StatMapper {
 
     @Delete("DELETE FROM fish_stat_ip")
     void clearIpTable();
+
+    @Delete("DELETE FROM fish_logs WHERE TO_DAYS(NOW())-TO_DAYS(date)>#{outdays}")
+    void deleteActionLogs(@Param("outdays") Integer outdays);
 }

@@ -91,6 +91,15 @@ function getUserHasPrivilege(userData, privilege){
   if(!userData) return false;
   return (userData.privilege & privilege) != 0;
 }
+/**
+ * 判断一个字符串是否为空
+ * @param {*} str 要判断的字符串
+ */
+function isNullOrEmpty(str){
+  if(typeof str == 'undefined') return true;
+  if(str==null || str=='')return true;
+  return false;
+}
 function isNumber(val) {
   var regPos = /^\d+(\.\d+)?$/; //非负浮点数
   var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数

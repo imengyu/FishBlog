@@ -21,7 +21,9 @@ public interface PostDatesMapper {
     List<PostDate> getAllDatesWithLimit(@Param("startIndex") Integer startIndex, @Param("pageSize") Integer pageSize);
 
     @Select("SELECT * FROM fish_post_dates WHERE id=#{id}")
-    List<PostDate> getDateById(@Param("id") Integer id);
+    PostDate getDateById(@Param("id") Integer id);
+    @Select("SELECT * FROM fish_post_dates WHERE date=#{date}")
+    PostDate getDateByDate(@Param("date") String date);
 
     /**
      * 删除文章归档时间
@@ -41,7 +43,7 @@ public interface PostDatesMapper {
      * @param date 文章归档时间
      * @return 返回 ID
      */
-    @Insert("INSERT INTO fish_post_tags (date,count) VALUES(#{date.date},#{date.count})")
+    @Insert("INSERT INTO fish_post_dates (date,count) VALUES(#{date.date},#{date.count})")
     @Options(useGeneratedKeys = true, keyProperty = "date.id", keyColumn = "id")
     void addDate(@Param("date") PostDate date);
 
@@ -51,6 +53,11 @@ public interface PostDatesMapper {
      * @param date 文章归档时间
      * @return
      */
-    @Update("UPDATE fish_post_tags SET count=#{date.count} where id=#{date.id}")
+    @Update("UPDATE fish_post_dates SET count=#{date.count} where id=#{date.id}")
     void updateDate(@Param("date") PostDate date);
+
+    @Update("UPDATE fish_post_dates SET count=count-1 where id=#{id}")
+    void updateDecreaseDateCount(@Param("id") Integer id);
+    @Update("UPDATE fish_post_dates SET count=count+1 where id=#{id}")
+    void updateIncreaseDateCount(@Param("id") Integer id);
 }

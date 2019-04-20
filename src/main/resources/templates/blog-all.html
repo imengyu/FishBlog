@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="keywords" content="梦想小鱼的博客,所有文章,ALONE SPACE,DreamFish,梦想小鱼的个人分享博客,梦想小鱼的个人分享平台,梦想小鱼">
     <meta name="description" content="梦想小鱼的个人分享博客-所有文章-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
-    <title>所有文章 - ALONE SPACE</title>
+    <title>所有文章</title>
     <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
     <script type="text/javascript" src="/assets/js/config.js"></script>
     <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
@@ -14,7 +14,7 @@
     <script type="text/javascript" src="/assets/libs/vue.js/vue.js"></script>-->
     <script type="text/javascript">
         setLoaderCSS(new Array("/assets/libs/bootstrap/css/bootstrap.min.css", "/assets/libs/font-awesome/css/font-awesome.min.css", "yzc-blog.min.css"));
-        setLoaderJS(new Array("/assets/libs/jquery/jquery.min.js", "/assets/libs/popper/popper.min.js", "/assets/libs/jquery/jquery.min.js", "/assets/libs/bootstrap/js/bootstrap.min.js", "/assets/libs/vue.js/vue.min.js", "utils.min.js", "blog-all.min.js", "blog-components.min.js", "/assets/libs/scrollReveal/scrollReveal.js"));
+        setLoaderJS(new Array(address_blog_api + "settings.js","/assets/libs/jquery/jquery.min.js", "/assets/libs/popper/popper.min.js", "/assets/libs/jquery/jquery.min.js", "/assets/libs/bootstrap/js/bootstrap.min.js", "/assets/libs/vue.js/vue.min.js", "utils.min.js", "blog-all.min.js", "blog-components.min.js"));
     </script>
     <!--Baidu tongji-->
     <script>
@@ -36,21 +36,14 @@
         <div class="container main-menu main-menu-white" style="padding-top: 40px; padding-bottom: 30px;">
             <div class="row align-items-center justify-content-between d-flex">
                 <div class="nav-header-text">
-                    <span class="logo"></span>
-                    <a href="/">Alone space</a>
+                    <span class="logo" id="header-logo"></span>
+                    <a href="/" id="header-title"></a>
                 </div>
-                <button type="button" id="mobile-nav-toggle">
-                    <i class="fa fa-bars"></i>
-                </button>
+                <button type="button" class="icon-menu" id="mobile-nav-toggle"></button>
                 <nav id="nav-menu-container" class="nav-menu-container">
-                    <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;">
-                        <li><a href="https://www.imyzc.com">主页</a></li>
-                        <li><a href="https://www.imyzc.com/storehouse">我的仓库</a></li>
-                        <li><a href="/">博客主页</a></li>
-                        <li class="menu-active"><a>所有文章</a></li>
-                        <li><a href="https://www.imyzc.com/about.html">关于我</a></li>
+                    <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
                     </ul>
-                </nav><!-- #nav-menu-container -->
+                </nav>
             </div>
         </div>
         <div class="bg-img dealy-load-bgimg" data-original="/images/background/tag-bg.jpg"></div>
@@ -71,7 +64,7 @@
     </header>
 
     <!--Main-->
-    <article id="main" class="sm-padding bg-grey pb-0">
+    <article id="main" class="sm-padding bg-grey">
         <div class="container">
             <div class="row justify-content-start">
                 <div class="col-12 col-sm-12 col-lg-3">
@@ -109,7 +102,7 @@
                                 </div>
                             </li>
                         </ul>
-                        <div v-if="contentMainLoading" class="text-center">
+                        <div v-if="contentMainLoading" class="text-center" style="position: fixed;top: 50%;left: 50%;margin-left: -25px;margin-top: -50px;">
                             <span class="simple-loading"></span>
                             <p>加载中</p>
                         </div>
@@ -127,50 +120,7 @@
                 </div>
             </div>
         </div>
-        <div class="half bg-grey-no-border pt-2 mt-4">
-            <span class="half-bg bg-footer" style="z-index:100"></span>
-            <div class="hello-vue">
-                <span @mouseenter="message = 'Powered by Vue.js'"
-                    @mouseleave="message = 'Hello Vue.js !'">{{ message }}</span>
-            </div>
-        </div>
     </article>
-
-    <!--Footer-->
-    <footer id="footer">
-        <ul class="icons">
-            <li><a href="javascript:void(0)" id="footer_qq" class="icon fa fa-qq"><span class="label">QQ</span></a>
-            </li>
-            <li><a href="javascript:void(0)" id="footer_weixin" class="icon fa fa-weixin text-success"><span
-                        class="label">Weixin</span></a></li>
-            <li class="pr-0"><a href="https://github.com/717021" id="footer_github" class="icon fa fa-github text-dark"
-                    data-original-title="" title=""><span class="label">Github</span></a></li>
-        </ul>
-        <ul class="copyright">
-            <li><i class="fa fa-copyright" aria-hidden="true"></i> 2019. All rights reserved</li>
-            <li>Design by <a class="link" href="https://www.imyzc.com//about.html">DreamFish</a></li>
-        </ul>
-        <ul class="copyright copyright-line">
-            <li><a href="https://www.imyzc.com/support-browser.html" target="_blank"
-                    class="badge badge-pill badge-dark">推荐使用 Microsoft
-                    Edge
-                    或 Chrome 浏览器浏览本页面</a></li>
-        </ul>
-        <ul class="copyright copyright-line">
-                <li><a href="/sitemap.html" target="_blank">网站地图</a></li>
-                <li><a href="/sign-in/" target="_blank">网站后台</a></li>
-            </ul>
-        <ul class="copyright">
-            <li><a class="link" href="https://www.miitbeian.gov.cn">浙ICP备18051956号-1</a></li>
-            <li>
-                <a class="jgwab" target="_blank"
-                    href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33080202000390">
-                    <p><i></i>浙公网安备 33080202000390号</p>
-                </a>
-            </li>
-        </ul>
-    </footer>
-
     <!--Back to top button-->
     <a id="back-top" href="#back-top" class="go-top" data-original-title="" title="" style="display: inline;"><i
             class="fa fa-angle-up"></i></a>
