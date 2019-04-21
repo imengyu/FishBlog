@@ -12,6 +12,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import java.util.Collections;
 
@@ -24,10 +25,14 @@ public class StatController {
     @Autowired
     private LogService logService = null;
 
+    @Autowired
+    private HttpServletRequest request = null;
+
+
     @PostMapping("/stat")
     @ResponseBody
     public Result updateStat(@RequestBody @NonNull JSONObject data){
-        return statService.updateStat(data);
+        return statService.updateStat(data, request);
     }
 
     @GetMapping("/stat")

@@ -10,13 +10,12 @@ import com.dreamfish.fishblog.core.service.StatService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
-import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.request.IpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -38,19 +37,21 @@ public class StatServiceImpl implements StatService {
      * @return 返回操作结果
      */
     @Override
-    public Result updateStat(JSONObject data) {
+    public Result updateStat(JSONObject data, HttpServletRequest request) {
 
         String url = data.getString("url");
         if(StringUtils.isBlank(url)) return Result.failure(ResultCodeEnum.BAD_REQUEST);
 
-        String ip = IpUtil.getIpAddr(ContextHolderUtils.getRequest());
+        String ip = IpUtil.getIpAddr(request);
         Integer oid = statIpMapper.isStaIpExists(ip);
         if(oid == null || oid <= 0) {
             //更新 IP 总计数
             statMapper.updateStatIncrease("ipToday");
             //插入新IP
-            statIpMapper.addStaIp(ip);
+            statIpMapper.addStatIp(ip);
         }
+
+        statIpMapper.updateStayIpIncrease(ip);
 
         //更新 PV 总计数
         statMapper.updateStatIncrease("pvToday");

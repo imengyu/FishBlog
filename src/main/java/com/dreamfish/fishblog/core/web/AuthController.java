@@ -6,6 +6,7 @@ import com.dreamfish.fishblog.core.config.ConstConfig;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.entity.UserExtened;
 import com.dreamfish.fishblog.core.service.AuthService;
+import com.dreamfish.fishblog.core.service.RedisService;
 import com.dreamfish.fishblog.core.service.UserService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
@@ -46,19 +47,17 @@ public class AuthController {
 
     //Redis
     @Autowired
-    private RedisTemplate<Object, Object> redis = null;
+    private RedisService redisService = null;
 
     //开始认证 登录
     @ResponseBody
     @PostMapping(value = "", name = "开始认证")
-    public Result authEntry(
-            @RequestBody @NonNull
-                    User user) {
+    public Result authEntry(@RequestBody @NonNull User user) {
 
         String ip = IpUtil.getIpAddr(request);
         String passwordErrCountKey = "password_error_count_" + ip + "_";
 
-        Integer passwordErrCount = (Integer) redis.opsForValue().get(passwordErrCountKey);
+        Integer passwordErrCount = redisService.get(passwordErrCountKey);
         if (passwordErrCount != null && passwordErrCount > 3)
             return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您的密码错误次数过多，请 15 分钟后再试！");
 
@@ -75,10 +74,10 @@ public class AuthController {
                 //设置或增加密码错误次数
                 if (passwordErrCount == null) {
                     passwordErrCount = 1;
-                    redis.opsForValue().set(passwordErrCountKey, passwordErrCount, 900, TimeUnit.SECONDS);
+                    redisService.set(passwordErrCountKey, passwordErrCount, 900, TimeUnit.SECONDS);
                 } else {
                     passwordErrCount++;
-                    redis.opsForValue().set(passwordErrCountKey, passwordErrCount, 900, TimeUnit.SECONDS);
+                    redisService.set(passwordErrCountKey, passwordErrCount, 900, TimeUnit.SECONDS);
                 }
 
                 if (passwordErrCount >= 4)
@@ -108,9 +107,7 @@ public class AuthController {
     //结束认证 退出
     @ResponseBody
     @GetMapping(value = "/auth-end", name = "结束认证")
-    public Result authEnd(
-            @RequestParam(value = "redirect_uri", required = false) String redirect_uri
-    ) throws IOException {
+    public Result authEnd(@RequestParam(value = "redirect_uri", required = false) String redirect_uri) throws IOException {
         Integer authCode = authService.checkUserAuth(request);
         CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, "", 0);
         authService.authClear(request);
@@ -143,12 +140,15 @@ public class AuthController {
             String loginName = jsonobject.getString("login");
             if(StringUtils.isEmpty(name)) name = loginName;
 
-            UserExtened oldUser = userService.findUser(Integer.parseInt(id));
+            //Find by thid id
+            UserExtened oldUser = userService.findUserByThirdId("github", id);
             if(oldUser == null) {
                 //Add new user
                 oldUser = new UserExtened();
                 oldUser.setFriendlyName(name);
+                oldUser.setThirdId("github_" + id);
                 oldUser.setEmail(email);
+
                 oldUser.setHeadimg(avatar_url);
                 oldUser.setHome(blog);
                 oldUser.setName(loginName);

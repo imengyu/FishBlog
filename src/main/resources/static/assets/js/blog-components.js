@@ -145,7 +145,7 @@ href="javascript:void(0);" :id="\'tag_\'+tag.id"\
 <div class="tags" v-if="contentClassesLoaded">\
 <a v-for="pclass in contentClasses" class="tag-color bg-info"\
 v-on:click="goViewClass(pclass.urlName ? pclass.urlName : pclass.id)"\
-href="javascript:void(0);">{{ pclass.title + \' (\' + pclass.count + \')\' }}</a>\
+href="javascript:void(0);">{{ pclass.title }}</a>\
 </div>\
 <div v-if="contentClassesLoaded && allClassCount > 5 && !contentAllClassesLoaded" class="text-center mt-2">\
 <button v-on:click="loadMoreClasses" class="flat flat-btn btn-link">显示全部</button></div>\

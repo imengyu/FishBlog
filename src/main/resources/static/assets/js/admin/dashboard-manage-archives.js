@@ -274,7 +274,6 @@ function initApp() {
                             url: address_blog_api + '/posts',
                             type: 'delete',
                             data: JSON.stringify(delPosts),
-                            contentType: "application/json; charset=utf-8",
                             dataType: "json",
                             contentType: "application/json; charset=utf-8",
                             success: function (response) {
@@ -370,7 +369,7 @@ function initApp() {
             reloadTable(page){
                 if(page == 'all') main.tableAllLoadStatus = 'notload'
                 else if(page == 'publish') main.tablePublishLoadStatus = 'notload'
-                else if(page == 'draft') main.tableDrafthLoadStatus = 'notload'
+                else if(page == 'draft') main.tableDraftLoadStatus = 'notload'
                 this.loadTable(page);
             },
             loadTable: function (page){
@@ -385,6 +384,7 @@ function initApp() {
                             main.tableAllDatas = response.data.content;
                             main.tableAllPageCurrent = response.data.number + 1;
                             main.tableAllPageAll = response.data.totalPages;
+                            main.reloadPostStats(page);
                           } else { main.tableAllLoadStatus = 'failed'; }
                         }, error: function (xhr, err) { main.tableAllLoadStatus = 'failed'; }
                     });
@@ -399,6 +399,7 @@ function initApp() {
                             main.tablePublishDatas = response.data.content;
                             main.tablePublishPageCurrent = response.data.number + 1;
                             main.tablePublishPageAll = response.data.totalPages;
+                            main.reloadPostStats(page);
                           } else { main.tablePublishLoadStatus = 'failed'; }
                         }, error: function (xhr, err) { main.tablePublishLoadStatus = 'failed'; }
                       });
@@ -413,10 +414,51 @@ function initApp() {
                             main.tableDraftDatas = response.data.content;
                             main.tableDraftPageCurrent = response.data.number + 1;
                             main.tableDraftPageAll = response.data.totalPages;
+                            main.reloadPostStats(page);
                           } else { main.tableDraftLoadStatus = 'failed'; }
                         }, error: function (xhr, err) { main.tableDraftLoadStatus = 'failed'; }
                       });
                 }
+            },
+            reloadPostStats: function(page){
+                var getPosts = { archives: [] };
+                var contentPosts = null;
+                if(page == 'all') contentPosts = main.tableAllDatas
+                else if(page == 'publish') contentPosts = main.tablePublishDatas
+                else if(page == 'draft') contentPosts = main.tableDraftDatas
+
+                for (var key in contentPosts)
+                    if (contentPosts[key].id)
+                        getPosts.archives.push(contentPosts[key].id);
+
+                var findOldPosts = function (id) {
+                    for (var key in contentPosts)
+                        if (contentPosts[key].id == id)
+                            return contentPosts[key];
+                    return null;
+                }
+                var reloadPostsStat = function (arr) {
+                    for (var key in arr) {
+                        var o = findOldPosts(key);
+                        if (o) {
+                            o.viewCount = arr[key].viewCount;
+                            o.commentCount = arr[key].commentCount;
+                        }
+                    }
+                }
+
+                $.ajax({
+                    url: address_blog_api + 'posts/stat',
+                  type: 'post',
+                  data: JSON.stringify(getPosts),
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (response) {
+                    if (response.success) 
+                      reloadPostsStat(response.data);
+                  }, error: function (xhr, err) {}
+                });
+                
             },
         }
     });

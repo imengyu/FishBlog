@@ -55,6 +55,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.findByFullById(id);
     }
 
+    @Override
+    public UserExtened findUserByThirdId(String type, String id) {
+        return userMapper.findByFullByThirdId(type + "_" + id);
+    }
+
     /**
      * 带认证删除用户（公开需认证）
      * @param userId 用户 ID

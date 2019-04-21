@@ -1,6 +1,7 @@
 package com.dreamfish.fishblog.core.mapper;
 
 import com.dreamfish.fishblog.core.entity.PostSimple;
+import com.dreamfish.fishblog.core.entity.PostStat;
 import com.dreamfish.fishblog.core.entity.PostTag;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -45,6 +46,9 @@ public interface PostSimpleMapper {
     List<PostSimple> getTagPostsWithLimitOrderBy(@Param("startIndex") Integer startIndex, @Param("pageSize") Integer pageSize, @Param("order") String order, @Param("tag") String tag);
     @Select("SELECT * WHERE status=1 AND show_in_list=1 AND tags LIKE '%-${tag}-%' ORDER BY ${order}")
     List<PostSimple> getTagPostsOrderBy(@Param("order") String order, @Param("tag") String tag);
+
+    @Select("SELECT view_count,comment_count,like_count FROM fish_posts WHERE id=#{id}")
+    PostStat getPostStatById(@Param("id") Integer id);
 
     /**
      * 获取文章作者 ID

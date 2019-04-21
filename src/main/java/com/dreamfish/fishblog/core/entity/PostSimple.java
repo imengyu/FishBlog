@@ -14,7 +14,7 @@ public class PostSimple implements Serializable {
     private static final long serialVersionUID = -4267297373765083850L;
 
     @Id()
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String urlName;
     private String postDate;
@@ -32,6 +32,24 @@ public class PostSimple implements Serializable {
     private String author;
     private Integer authorId;
     private Boolean showInList;
+    private Boolean topMost;
+    private Integer likeCount;
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public Boolean getTopMost() {
+        return topMost;
+    }
+
+    public void setTopMost(Boolean topMost) {
+        this.topMost = topMost;
+    }
 
     public Boolean getShowInList() {
         return showInList;

@@ -32,6 +32,9 @@ public interface UserMapper {
     @Select("SELECT * FROM fish_users WHERE id = #{id}")
     UserExtened findByFullById(@Param("id") Integer id);
 
+    @Select("SELECT * FROM fish_users WHERE thrid_id = #{thirdId}")
+    UserExtened findByFullByThirdId(@Param("thirdId") String thirdId);
+
     /**
      * 根据用户 id 查询用户头像
      * @param id 用户 id

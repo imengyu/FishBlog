@@ -22,7 +22,7 @@ var main = new Vue({
       this.loadTagPosts();
     },
     loadTagPosts: function(){
-      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/20?sortBy=date&onlyTag=" + this.contentLoadTag;
+      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/20?sortBy=date&noTopMost=true&onlyTag=" + this.contentLoadTag;
       var tags_url = address_blog_api + "tags";
       var oldScrollTop = $('body,html').scrollTop();
       this.contentMainLoading = true;
@@ -34,6 +34,7 @@ var main = new Vue({
             main.allPostPage = response.data.totalPages;
             if (main.contentPosts == null) main.contentPosts = response.data.content;
             else main.contentPosts = mergeJsonArray(main.contentPosts, response.data.content);
+            main.reloadPostStats();
             main.currentPostPage++;
             $('body,html').scrollTop(oldScrollTop);
           } else {
@@ -72,7 +73,42 @@ var main = new Vue({
     },
     goViewTag (tagId) {
       location.href = partPositions.viewTag + tagId + '/';
-  },
+    },
+    reloadPostStats: function(){
+      var getPosts = { archives: [] };
+      for(var key in main.contentPosts)
+        if(main.contentPosts[key].id) 
+          getPosts.archives.push(main.contentPosts[key].id);
+
+      var findOldPosts = function(id){
+        for(var key in main.contentPosts)
+          if(main.contentPosts[key].id==id) 
+            return main.contentPosts[key];
+        return null;
+      }
+      var reloadPostsStat = function(arr){
+        for(var key in arr) {
+          var o = findOldPosts(key);
+          if(o){
+            o.viewCount = arr[key].viewCount;
+            o.commentCount = arr[key].commentCount;
+          }
+        }
+      }
+
+      $.ajax({
+        url: address_blog_api + 'posts/stat',
+        type: 'post',
+        data: JSON.stringify(getPosts),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (response) {
+          if (response.success) 
+            reloadPostsStat(response.data);
+        }, error: function (xhr, err) {}
+      });
+      
+    },
   }
 })
 

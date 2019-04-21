@@ -18,9 +18,10 @@ public class UserExtened implements Serializable {
     private String home;
     private String email;
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     private String name;
+    private String thirdId;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passwd;
     private Integer level;
@@ -69,7 +70,13 @@ public class UserExtened implements Serializable {
     public String getCardBackground() {
         return cardBackground;
     }
+    public String getThirdId() {
+        return thirdId;
+    }
 
+    public void setThirdId(String thirdId) {
+        this.thirdId = thirdId;
+    }
     public void setCardBackground(String cardBackground) {
         this.cardBackground = cardBackground;
     }

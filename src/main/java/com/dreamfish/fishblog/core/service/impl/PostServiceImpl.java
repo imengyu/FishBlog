@@ -25,6 +25,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,18 +49,19 @@ public class PostServiceImpl implements PostService {
     private PostCommentMapper postCommentMapper = null;
 
     @Override
-    @Cacheable(value = "blog-simple-reader-cache", key = "'post_'+#p0")
     public Result findPostWithIdOrUrlName(String idOrUrlName, boolean authForRead) {
 
-        HttpServletRequest request = ContextHolderUtils.getRequest();
-        Post post;
-        if(StringUtils.isInteger(idOrUrlName)) {
-            Optional<Post> o = postRepository.findById(Integer.parseInt(idOrUrlName));
-            if(!o.isPresent()) return Result.failure(ResultCodeEnum.NOT_FOUNT);
-            post = o.get();
-        }
-        else post =  postRepository.findByUrlName(RequestUtils.encoderURLString(idOrUrlName));
+        Integer id ;
+        if(StringUtils.isInteger(idOrUrlName)) id = Integer.parseInt(idOrUrlName);
+        else id = postMapper.getPostIdByUrlName(RequestUtils.encoderURLString(idOrUrlName));
+        return findPostWithId(id, authForRead);
+    }
 
+    @Override
+    @Cacheable(value = "blog-simple-reader-cache", key = "'post_'+#p0")
+    public Result findPostWithId(Integer id, boolean authForRead) {
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        Post post = postMapper.findById(id);
         if(post==null) return Result.failure(ResultCodeEnum.NOT_FOUNT);
         //访问非公开文章需要验证权限
         if(post.getStatus().intValue() != Post.POST_STATUS_PUBLISH) {
@@ -86,9 +88,9 @@ public class PostServiceImpl implements PostService {
         if(!StringUtils.isBlank(postTags)){
             List<PostTag> tagNames = new ArrayList<>();
             String[] tagIds = postTags.split("-");
-            for (String id : tagIds) {
-                if(!StringUtils.isBlank(id) && StringUtils.isInteger(id))
-                    tagNames.add(postMapper.getTag(Integer.parseInt(id)));
+            for (String gid : tagIds) {
+                if(!StringUtils.isBlank(gid) && StringUtils.isInteger(gid))
+                    tagNames.add(postMapper.getTag(Integer.parseInt(gid)));
             }
 
             post.setPostTagNames(tagNames);
@@ -99,11 +101,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Caching(
-        evict = {
-            @CacheEvict(value = "blog-simple-reader-cache", key = "'post_'+#p0"),
-            @CacheEvict(value = "blog-simple-reader-cache", key = "'post_'+#p1.urlName"),
-            @CacheEvict(value = "blog-posts-pages-cache", allEntries = true)
-        }
+            evict = {
+                    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_'+#p0"),
+                    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0"),
+                    @CacheEvict(value = "blog-posts-pages-cache", allEntries = true)
+            }
     )
     public Result updatePost(Integer id, Post post) {
 
@@ -126,18 +128,23 @@ public class PostServiceImpl implements PostService {
     }
     @Override
     @Caching(
-        evict = {
-            @CacheEvict(value = "blog-posts-pages-cache", allEntries = true)
-        }
+            evict = {
+                    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_'+#p0"),
+                    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0"),
+                    @CacheEvict(value = "blog-posts-pages-cache", allEntries = true)
+            }
     )
     public Result addPost(Post post) {
+        Date now = new Date();
+
+        post.setPostDate(now);
         post = postRepository.saveAndFlush(post);
 
         //日志
         ActionLog.logUserAction("创建文章："+post.getId(), ContextHolderUtils.getRequest());
 
         //添加对应归档项
-        Date now = new Date();
+
         String nowDateStr = new SimpleDateFormat("yyyy-MM").format(now);
         PostDate dateItem =  postDatesMapper.getDateByDate(nowDateStr);
         if(dateItem == null){
@@ -151,10 +158,11 @@ public class PostServiceImpl implements PostService {
     }
     @Override
     @Caching(
-        evict = {
-            @CacheEvict(value = "blog-simple-reader-cache", key = "'post_'+#p0"),
-            @CacheEvict(value = "blog-posts-pages-cache", allEntries = true)
-        }
+            evict = {
+                    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_'+#p0"),
+                    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0"),
+                    @CacheEvict(value = "blog-posts-pages-cache", allEntries = true)
+            }
     )
     public Result deletePost(Integer id) {
 
@@ -185,11 +193,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_'+#p0")
+    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0")
     public Result increasePostViewCount(Integer id) {
         postMapper.increasePostValue(id, "view_count");
         return Result.success();
     }
-
-
+    @Override
+    @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0")
+    public Result increasePostLikeCount(Integer id) {
+        postMapper.increasePostValue(id, "like_count");
+        return Result.success();
+    }
 }

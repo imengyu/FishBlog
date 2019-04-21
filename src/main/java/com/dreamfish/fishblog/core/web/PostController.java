@@ -7,6 +7,7 @@ import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.service.PostService;
 import com.dreamfish.fishblog.core.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +43,7 @@ public class PostController {
                     Integer id,
             @RequestBody @NonNull
                     Post postData){
+
         return postService.updatePost(id,postData);
     }
 
@@ -67,6 +69,16 @@ public class PostController {
     @GetMapping("/updateViewCount")
     @ResponseBody
     public Result updatePostViewCount(
+            @RequestParam("id")
+                    Integer id){
+        return postService.increasePostViewCount(id);
+    }
+
+
+    //增加文章查看数
+    @GetMapping("/updateLikeCount")
+    @ResponseBody
+    public Result updateLikeCount(
             @RequestParam("id")
                     Integer id){
         return postService.increasePostViewCount(id);

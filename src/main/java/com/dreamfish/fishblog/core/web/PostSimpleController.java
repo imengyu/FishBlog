@@ -80,11 +80,13 @@ public class PostSimpleController {
             @RequestParam(value = "byUser", required = false, defaultValue = "0")
                     Integer byUser,
             @RequestParam(value = "byStatus", required = false, defaultValue = "none")
-                    String byStatus){
+                    String byStatus,
+             @RequestParam(value = "noTopMost", required = false, defaultValue = "false")
+                    Boolean noTopMost){
 
         Page<PostSimple> result;
         try {
-            result = postSimpleService.getSimplePostsWithPageable(pageIndex, pageSize, sortByStrToVal(sortBy), onlyTag, byDate, byClass, byUser, byStatus);
+            result = postSimpleService.getSimplePostsWithPageable(pageIndex, pageSize, sortByStrToVal(sortBy), onlyTag, byDate, byClass, byUser, byStatus, false);
         } catch (NoPrivilegeException e) {
             return Result.failure(e.getCode().toString(), e.getMessage(), "");
         }
@@ -103,7 +105,7 @@ public class PostSimpleController {
 
         List<Integer> ids = new ArrayList<>();
         for(int i =0, size = archiveIds.size(); i<size; i++){
-            if(StringUtils.isInteger(archiveIds.getString(i))) ids.add(Integer.parseInt(archiveIds.getString(i)));
+            if(archiveIds.getString(i) != null && StringUtils.isInteger(archiveIds.getString(i))) ids.add(Integer.parseInt(archiveIds.getString(i)));
             else return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "参数 archives[" + i + "] 类型有误","");
         }
         try {
@@ -114,6 +116,26 @@ public class PostSimpleController {
         }
     }
 
+    //获取一些文章的状态
+    @RequestMapping(value = "/stat", name = "获取一些文章的状态", method = RequestMethod.POST)
+    @ResponseBody
+    public Result getPostsStats(@RequestBody JSONObject jsonObject) {
+        JSONArray archiveIds = jsonObject.getJSONArray("archives");
+        if(archiveIds == null || archiveIds.size() == 0)
+            return Result.failure(ResultCodeEnum.BAD_REQUEST);
+
+        List<Integer> ids = new ArrayList<>();
+        for(int i =0, size = archiveIds.size(); i<size; i++){
+            if(archiveIds.getString(i) != null && StringUtils.isInteger(archiveIds.getString(i))) ids.add(Integer.parseInt(archiveIds.getString(i)));
+            else return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "参数 archives[" + i + "] 类型有误","");
+        } return postSimpleService.getPostsStats(ids);
+    }
+    //获取一些文章的状态
+    @RequestMapping(value = "/stat/{postId}", name = "获取一些文章的状态", method = RequestMethod.GET)
+    @ResponseBody
+    public Result getPostStats(@PathVariable("postId") Integer postId) {
+        return Result.success(postSimpleService.getPostsStats(postId));
+    }
 
     private int sortByStrToVal(String sortBy){
         if("".equals(sortBy) || "none".equals(sortBy))

@@ -13,14 +13,13 @@ public class PostClass implements Serializable {
     private static final long serialVersionUID = -3037304079571291010L;
 
     @Id()
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String url_name;
     private String preview_text;
     private String preview_image;
     private String title;
     private Integer status;
-    private Integer count;
 
     public Integer getId() {
         return id;
@@ -44,14 +43,6 @@ public class PostClass implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
     }
 
     public String getUrlName() {

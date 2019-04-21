@@ -30,7 +30,7 @@ var main = new Vue({
       $('title').text('文章归档 ' + this.currentDateShow + ' - ALONE SPACE');
     },
     loadDatePosts: function(){
-      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/10?sortBy=date&byDate=" + this.contentLoadDateY + "-" + this.contentLoadDateM;
+      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/10?sortBy=date&noTopMost=true&byDate=" + this.contentLoadDateY + "-" + this.contentLoadDateM;
       var oldScrollTop = $('body,html').scrollTop();
       this.currentDateShow =  this.contentLoadDateY + " 年 " + this.contentLoadDateM + " 月 发表的文章";
       this.contentMainLoading = true;
@@ -42,6 +42,7 @@ var main = new Vue({
             main.allPostPage = response.data.totalPages;
             if (main.contentPosts == null) main.contentPosts = response.data.content;
             else main.contentPosts = mergeJsonArray(main.contentPosts, response.data.content);
+            main.reloadPostStats();
             main.currentPostPage++;
             $('body,html').scrollTop(oldScrollTop);
           } else {
@@ -66,6 +67,41 @@ var main = new Vue({
     },
     getPostPrefix: function (prefixId){
       return getPostPrefix(prefixId);
+    },
+    reloadPostStats: function(){
+      var getPosts = { archives: [] };
+      for(var key in main.contentPosts)
+        if(main.contentPosts[key].id) 
+          getPosts.archives.push(main.contentPosts[key].id);
+
+      var findOldPosts = function(id){
+        for(var key in main.contentPosts)
+          if(main.contentPosts[key].id==id) 
+            return main.contentPosts[key];
+        return null;
+      }
+      var reloadPostsStat = function(arr){
+        for(var key in arr) {
+          var o = findOldPosts(key);
+          if(o){
+            o.viewCount = arr[key].viewCount;
+            o.commentCount = arr[key].commentCount;
+          }
+        }
+      }
+
+      $.ajax({
+        url: address_blog_api + 'posts/stat',
+        type: 'post',
+        data: JSON.stringify(getPosts),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (response) {
+          if (response.success) 
+            reloadPostsStat(response.data);
+        }, error: function (xhr, err) {}
+      });
+      
     },
   }
 })

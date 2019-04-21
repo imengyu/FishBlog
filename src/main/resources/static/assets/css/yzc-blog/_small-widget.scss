@@ -893,7 +893,102 @@
     }
 }
 
+/*Like button*/
+.like{
+    display: block;
+    margin-top: 20px;
 
+    .like-group {
+        position: relative;
+        padding: 13px 0 15px 0;
+        font-size: 0;
+        border: 1px solid #EA6F5A;
+        border-radius: 40px;
+
+        &:hover {
+            background-color: rgba(236, 97, 73, 0.05);
+        }
+
+        .btn-like {
+            display: inline-block;
+            font-size: 19px;
+
+            a {
+                position: relative;
+                padding: 18px 30px 18px 55px;
+                color: #EA6F5A;
+            }
+
+            &:before {
+                content: '';
+                position: absolute;
+                left: 12px;
+                top: 2px;
+                width: 50px;
+                height: 50px;
+                background-image: url(/images/blocks/like_animation_steps.png);
+                background-position: left;
+                background-repeat: no-repeat;
+                background-size: 1000px 50px;
+            }
+        }
+
+        .modal-wrap {
+            font-size: 18px;
+            border-left: 1px solid rgba(236, 97, 73, 0.4);
+            display: inline-block;
+            margin-left: -15px;
+
+            a {
+                color: #EA6F5A;
+                padding: 18px 26px 18px 18px;
+            }
+        }
+    }
+
+    .share-group {
+        float: right;
+
+        .share-circle {
+            width: 50px;
+            height: 50px;
+            margin-left: 5px;
+            text-align: center;
+            border: 1px solid #dcdcdc;
+            border-radius: 50%;
+            vertical-align: middle;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+
+            .fa-weixin {
+                color: #00bb29;
+            }
+
+            .fa-weibo {
+                color: #e05244;
+            }
+            
+            &:hover {
+                background-color: hsla(0,0%,71%,.1);
+            }
+            &.more-share{
+                width: auto;
+                padding: 4px 18px;
+                font-size: 14px;
+                color: #9b9b9b;
+                line-height: 40px;
+                border-radius: 50px;
+            }
+
+            i {
+                font-size: 24px;
+                line-height: 2;
+            }
+        }
+        
+    }
+}
 
 
 

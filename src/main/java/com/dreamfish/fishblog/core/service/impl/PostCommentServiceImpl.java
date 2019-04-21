@@ -66,6 +66,7 @@ public class PostCommentServiceImpl implements PostCommentService {
         evict = {
             @CacheEvict(value = "blog-single-reader-cache", key = "'comment-single-'+#p1.id"),
             @CacheEvict(value = "blog-single-reader-cache", key = "'comment-in-post-'+#p0"),
+            @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0"),
             @CacheEvict(value = "blog-comment-pages-cache", allEntries = true)
         }
     )
@@ -98,6 +99,7 @@ public class PostCommentServiceImpl implements PostCommentService {
         evict = {
             @CacheEvict(value = "blog-single-reader-cache", key = "'comment-single-'+#p1"),
             @CacheEvict(value = "blog-single-reader-cache", key = "'comment-in-post-'+#p0"),
+            @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0"),
             @CacheEvict(value = "blog-comment-pages-cache", allEntries = true)
         }
     )
@@ -130,6 +132,7 @@ public class PostCommentServiceImpl implements PostCommentService {
         evict = {
             @CacheEvict(value = "blog-single-reader-cache", key = "'comment-single-'+#p1.id"),
             @CacheEvict(value = "blog-single-reader-cache", key = "'comment-in-post-'+#p0"),
+            @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0"),
             @CacheEvict(value = "blog-comment-pages-cache", allEntries = true)
         }
     )

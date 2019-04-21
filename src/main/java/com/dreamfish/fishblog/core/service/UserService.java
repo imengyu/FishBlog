@@ -10,6 +10,7 @@ public interface UserService {
 
     boolean isUserExistes(int id);
     UserExtened findUser(int id);
+    UserExtened findUserByThirdId(String type, String id);
     Result deleteUser(int userId);
     Result addUser(UserExtened user);
     void deleteUserInternal(int userId);

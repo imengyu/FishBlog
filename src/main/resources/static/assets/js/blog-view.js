@@ -232,7 +232,7 @@ var main = new Vue({
                     var postHeight = $('#comment').offset().top;
                     var commentFirstLoaded = false;
                     $(document).scroll(function (e) {
-                        if ($(document).scrollTop() >= postHeight && !commentFirstLoaded) {
+                        if ($(document).scrollTop() >= (postHeight - 300) && !commentFirstLoaded) {
                             main.$refs.postComment.loadPostComment();
                             commentFirstLoaded = true;
                         }
@@ -245,6 +245,28 @@ var main = new Vue({
                 if(document.referrer!=document.location.toString())
                     $.get(address_blog_api + "post/updateViewCount?id=" + main.currentPostId);
             },1500)
+        },
+        updateLikeCount: function(){
+            if(document.referrer!=document.location.toString())
+                $.get(address_blog_api + "post/updateLikeCount?id=" + main.currentPostId);
+        },
+        reloadPostStats: function () {
+
+            $.ajax({
+                url: address_blog_api + 'posts/stat/',
+                type: 'post',
+                data: JSON.stringify(getPosts),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.success){
+                        main.postContent.viewCount = response.data.viewCount;
+                        main.postContent.commentCount = response.data.commentCount;
+                        main.postContent.likeCount = response.data.likeCount;
+                    }
+                }, error: function (xhr, err) { }
+            });
+
         },
 
         //Clicks

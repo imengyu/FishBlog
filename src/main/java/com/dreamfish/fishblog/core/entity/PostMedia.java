@@ -14,7 +14,7 @@ public class PostMedia implements Serializable {
     private static final long serialVersionUID = 2653829053946397782L;
 
     @Id()
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private Integer postId;

@@ -222,6 +222,7 @@ Vue.component('commenter', {
                         "authorName": $('#comment_name').val(),
                         "authorMail": $('#comment_mail').val(),
                         "authorWebsite": $('#comment_website').val(),
+                        'authorHead': this.authedUserInfo.headimg,
                         "postId": this.currentPostId,
                         "parentComment": this.currReplyItem,
                         "postDate": new Date().format("yyyy-MM-dd HH:mm:ss"),
@@ -241,7 +242,13 @@ Vue.component('commenter', {
             var website = $('#comment_website').val();
             var id =  main.currentPostId;
             var user_id = 0;
-            if(main.authed && main.authedUserInfo) user_id = main.authedUserInfo.id;
+            if(main.authed && main.authedUserInfo) {
+                user_id = main.authedUserInfo.id;
+                if(main.authedUserInfo.friendlyName) name = main.authedUserInfo.friendlyName;
+                if(main.authedUserInfo.name)  name = main.authedUserInfo.name;
+                if(main.authedUserInfo.email) mail = main.authedUserInfo.email;
+                if(main.authedUserInfo.home) website = main.authedUserInfo.home;
+            }
             else if(!anonymousComment){
                 swal("请先登录", "需要登录才能评论", "info");
                 return;
@@ -291,6 +298,7 @@ Vue.component('commenter', {
                         $('#comment_content').val('');
                         main.mergeNewItem(dataObj.data);
                         main.currentEditComment='';
+                        main.currentPreviewItem=null;
                         swal("发表成功!", "您的评论已经发表，感谢您对我们的支持！", "success");
                     }
                     else swal("抱歉！发表失败了!", "提交时发生了错误 "+ dataObj.message, "error");
@@ -473,7 +481,7 @@ Vue.component('commenter', {
 </div>\
 <textarea v-if="isEditing" v-model="currentEditComment" class="flat" name="comment_content" id="comment_content" rows="4" placeholder="说点什么吧"></textarea>\
 <div v-else-if="currentPreviewItem">\
-<div class="comment" :id="\'comment-\'+currentPreviewItem.id" :data-name="currentPreviewItem.authorName" :data-parent="currentPreviewItem.parentComment">\
+<div class="comment" :id="\'comment-\'+currentPreviewItem.id" :data-name="currentPreviewItem.authorName" :data-parent="currentPreviewItem.parentComment" style="width:100%">\
 <div class="comment-one">\
 <div class="comment-head">\
 <img class="rounded-circle" :src="currentPreviewItem.authorHead?getImageUrl(currentPreviewItem.authorHead):\'/images/default/head-default.png\'" :alt="currentPreviewItem.authorName">\
@@ -543,21 +551,3 @@ Vue.component('commenter', {
 <div v-if="loadFailed" class="text-secondary text-center p-4"><i class="fa fa-exclamation-triangle"></i><br />加载评论失败<br />{{ laodErr }} {{ currentPostId }}</div>\
 </div></div>'
 })
-
-function add_new_comment(id){
-    var data = {
-        id: id, parent_comment: curr_reply_par_item,
-        author_name: $('#comment_name').val(),
-        author_website: $('#comment_website').val(),
-        post_date: new Date().format("yyyy-MM-dd HH:mm:ss"),
-        comment_content: $('#comment_content').val(),
-    };
-    load_one_item($comment_host, data, false);
-    $parentitem = $('#comment-' + data.parent_comment);
-    $item = $('#comment-' + data.id);
-    if($parentitem.length > 0){
-        $parentitem.append($($item.prop("outerHTML")));
-        $item.remove();
-    }
-}
-

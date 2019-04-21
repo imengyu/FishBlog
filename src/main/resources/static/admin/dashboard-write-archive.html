@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
-                                        <label for="archive-headimg">章头背景图片</label>
+                                        <label for="archive-headimg">章头背景图片URL</label>
                                         <input type="text" class="form-control" id="archive-headimg"
                                             v-model="archiveObject.headimg">
                                         <div class="custom-control custom-checkbox mt-1">
@@ -94,7 +94,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="archive-previewImage">文章预览小图</label>
+                                        <label for="archive-previewImage">文章预览小图URL</label>
                                         <input type="text" class="form-control" id="archive-previewImage"
                                             v-model="archiveObject.previewImage">
                                     </div>
@@ -104,7 +104,7 @@
                                             v-model="archiveObject.viewCount">
                                     </div>
                                     <div class="form-group col-md-2">
-                                        <label for="archive-commentCount">重写评论数</label>
+                                        <label for="archive-commentCount" title="如果评论数与实际不符，您可以重写它">重写评论数</label>
                                         <input type="text" class="form-control" id="archive-commentCount"
                                             v-model="archiveObject.commentCount">
                                         <div class="custom-control custom-checkbox mt-1">
@@ -149,6 +149,18 @@
                                         </ul>
                                     </div>
                                 </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="archive-prv-id">上一篇文章ID</label>
+                                        <input type="text" class="form-control" id="archive-prv-id"
+                                            v-model="archiveObject.postPrvId">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="archive-next-id">下一篇文章ID</label>
+                                        <input type="text" class="form-control" id="archive-next-id"
+                                            v-model="archiveObject.postNextId">
+                                    </div>
+                                </div>
                                 <div class="from-group form-inline">
                                     <div class="custom-control custom-checkbox mt-1">
                                         <input type="checkbox" class="custom-control-input"
@@ -158,13 +170,21 @@
                                     </div>
                                     <div class="custom-control custom-checkbox ml-3" title="取消勾选此项以后，用户将不能从文章列表中看到这篇文章（但是依然可以看这篇文章）">
                                         <input type="checkbox" class="custom-control-input"
-                                            id="archive-add-last-modify-date" v-model="archiveObject.showInList">
-                                        <label class="custom-control-label" for="archive-add-last-modify-date">显示在文章列表中</label>
+                                            id="archive-show-in-list" v-model="archiveObject.showInList">
+                                        <label class="custom-control-label" for="archive-show-in-list">显示在文章列表中</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox ml-3" title="取消勾选此项以后，用户将不能从文章列表中看到这篇文章（但是依然可以看这篇文章）">
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="archive-show-catalog" v-model="archiveObject.showCatalog">
+                                        <label class="custom-control-label" for="archive-show-catalog">是否显示目录</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox ml-3" title="文章将会置顶在列表的顶部">
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="archive-top-most" v-model="archiveObject.topMost">
+                                        <label class="custom-control-label" for="archive-top-most">文章置顶</label>
                                     </div>
                                 </div>
-                                <div class="form-group form-inline">
-
-                                </div>
+                                
                             </div>
                         </form>
                     </div>

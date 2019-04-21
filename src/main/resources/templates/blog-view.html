@@ -66,7 +66,7 @@
                     <button type="button" class="icon-menu" id="mobile-nav-toggle"></button>
                     <nav id="nav-menu-container" class="nav-menu-container">
                         <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
-                            <li class="menu-active"><a>文章视图</a></li>
+                            <li v-if="isLoaded && postContent.showInList" class="menu-active"><a>文章视图</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -90,7 +90,7 @@
                                 <h1 :class="postContent.headimg ? 'black-text' : 'light-text'">{{ postContent.title }}
                                 </h1>
                                 <p :class="postContent.headimg ? 'black-text' : 'light-text'">{{ postContent.postDate }}
-                                    <i class="fa fa-eye ml-3 mr-2"></i>{{ postContent.viewCount }} 浏览 <i class="fa fa-user ml-3 mr-2"></i>{{ postContent.author }}</p>
+                                    <i class="fa fa-eye ml-3 mr-2"></i>{{ postContent.viewCount + 1 }} 浏览 <i class="fa fa-user ml-3 mr-2"></i>{{ postContent.author }}</p>
                             </div>
                         </div>
                         <!-- /blog content -->
@@ -100,16 +100,35 @@
         </header>
 
         <!--Main-->
-        <article v-if="isLoaded" class="sm-padding bg-grey-no-border pb-0">
+        <article v-if="isLoaded" class="sm-padding bg-grey-no-border">
 
             <div class="container">
                 <!--Post area-->
-                <div class="row justify-content-end">
+                <div v-if="postContent.showCatalog" class="row justify-content-end">
                     <!-- Post Container -->
                     <div class="col-lg-8 col-md-10 post-container">
                         <div v-if="postContentWithHtml!=null" v-html="postContentWithHtml"
                             class="blog-content-result post-container" id="post_content">
 
+                        </div>
+                        <div v-if="isLoaded">
+                            <p v-if="postContent.lastmodifyDate" class="text-secondary mt-3 mb-2">本文最后在 {{ postContent.lastmodifyDate }} 进行了编辑
+                            </p>
+                            <!--<div class="like mt-2">
+                                <div class="btn like-group" v-on:click="updateLikeCount()">
+                                    <div class="btn-like"><a>喜欢</a></div>
+                                    <div class="modal-wrap"><a >{{ postContent.likeCount }}</a></div>
+                                </div>
+                                <div class="share-group">
+                                        <a class="share-circle" data-action="weixin-share" data-toggle="tooltip" data-original-title="分享到微信">
+                                          <i class="fa fa-weixin"></i>
+                                        </a>
+                                        <a class="share-circle" data-action="weibo-share" data-toggle="tooltip" href="javascript:void((function(s,d,e,r,l,p,t,z,c){var%20f='http://v.t.sina.com.cn/share/share.php?appkey=1881139527',u=z||d.location,p=['&amp;url=',e(u),'&amp;title=',e(t||d.title),'&amp;source=',e(r),'&amp;sourceUrl=',e(l),'&amp;content=',c||'gb2312','&amp;pic=',e(p||'')].join('');function%20a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=440,height=430,left=',(s.width-440)/2,',top=',(s.height-430)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else%20a();})(screen,document,encodeURIComponent,'','','', '推荐 @埃尔文放弃 的文章《springboot2.0 整合 Mybatis (springboot2.0版本)》（ 分享自 @简书 ）','https://www.jianshu.com/p/5cd772c07041?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=reader_share&amp;utm_source=weibo','页面编码gb2312|utf-8默认gb2312'));" data-original-title="分享到微博">
+                                          <i class="fa fa-weibo"></i>
+                                        </a>
+                                        <a class="share-circle more-share" tabindex="0" data-toggle="popover" data-placement="top" data-html="true" data-trigger="focus" href="javascript:void(0);" data-original-title="" title="">更多分享</a>
+                                      </div>-->
+                            </div>
                         </div>
                     </div>
                     <!-- Post Catalog -->
@@ -127,6 +146,20 @@
                         </div>
                     </div>
                 </div>
+
+                <!--Post area no catalog-->
+                <div v-else class="row justify-content-end">
+                    <div v-if="postContentWithHtml!=null" v-html="postContentWithHtml"
+                        class="blog-content-result post-container" id="post_content">
+
+                    </div>
+                    <div v-if="isLoaded">
+                        <p v-if="postContent.lastmodifyDate" class="text-secondary mt-3 mb-2">本文最后在 {{ postContent.lastmodifyDate }} 进行了编辑</p>
+                    
+
+                    </div>
+                </div>
+
                 <!-- Post Up down Navigator -->
                 <div class="row justify-content-end mt-3" id="post_content_end">
                     <div class="col-lg-4 col-md-5">
@@ -166,7 +199,7 @@
         </div>
 
         <!--Comments-->
-        <article v-if="postCanComment" id="comment" class="sm-padding bg-grey-no-border pb-0">
+        <article v-if="postCanComment" id="comment" class="sm-padding bg-grey-no-border">
             <div class="container">
                 <div class="row justify-content-end">
                     <div class="col-lg-8 col-md-10 col-sm-12">
@@ -195,7 +228,7 @@
                 </div>
             </div>
         </article>
-        <article v-else-if="isLoaded" id="comment" class="sm-padding bg-grey-no-border pb-0">
+        <article v-else-if="isLoaded" id="comment" class="sm-padding bg-grey-no-border">
         
             <div class="container">
                 <div class="row justify-content-end">

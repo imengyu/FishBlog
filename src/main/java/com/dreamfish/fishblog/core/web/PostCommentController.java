@@ -54,7 +54,7 @@ public class PostCommentController {
 
         List<Integer> ids = new ArrayList<Integer>();
         for(int i =0, size = archiveIds.size(); i<size; i++){
-            if(StringUtils.isInteger(archiveIds.getString(i))) ids.add(Integer.parseInt(archiveIds.getString(i)));
+            if(archiveIds.getString(i) != null && StringUtils.isInteger(archiveIds.getString(i))) ids.add(Integer.parseInt(archiveIds.getString(i)));
             else return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "参数 comments[" + i + "] 类型有误","");
         }
         try {

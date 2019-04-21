@@ -471,7 +471,26 @@ h3.blog-title{
         }
     }
 
+    .blog-sticky {
+        position: absolute;
+        display: inline-block;
 
+        @include size(50px, 50px);
+
+        color: #fff;
+        border-width: 0 0 50px 50px;
+        border-style: solid;
+        border-color: #005fff #005fff #fff;
+        outline: none;
+        font-size: 13px;
+
+        span {
+            position: absolute;
+            transform: rotate(-45deg);
+            top: 8px;
+            left: -46px;
+        }
+    }
     .blog-img {
         overflow: hidden;
         padding: 20px;

@@ -25,7 +25,7 @@ public class Post implements Serializable {
     private static final long serialVersionUID = -3035781360400015965L;
 
     @Id()
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String urlName;
 
@@ -58,6 +58,34 @@ public class Post implements Serializable {
     @Transient
     private List<PostTag> postTagNames;
     private Boolean showInList;
+    private Boolean showCatalog;
+    private Boolean topMost;
+
+    private Integer likeCount;
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public Boolean getTopMost() {
+        return topMost;
+    }
+
+    public void setTopMost(Boolean topMost) {
+        this.topMost = topMost;
+    }
+
+    public Boolean getShowCatalog() {
+        return showCatalog;
+    }
+
+    public void setShowCatalog(Boolean showCatalog) {
+        this.showCatalog = showCatalog;
+    }
 
     public Boolean getShowInList() {
         return showInList;

@@ -38,7 +38,7 @@ public class User implements Serializable {
     private static final long serialVersionUID = -3711977388670023741L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

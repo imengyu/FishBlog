@@ -1,11 +1,9 @@
 package com.dreamfish.fishblog.core.mapper;
 
-import com.dreamfish.fishblog.core.entity.Post;
-import com.dreamfish.fishblog.core.entity.PostAbstract;
-import com.dreamfish.fishblog.core.entity.PostTag;
-import com.dreamfish.fishblog.core.entity.PostUrl;
+import com.dreamfish.fishblog.core.entity.*;
 import org.apache.ibatis.annotations.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 
 @Mapper
@@ -47,8 +45,8 @@ public interface PostMapper {
      * 获取所有文章（包括未公开的）
      * @return 返回文章数组
      */
-    @Select("SELECT * FROM fish_posts")
-    List<Post> getAllPostsIncludeingPrivate();
+    @Select("SELECT url_name FROM fish_posts WHERE id=#{id}")
+    String getAllPostsUrlNameById(Integer id);
 
     /**
      * 获取所有文章数（包括未公开的）
@@ -95,12 +93,16 @@ public interface PostMapper {
 
     @Select("SELECT * FROM fish_post_tags WHERE id=#{id}")
     PostTag getTag(@Param("id") Integer id);
+    @Select("SELECT id FROM fish_posts WHERE url_name=#{url_name}")
+    Integer getPostIdByUrlName(@Param("url_name") String url_name);
 
 
     @Select("SELECT title,preview_text,keywords,content FROM fish_posts WHERE url_name=#{urlName}")
     PostAbstract findAbstractByUrlName(@Param("urlName") String urlName);
     @Select("SELECT title,preview_text,keywords,content FROM fish_posts WHERE id=#{id}")
     PostAbstract findAbstractById(@Param("id") Integer id);
+    @Select("SELECT * FROM fish_posts WHERE id=#{id}")
+    Post findById(@Param("id") Integer id);
 
     @Select("SELECT id,title,url_name,preview_text,keywords FROM fish_posts WHERE status=1 ORDER BY post_date DESC LIMIT #{maxCount}")
     List<PostUrl> findAbstractTitles(@Param("maxCount") Integer maxCount);

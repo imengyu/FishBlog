@@ -877,6 +877,37 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 
 .toast-overlay-wrapper .toast-alert .toast-close { position: absolute; top: 15px; right: 15px; display: inline-block; vertical-align: middle; width: 15px; height: 15px; background-size: 15px 15px; background-repeat: no-repeat; background-image: url(/assets/images/icon/ico-close.svg); }
 
+/*Like button*/
+.like { display: block; margin-top: 20px; }
+
+.like .like-group { position: relative; padding: 13px 0 15px 0; font-size: 0; border: 1px solid #EA6F5A; border-radius: 40px; }
+
+.like .like-group:hover { background-color: rgba(236, 97, 73, 0.05); }
+
+.like .like-group .btn-like { display: inline-block; font-size: 19px; }
+
+.like .like-group .btn-like a { position: relative; padding: 18px 30px 18px 55px; color: #EA6F5A; }
+
+.like .like-group .btn-like:before { content: ''; position: absolute; left: 12px; top: 2px; width: 50px; height: 50px; background-image: url(/images/blocks/like_animation_steps.png); background-position: left; background-repeat: no-repeat; background-size: 1000px 50px; }
+
+.like .like-group .modal-wrap { font-size: 18px; border-left: 1px solid rgba(236, 97, 73, 0.4); display: inline-block; margin-left: -15px; }
+
+.like .like-group .modal-wrap a { color: #EA6F5A; padding: 18px 26px 18px 18px; }
+
+.like .share-group { float: right; }
+
+.like .share-group .share-circle { width: 50px; height: 50px; margin-left: 5px; text-align: center; border: 1px solid #dcdcdc; border-radius: 50%; vertical-align: middle; display: inline-block; position: relative; cursor: pointer; }
+
+.like .share-group .share-circle .fa-weixin { color: #00bb29; }
+
+.like .share-group .share-circle .fa-weibo { color: #e05244; }
+
+.like .share-group .share-circle:hover { background-color: rgba(181, 181, 181, 0.1); }
+
+.like .share-group .share-circle.more-share { width: auto; padding: 4px 18px; font-size: 14px; color: #9b9b9b; line-height: 40px; border-radius: 50px; }
+
+.like .share-group .share-circle i { font-size: 24px; line-height: 2; }
+
 /* Anchor place left on bigger screen */
 .anchorjs-link { font-size: 130%; }
 
@@ -1086,6 +1117,10 @@ h3.blog-title { border-bottom: 1px solid #eee; color: #484848; font-weight: norm
 .blog-list > ul > li:not(.blog-list-head) { -webkit-box-shadow: 8px 14px 38px rgba(39, 44, 49, 0.06), 1px 3px 8px rgba(39, 44, 49, 0.03); box-shadow: 8px 14px 38px rgba(39, 44, 49, 0.06), 1px 3px 8px rgba(39, 44, 49, 0.03); border-bottom: 1px solid #eee; position: relative; overflow: hidden; display: -webkit-box; display: -ms-flexbox; display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; -ms-flex-direction: row; flex-direction: row; -webkit-box-pack: start; -ms-flex-pack: start; justify-content: flex-start; /*justify-content: space-between;*/ background: #fff; margin-top: 0; margin-bottom: 1rem; border-radius: 5px; -webkit-transition: all .2s ease; transition: all .2s ease; }
 
 .blog-list > ul > li:not(.blog-list-head):hover { -webkit-box-shadow: 8px 28px 50px rgba(39, 44, 49, 0.07), 1px 6px 12px rgba(39, 44, 49, 0.04); box-shadow: 8px 28px 50px rgba(39, 44, 49, 0.07), 1px 6px 12px rgba(39, 44, 49, 0.04); -webkit-transition: all .4s ease; transition: all .4s ease; -webkit-transform: translate3D(0, -1px, 0) scale(1.03); transform: translate3D(0, -1px, 0) scale(1.03); }
+
+.blog-list .blog-sticky { position: absolute; display: inline-block; width: 50px; height: 50px; color: #fff; border-width: 0 0 50px 50px; border-style: solid; border-color: #005fff #005fff #fff; outline: none; font-size: 13px; }
+
+.blog-list .blog-sticky span { position: absolute; -webkit-transform: rotate(-45deg); transform: rotate(-45deg); top: 8px; left: -46px; }
 
 .blog-list .blog-img { overflow: hidden; padding: 20px; padding-right: 0; min-width: 220px; }
 

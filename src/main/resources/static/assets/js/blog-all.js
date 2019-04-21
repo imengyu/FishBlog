@@ -25,6 +25,7 @@ var main = new Vue({
             if (main.contentPosts == null) main.contentPosts = response.data.content;
             else main.contentPosts = mergeJsonArray(main.contentPosts, response.data.content);
             main.contentPosts = main.resolvePostArr(main.contentPosts);
+            main.reloadPostStats();
             main.currentPostPage++;
           } else {
             main.contentMainLoadError = response.message;
@@ -58,7 +59,7 @@ var main = new Vue({
         if (arr[key].isHead) continue;
         if (typeof arr[key].postDate != 'undefined') {
           var this_y = arr[key].postDate.substr(0, 4);
-          if (this_y != y) {
+          if (this_y != y && !arr[key].topMost) {
             y = this_y;
             new_arr[i] = {
               isHead: true,
@@ -72,6 +73,41 @@ var main = new Vue({
       }
 
       return new_arr;
+    },
+    reloadPostStats: function(){
+      var getPosts = { archives: [] };
+      for(var key in main.contentPosts)
+        if(main.contentPosts[key].id) 
+          getPosts.archives.push(main.contentPosts[key].id);
+
+      var findOldPosts = function(id){
+        for(var key in main.contentPosts)
+          if(main.contentPosts[key].id==id) 
+            return main.contentPosts[key];
+        return null;
+      }
+      var reloadPostsStat = function(arr){
+        for(var key in arr) {
+          var o = findOldPosts(key);
+          if(o){
+            o.viewCount = arr[key].viewCount;
+            o.commentCount = arr[key].commentCount;
+          }
+        }
+      }
+
+      $.ajax({
+        url: address_blog_api + 'posts/stat',
+        type: 'post',
+        data: JSON.stringify(getPosts),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (response) {
+          if (response.success) 
+            reloadPostsStat(response.data);
+        }, error: function (xhr, err) {}
+      });
+      
     },
   }
 })

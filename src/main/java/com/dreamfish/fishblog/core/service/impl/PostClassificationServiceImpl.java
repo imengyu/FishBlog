@@ -1,12 +1,8 @@
 package com.dreamfish.fishblog.core.service.impl;
 
-import com.dreamfish.fishblog.core.annotation.RequestAuth;
-import com.dreamfish.fishblog.core.annotation.RequestPrivilegeAuth;
 import com.dreamfish.fishblog.core.entity.PostClass;
 import com.dreamfish.fishblog.core.entity.PostDate;
 import com.dreamfish.fishblog.core.entity.PostTag;
-import com.dreamfish.fishblog.core.entity.User;
-import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.mapper.PostClassMapper;
 import com.dreamfish.fishblog.core.mapper.PostDatesMapper;
 import com.dreamfish.fishblog.core.mapper.PostTagsMapper;
@@ -33,14 +29,14 @@ import java.util.Map;
 public class PostClassificationServiceImpl implements PostClassificationService {
 
     @Autowired
-    private PostClassMapper postClassMapper;
+    private PostClassMapper postClassMapper = null;
     @Autowired
-    private PostTagsMapper postTagsMapper;
+    private PostTagsMapper postTagsMapper = null;
     @Autowired
-    private PostDatesMapper postDatesMapper;
+    private PostDatesMapper postDatesMapper = null;
 
     @Autowired
-    private PostClassRepository postClassRepository;
+    private PostClassRepository postClassRepository = null;
 
     @Override
     @Cacheable("blog-tags-cache")
@@ -93,7 +89,7 @@ public class PostClassificationServiceImpl implements PostClassificationService 
     @Cacheable("blog-classes-cache")
     @Override
     public Page<PostClass> getClassesWithPager(Integer page, Integer pageSize) {
-        return postClassRepository.findAll(new PageRequest(page, pageSize));
+        return postClassRepository.findAll(PageRequest.of(page, pageSize));
     }
     @Cacheable("blog-classes-cache")
     @Override

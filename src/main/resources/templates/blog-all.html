@@ -75,6 +75,7 @@
                     <div class="blog-list mt-3">
                         <ul v-if="!contentMainLoading">
                             <li v-for="post in contentPosts" :class="post.isHead ? 'blog-list-head' : ''">
+                                <span v-if="post.topMost" class="blog-sticky"><span>置顶</span></span>
                                 <div v-if="post.isHead" class="blog-preview">
                                     <h3>
                                         <i class="fa fa-calendar-check-o"></i>{{ post.year }}<small>发布的文章</small>

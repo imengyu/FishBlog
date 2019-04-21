@@ -192,7 +192,7 @@ function initApp() {
                 gotoPage('manage-classes', false);
             },
             goView(){
-                window.open(getPostRealUrl(archiveObject));
+                window.open(getPostRealUrl(this.archiveObject));
             },
 
             //设置类型
@@ -268,6 +268,8 @@ function initApp() {
                             type: "markdown",
                             urlName: "",
                             viewCount: 0,
+                            showInList: true,
+                            showCatalog: true,
                         };
                         main.archiveLoadError = '';
                         main.archiveId = 0;
@@ -298,6 +300,7 @@ function initApp() {
                                 main.archiveType = response.data.type;
                                 main.archiveTags = response.data.postTagNames;
                                 main.archiveStatus = response.data.status;
+                                main.archiveShowLastModifyDate = !isNullOrEmpty(response.data.lastmodifyDate);
                                 if(response.data.postClass) main.archiveClass = response.data.postClass.split(':')[0];
                                 main.archiveLoadStatus = 'loaded';
 

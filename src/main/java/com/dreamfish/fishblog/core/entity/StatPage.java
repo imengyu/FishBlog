@@ -9,7 +9,7 @@ public class StatPage implements Serializable {
     private static final long serialVersionUID = -4318773964306798788L;
 
     @Id()
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String url;
     private String date;

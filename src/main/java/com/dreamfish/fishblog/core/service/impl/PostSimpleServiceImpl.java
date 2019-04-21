@@ -2,6 +2,7 @@ package com.dreamfish.fishblog.core.service.impl;
 
 import com.dreamfish.fishblog.core.entity.Post;
 import com.dreamfish.fishblog.core.entity.PostSimple;
+import com.dreamfish.fishblog.core.entity.PostStat;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.exception.InvalidArgumentException;
@@ -18,7 +19,6 @@ import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +26,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章简要信息 服务
@@ -39,22 +41,17 @@ public class PostSimpleServiceImpl implements PostSimpleService {
     @Autowired
     private PostSimpleRepository postSimpleRepository = null;
 
-    //公用获取文章简要信息方法
-    @Override
-    public List<PostSimple> getSimplePosts(Integer page, Integer pageSize) {
-        return getSimplePosts(page, pageSize, POST_SORT_NONE);
-    }
     @Override
     @Cacheable(value = "blog-posts-pages-cache")
     public List<PostSimple> getSimpleWithMaxCount(Integer maxCount, Integer soryBy) {
         if(soryBy==POST_SORT_NONE) {
             return postSimpleMapper.getAllPostsWithLimit(maxCount);
         }else if(soryBy==POST_SORT_NONE) {
-            return postSimpleMapper.getAllPostsWithLimitOrderBy(maxCount, "title ASC");
+            return postSimpleMapper.getAllPostsWithLimitOrderBy(maxCount, "top_most DESC, title ASC");
         }else if(soryBy==POST_SORT_BY_DATE) {
-            return postSimpleMapper.getAllPostsWithLimitOrderBy(maxCount,"post_date DESC");
+            return postSimpleMapper.getAllPostsWithLimitOrderBy(maxCount,"top_most DESC, post_date DESC");
         }else if(soryBy==POST_SORT_BY_VIEW) {
-            return postSimpleMapper.getAllPostsWithLimitOrderBy(maxCount,"view_count DESC, post_date DESC");
+            return postSimpleMapper.getAllPostsWithLimitOrderBy(maxCount,"top_most DESC, view_count DESC, post_date DESC");
         }
         return null;
     }
@@ -68,22 +65,22 @@ public class PostSimpleServiceImpl implements PostSimpleService {
         Integer startIndex = page*pageSize;
         if("none".equals(onlyTag)) {
             if (soryBy == POST_SORT_NONE) {
-                if (page == -1 && pageSize == -1) return postSimpleMapper.getAllPosts();
-                else return postSimpleMapper.getPosts(startIndex, pageSize);
+                if (page == -1 && pageSize == -1) return postSimpleMapper.getAllPostsOrderBy("top_most DESC");
+                else return postSimpleMapper.getPostsOrderBy(startIndex, pageSize, "top_most DESC");
             } else if (soryBy == POST_SORT_BY_NAME) {
-                if (page == -1 && pageSize == -1) return postSimpleMapper.getAllPostsOrderBy("title ASC");
-                else return postSimpleMapper.getPostsOrderBy(startIndex, pageSize, "title ASC");
+                if (page == -1 && pageSize == -1) return postSimpleMapper.getAllPostsOrderBy("top_most DESC, title ASC");
+                else return postSimpleMapper.getPostsOrderBy(startIndex, pageSize, "top_most DESC, title ASC");
             } else if (soryBy == POST_SORT_BY_DATE) {
-                if (page == -1 && pageSize == -1) return postSimpleMapper.getAllPostsOrderBy("post_date DESC");
-                else return postSimpleMapper.getPostsOrderBy(startIndex, pageSize, "post_date DESC");
+                if (page == -1 && pageSize == -1) return postSimpleMapper.getAllPostsOrderBy("top_most DESC, post_date DESC");
+                else return postSimpleMapper.getPostsOrderBy(startIndex, pageSize, "top_most DESC, post_date DESC");
             } else if (soryBy == POST_SORT_BY_VIEW) {
-                if (page == -1 && pageSize == -1) return postSimpleMapper.getAllPostsOrderBy("view_count DESC, post_date DESC");
-                else return postSimpleMapper.getPostsOrderBy(startIndex, pageSize, "view_count DESC, post_date DESC");
+                if (page == -1 && pageSize == -1) return postSimpleMapper.getAllPostsOrderBy("top_most DESC, view_count DESC, post_date DESC");
+                else return postSimpleMapper.getPostsOrderBy(startIndex, pageSize, "top_most DESC, view_count DESC, post_date DESC");
             }
         }else{
             if (soryBy == POST_SORT_NONE) {
-                if (page == -1 && pageSize == -1) return postSimpleMapper.getTagPosts(onlyTag);
-                else return postSimpleMapper.getTagPostsWithLimit(startIndex, pageSize, onlyTag);
+                if (page == -1 && pageSize == -1) return postSimpleMapper.getTagPostsOrderBy(onlyTag, "top_most DESC");
+                else return postSimpleMapper.getTagPostsWithLimitOrderBy(startIndex, pageSize, onlyTag, "top_most DESC");
             } else if (soryBy == POST_SORT_BY_NAME) {
                 if (page == -1 && pageSize == -1) return postSimpleMapper.getTagPostsOrderBy("title ASC", onlyTag);
                 else return postSimpleMapper.getTagPostsWithLimitOrderBy(startIndex, pageSize, "title ASC", onlyTag);
@@ -99,19 +96,24 @@ public class PostSimpleServiceImpl implements PostSimpleService {
     }
     @Override
     @Cacheable(value = "blog-posts-pages-cache")
-    public Page<PostSimple> getSimplePostsWithPageable(Integer page, Integer pageSize, Integer soryBy, String onlyTag, String byDate, String byClass, Integer byUser, String byStatus) throws NoPrivilegeException {
+    public Page<PostSimple> getSimplePostsWithPageable(Integer page, Integer pageSize, Integer soryBy, String onlyTag, String byDate, String byClass, Integer byUser, String byStatus, Boolean noTopMost) throws NoPrivilegeException {
 
+        Page<PostSimple> result;
         HttpServletRequest request = ContextHolderUtils.getRequest();
         //生成分页（这里性能不是非常好）
         Pageable pageable = null;
         if(soryBy==POST_SORT_NONE) {
-            pageable = new PageRequest(page, pageSize);
+            if(noTopMost) pageable = PageRequest.of(page, pageSize);
+            else pageable = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "topMost"));
         }else if(soryBy==POST_SORT_BY_NAME) {
-            pageable = new PageRequest(page, pageSize, new Sort(Sort.Direction.ASC, "title"));
+            if(noTopMost) pageable = PageRequest.of(page, pageSize, new Sort(Sort.Direction.ASC, "title"));
+            else pageable = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "topMost").and(new Sort(Sort.Direction.ASC, "title")));
         }else if(soryBy==POST_SORT_BY_DATE) {
-            pageable = new PageRequest(page, pageSize, new Sort(Sort.Direction.DESC, "postDate"));
+            if(noTopMost) pageable = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC,"postDate"));
+            else pageable = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "topMost","postDate"));
         }else if(soryBy==POST_SORT_BY_VIEW) {
-            pageable = new PageRequest(page, pageSize, new Sort(Sort.Direction.DESC, "viewCount", "postDate"));
+            if(noTopMost) pageable = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "viewCount", "postDate"));
+            else pageable = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "topMost", "viewCount", "postDate"));
         }else throw new InvalidArgumentException("Invalid argument soryBy : " + soryBy);
 
         if("all".equals(byStatus)){
@@ -124,10 +126,10 @@ public class PostSimpleServiceImpl implements PostSimpleService {
                     if(authCode < AuthCode.SUCCESS) throw new NoPrivilegeException("无权限访问用户 " + byUser + " 的数据", 403);
                 }
 
-                if(!"none".equals(onlyTag)) return postSimpleRepository.findByAuthorIdAndTagsLike(byUser,"%-" + onlyTag + "-%", pageable);
-                else if(!"0-0".equals(byDate)) return postSimpleRepository.findByAuthorIdAndPostDateLike(byUser,byDate + "%", pageable);
-                else if(!"none".equals(byClass)) return postSimpleRepository.findByAuthorIdAndPostClassLike(byUser, byClass + ":%", pageable);
-                else return postSimpleRepository.findByAuthorId(byUser, pageable);
+                if(!"none".equals(onlyTag)) result = postSimpleRepository.findByAuthorIdAndTagsLike(byUser,"%-" + onlyTag + "-%", pageable);
+                else if(!"0-0".equals(byDate)) result = postSimpleRepository.findByAuthorIdAndPostDateLike(byUser,byDate + "%", pageable);
+                else if(!"none".equals(byClass)) result = postSimpleRepository.findByAuthorIdAndPostClassLike(byUser, byClass + ":%", pageable);
+                else result = postSimpleRepository.findByAuthorId(byUser, pageable);
 
             }else{
                 //需要有管理所有文章权限才可读取
@@ -135,10 +137,10 @@ public class PostSimpleServiceImpl implements PostSimpleService {
                 if(authCode < AuthCode.SUCCESS) throw new NoPrivilegeException("无权限访问数据", 403);
 
                 //读取
-                if(!"none".equals(onlyTag)) return postSimpleRepository.findByTagsLikeAndShowInList("%-" + onlyTag + "-%", true, pageable);
-                else if(!"0-0".equals(byDate)) return postSimpleRepository.findByPostDateLikeAndShowInList(byDate + "%", true, pageable);
-                else if(!"none".equals(byClass)) return postSimpleRepository.findByPostClassLikeAndShowInList(byClass + ":%", true, pageable);
-                else return postSimpleRepository.findAll(pageable);
+                if(!"none".equals(onlyTag)) result = postSimpleRepository.findByTagsLikeAndShowInList("%-" + onlyTag + "-%", true, pageable);
+                else if(!"0-0".equals(byDate)) result = postSimpleRepository.findByPostDateLikeAndShowInList(byDate + "%", true, pageable);
+                else if(!"none".equals(byClass)) result = postSimpleRepository.findByPostClassLikeAndShowInList(byClass + ":%", true, pageable);
+                else result = postSimpleRepository.findAll(pageable);
             }
         }else{
             int byStatusVal = byStatusStrToVal(byStatus);
@@ -156,10 +158,10 @@ public class PostSimpleServiceImpl implements PostSimpleService {
                 }
 
                 //读取
-                if(!"none".equals(onlyTag)) return postSimpleRepository.findByStatusAndAuthorIdAndTagsLike(byStatusVal, byUser, "%-" + onlyTag + "-%", pageable);
-                else if(!"0-0".equals(byDate)) return postSimpleRepository.findByStatusAndAuthorIdAndPostDateLike(byStatusVal, byUser, byDate + "%", pageable);
-                else if(!"none".equals(byClass)) return postSimpleRepository.findByStatusAndAuthorIdAndPostClassLike(byStatusVal , byUser,byClass + ":%", pageable);
-                else return postSimpleRepository.findByStatusAndAuthorId(byStatusVal, byUser, pageable);
+                if(!"none".equals(onlyTag)) result = postSimpleRepository.findByStatusAndAuthorIdAndTagsLike(byStatusVal, byUser, "%-" + onlyTag + "-%", pageable);
+                else if(!"0-0".equals(byDate)) result = postSimpleRepository.findByStatusAndAuthorIdAndPostDateLike(byStatusVal, byUser, byDate + "%", pageable);
+                else if(!"none".equals(byClass)) result = postSimpleRepository.findByStatusAndAuthorIdAndPostClassLike(byStatusVal , byUser,byClass + ":%", pageable);
+                else result = postSimpleRepository.findByStatusAndAuthorId(byStatusVal, byUser, pageable);
 
             }else{
                 if(byStatusVal != Post.POST_STATUS_PUBLISH){
@@ -170,20 +172,18 @@ public class PostSimpleServiceImpl implements PostSimpleService {
                 }
 
                 //读取
-                if(!"none".equals(onlyTag)) return postSimpleRepository.findByStatusAndShowInListAndTagsLike(byStatusVal, true, "%-" + onlyTag + "-%", pageable);
-                else if(!"0-0".equals(byDate)) return postSimpleRepository.findByStatusAndShowInListAndPostDateLike(byStatusVal, true, byDate + "%", pageable);
-                else if(!"none".equals(byClass)) return postSimpleRepository.findByStatusAndShowInListAndPostClassLike(byStatusVal, true, byClass + ":%", pageable);
-                else return postSimpleRepository.findByStatusAndShowInList(byStatusVal, true, pageable);
+                if(!"none".equals(onlyTag)) result = postSimpleRepository.findByStatusAndShowInListAndTagsLike(byStatusVal, true, "%-" + onlyTag + "-%", pageable);
+                else if(!"0-0".equals(byDate)) result = postSimpleRepository.findByStatusAndShowInListAndPostDateLike(byStatusVal, true, byDate + "%", pageable);
+                else if(!"none".equals(byClass)) result = postSimpleRepository.findByStatusAndShowInListAndPostClassLike(byStatusVal, true, byClass + ":%", pageable);
+                else result = postSimpleRepository.findByStatusAndShowInList(byStatusVal, true, pageable);
             }
-
         }
+        return result;
     }
 
     //删除一些文章
     @Override
-    @Caching(
-        evict = {  @CacheEvict(value = "blog-posts-pages-cache", allEntries = true) }
-    )
+    @CacheEvict(value = "blog-posts-pages-cache", allEntries = true)
     public Result deleteSomePosts(List<Integer> ids) throws NoPrivilegeException {
 
         HttpServletRequest request = ContextHolderUtils.getRequest();
@@ -217,6 +217,22 @@ public class PostSimpleServiceImpl implements PostSimpleService {
         //写入数据库进行删除
         postSimpleRepository.deleteByIdIn(ids);
         return Result.success();
+    }
+
+    //获取一些文章统计计数参数
+    @Override
+    public Result getPostsStats(List<Integer> ids) {
+
+        Map<Integer, PostStat> rs = new HashMap<>();
+        for(Integer id : ids)
+            rs.put(id, getPostsStats(id));
+        return Result.success(rs);
+    }
+
+    @Override
+    @Cacheable(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0")
+    public PostStat getPostsStats(Integer id) {
+        return postSimpleMapper.getPostStatById(id);
     }
 
     //文章状态参数转数值

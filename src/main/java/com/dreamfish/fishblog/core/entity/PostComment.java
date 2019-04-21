@@ -16,7 +16,7 @@ public class PostComment implements Serializable {
     private static final long serialVersionUID = 3045385884753999532L;
 
     @Id()
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private Integer authorId;
