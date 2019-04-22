@@ -61,10 +61,10 @@ function initApp() {
                 },
                 {
                     width: '130px',
-                    text: '浏览/评论',
+                    text: '浏览/评论/赞',
                     useData: 'custom',
                     customDataFunc: function(item){
-                        return item.viewCount + ' / ' + item.commentCount;
+                        return item.viewCount + ' / ' + item.commentCount + ' / ' + item.likeCount;
                     }
                 },
                 {
@@ -127,10 +127,10 @@ function initApp() {
                 },
                 {
                     width: '130px',
-                    text: '浏览/评论',
+                    text: '浏览/评论/赞',
                     useData: 'custom',
                     customDataFunc: function(item){
-                        return item.viewCount + ' / ' + item.commentCount;
+                        return item.viewCount + ' / ' + item.commentCount + ' / ' + item.likeCount;
                     }
                 },
                 {
@@ -443,6 +443,7 @@ function initApp() {
                         if (o) {
                             o.viewCount = arr[key].viewCount;
                             o.commentCount = arr[key].commentCount;
+                            o.likeCount = arr[key].likeCount;
                         }
                     }
                 }

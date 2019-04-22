@@ -81,7 +81,7 @@ public interface PostMapper {
      * 更新文章某个数值-1
      * @param id 文章 ID
      */
-    @Update("UPDATE fish_posts SET ${valueName}=${valueName}+1 WHERE id=#{id}")
+    @Update("UPDATE fish_posts SET ${valueName}=${valueName}-1 WHERE id=#{id}")
     void decreasePostValue(@Param("id") Integer id, @Param("valueName") String valueName);
 
     /**
@@ -96,6 +96,10 @@ public interface PostMapper {
     @Select("SELECT id FROM fish_posts WHERE url_name=#{url_name}")
     Integer getPostIdByUrlName(@Param("url_name") String url_name);
 
+    @Select("SELECT like_users FROM fish_posts WHERE id=#{id}")
+    String getPostLikeUsersById(@Param("id") Integer id);
+    @Update("UPDATE fish_posts SET like_users=#{like_users} WHERE id=#{id}")
+    void updatePostLikeUsersById(@Param("id") Integer id, @Param("like_users") String like_users);
 
     @Select("SELECT title,preview_text,keywords,content FROM fish_posts WHERE url_name=#{urlName}")
     PostAbstract findAbstractByUrlName(@Param("urlName") String urlName);

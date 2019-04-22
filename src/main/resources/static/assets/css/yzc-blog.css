@@ -200,6 +200,18 @@ a:active { color: #0045bb; text-decoration: none; }
 
 .icon-close { background-image: url(/assets/images/icon/ico-close.svg); }
 
+.social-icon-sprite { display: inline-block; *display: inline; vertical-align: middle; margin: 0; padding: 0; width: 18px; height: 18px; background: url(/images/blocks/social-icon.png) no-repeat; }
+
+.social-icon-zone { background-position: -60px 0; }
+
+.social-icon-twitter { background-position: -80px 0; }
+
+.social-icon-facebook { background-position: -100px 0; }
+
+.social-icon-google { background-position: -120px 0; }
+
+.social-icon-douban { background-position: -140px 0; }
+
 @font-face { font-family: 'Emoji'; src: url("../fonts/seguiemj.eot"); src: url("../fonts/seguiemj.eot?#iefix") format("embedded-opentype"), url("../fonts/seguiemj.ttf") format("truetype"), url("../fonts/seguiemj.woff2") format("woff2"), url("../fonts/seguiemj.woff") format("woff"); }
 
 @font-face { font-family: 'AbductionII'; src: url("../fonts/AbductionII.eot"); src: url("../fonts/AbductionII.eot?#iefix") format("embedded-opentype"), url("../fonts/AbductionII.woff") format("woff"); font-weight: normal; font-style: normal; }
@@ -368,6 +380,10 @@ a:active { color: #0045bb; text-decoration: none; }
 .main-menu-white-fade-mask:not(.header-scrolled) .nav-header-text a { color: #fff; }
 
 .main-menu-white-fade-mask:not(.header-scrolled) #mobile-nav-toggle { color: #fff; }
+
+.main-menu-white-fade-mask:not(.header-scrolled) #mobile-nav-toggle.icon-menu { background-image: url(/assets/images/icon/ico-menu-white.svg); }
+
+.main-menu-white-fade-mask:not(.header-scrolled) #mobile-nav-toggle.icon-close { background-image: url(/assets/images/icon/ico-close-white.svg); }
 
 .main-menu-white-fade-mask:not(.header-scrolled).main-menu-white .nav-menu a { color: #fff !important; }
 
@@ -894,9 +910,26 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 
 .like .like-group .modal-wrap a { color: #EA6F5A; padding: 18px 26px 18px 18px; }
 
+.like .like-group.active { border: none; background-color: #EA6F5A; color: #fff; }
+
+.like .like-group.active .btn-like a { position: relative; color: #fff; }
+
+.like .like-group.active .btn-like:before { background-position: right; }
+
+.like .like-group.active .modal-wrap { border-left: 1px solid #fff; }
+
+.like .like-group.active .modal-wrap a { color: #fff; }
+
+@media (max-width: 576px) { .like .like-group { padding: 9px 0 10px 0; }
+  .like .like-group .btn-like { font-size: 15px; }
+  .like .like-group .btn-like a { padding: 18px 25px 18px 40px; }
+  .like .like-group .btn-like:before { width: 36px; height: 36px; left: 0px; }
+  .like .like-group .modal-wrap { font-size: 14px; }
+  .like .like-group .modal-wrap a { padding: 18px 16px 18px 10px; } }
+
 .like .share-group { float: right; }
 
-.like .share-group .share-circle { width: 50px; height: 50px; margin-left: 5px; text-align: center; border: 1px solid #dcdcdc; border-radius: 50%; vertical-align: middle; display: inline-block; position: relative; cursor: pointer; }
+.like .share-group .share-circle { width: 50px; height: 50px; margin-left: 5px; text-align: center; border: 1px solid #dcdcdc; border-radius: 50%; vertical-align: middle; display: inline-block; position: relative; cursor: pointer; outline: none; }
 
 .like .share-group .share-circle .fa-weixin { color: #00bb29; }
 
@@ -907,6 +940,23 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 .like .share-group .share-circle.more-share { width: auto; padding: 4px 18px; font-size: 14px; color: #9b9b9b; line-height: 40px; border-radius: 50px; }
 
 .like .share-group .share-circle i { font-size: 24px; line-height: 2; }
+
+@media (max-width: 576px) { .like .share-group .share-circle { width: 42px; height: 42px; }
+  .like .share-group .share-circle.more-share { padding: 2px 18px; }
+  .like .share-group .share-circle i { font-size: 20px; line-height: 2; } }
+
+ul.share-list { list-style: none; padding: 0; margin: 0; }
+
+ul.share-list a { padding: 5px 10px 5px 8px; display: block; color: #000; }
+
+ul.share-list a:hover { color: #000; background-color: #e9e9e9; }
+
+ul.share-list i { margin-right: 10px; }
+
+ul.share-list span { vertical-align: middle; }
+
+/* popover padding fix */
+.popover-body { padding: 0; }
 
 /* Anchor place left on bigger screen */
 .anchorjs-link { font-size: 130%; }

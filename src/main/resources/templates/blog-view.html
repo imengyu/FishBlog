@@ -114,20 +114,22 @@
                         <div v-if="isLoaded">
                             <p v-if="postContent.lastmodifyDate" class="text-secondary mt-3 mb-2">本文最后在 {{ postContent.lastmodifyDate }} 进行了编辑
                             </p>
-                            <!--<div class="like mt-2">
-                                <div class="btn like-group" v-on:click="updateLikeCount()">
+                            <div v-if="authedUserInfo"  class="like">
+                                <div :class="'btn like-group' + (authedUserLiked ? ' active' : '')" v-on:click="updateLikeCount()">
                                     <div class="btn-like"><a>喜欢</a></div>
-                                    <div class="modal-wrap"><a >{{ postContent.likeCount }}</a></div>
+                                    <div class="modal-wrap" v-if="postContent.likeCount && postContent.likeCount>0"><a>{{ postContent.likeCount }}</a></div>
                                 </div>
                                 <div class="share-group">
-                                        <a class="share-circle" data-action="weixin-share" data-toggle="tooltip" data-original-title="分享到微信">
-                                          <i class="fa fa-weixin"></i>
-                                        </a>
-                                        <a class="share-circle" data-action="weibo-share" data-toggle="tooltip" href="javascript:void((function(s,d,e,r,l,p,t,z,c){var%20f='http://v.t.sina.com.cn/share/share.php?appkey=1881139527',u=z||d.location,p=['&amp;url=',e(u),'&amp;title=',e(t||d.title),'&amp;source=',e(r),'&amp;sourceUrl=',e(l),'&amp;content=',c||'gb2312','&amp;pic=',e(p||'')].join('');function%20a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=440,height=430,left=',(s.width-440)/2,',top=',(s.height-430)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else%20a();})(screen,document,encodeURIComponent,'','','', '推荐 @埃尔文放弃 的文章《springboot2.0 整合 Mybatis (springboot2.0版本)》（ 分享自 @简书 ）','https://www.jianshu.com/p/5cd772c07041?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=reader_share&amp;utm_source=weibo','页面编码gb2312|utf-8默认gb2312'));" data-original-title="分享到微博">
-                                          <i class="fa fa-weibo"></i>
-                                        </a>
-                                        <a class="share-circle more-share" tabindex="0" data-toggle="popover" data-placement="top" data-html="true" data-trigger="focus" href="javascript:void(0);" data-original-title="" title="">更多分享</a>
-                                      </div>-->
+                                    <a href="javascript:;" class="share-circle" v-on:click="share('weixin')" data-toggle="tooltip" data-original-title="分享到微信">
+                                        <i class="fa fa-weixin"></i>
+                                    </a>
+                                    <a href="javascript:;" class="share-circle" v-on:click="share('weibo')" data-toggle="tooltip" data-original-title="分享到微博">
+                                        <i class="fa fa-weibo"></i>
+                                    </a>
+                                    <a href="javascript:;" class="share-circle more-share" tabindex="0" data-toggle="popover" data-placement="top" data-html="true"
+                                        data-trigger="focus" data-original-title="" title="" data-content="&lt;ul class=&quot;share-list&quot;&gt;&lt;li&gt;&lt;a href=&quot;javascript:;&quot; v-on:click=&quot;share('qq-zone')&quot;&gt;&lt;i class=&quot;social-icon-sprite social-icon-zone&quot;&gt;&lt;/i&gt;&lt;span&gt;分享到QQ空间&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;">更多分享</a>
+                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -148,7 +150,7 @@
                 </div>
 
                 <!--Post area no catalog-->
-                <div v-else class="row justify-content-end">
+                <div v-else class="row justify-content-center">
                     <div v-if="postContentWithHtml!=null" v-html="postContentWithHtml"
                         class="blog-content-result post-container" id="post_content">
 
@@ -156,7 +158,23 @@
                     <div v-if="isLoaded">
                         <p v-if="postContent.lastmodifyDate" class="text-secondary mt-3 mb-2">本文最后在 {{ postContent.lastmodifyDate }} 进行了编辑</p>
                     
-
+                        <div v-if="authedUserInfo" class="like">
+                            <div :class="'btn like-group' + (authedUserLiked ? ' active' : '')" v-on:click="updateLikeCount()">
+                                <div class="btn-like"><a>喜欢</a></div>
+                                <div class="modal-wrap" v-if="postContent.likeCount && postContent.likeCount>0"><a>{{ postContent.likeCount }}</a></div>
+                            </div>
+                            <div class="share-group">
+                                <a href="javascript:;" class="share-circle" v-on:click="share('weixin')" data-toggle="tooltip" data-original-title="分享到微信">
+                                    <i class="fa fa-weixin"></i>
+                                </a>
+                                <a href="javascript:;" class="share-circle" v-on:click="share('weibo')" data-toggle="tooltip" data-original-title="分享到微博">
+                                    <i class="fa fa-weibo"></i>
+                                </a>
+                                <a href="javascript:;" class="share-circle more-share" tabindex="0" data-toggle="popover" data-placement="top" data-html="true"
+                                    data-trigger="focus" data-original-title="" title="" data-content="&lt;ul class=&quot;share-list&quot;&gt;&lt;li&gt;&lt;a href=&quot;javascript:;&quot; v-on:click=&quot;share('qq-zone')&quot;&gt;&lt;i class=&quot;social-icon-sprite social-icon-zone&quot;&gt;&lt;/i&gt;&lt;span&gt;分享到QQ空间&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;">更多分享</a>
+                            </div>
+                            
+                        </div>
                     </div>
                 </div>
 
@@ -203,7 +221,7 @@
             <div class="container">
                 <div class="row justify-content-end">
                     <div class="col-lg-8 col-md-10 col-sm-12">
-                        <commenter ref="postComment" v-if="isLoaded" v-bind:current-post-id="currentPostId" v-bind:current-post-id-or-name="currentPostIdOrName"></commenter>
+                        <commenter ref="postComment" v-if="isLoaded" v-bind:authed-user-info="authedUserInfo" v-bind:current-post-id="currentPostId" v-bind:current-post-id-or-name="currentPostIdOrName"></commenter>
                     </div>
                     <div class="col-lg-3 ml-3"></div>
                 </div>

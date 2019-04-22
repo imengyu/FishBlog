@@ -18,6 +18,7 @@ public enum ResultCodeEnum {
     FAILED_RES_ALREADY_EXIST("486", "指定的资源已存在"),
     FAILED_AUTH("487", "认证失败"),
     FAILED_DOWNLOAD("488", "下载请求失败"),
+    FAILED_MULTIPLE_ACTION("489", "用户无法重复执行操作"),
     NOT_IMPLEMENTED("499", "接口未实现"),
     INTERNAL_SERVER_ERROR("500", "服务器内部错误"),
     NOT_VALIABLE("501", "业务异常");

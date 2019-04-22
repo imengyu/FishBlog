@@ -944,6 +944,52 @@
                 padding: 18px 26px 18px 18px;
             }
         }
+
+        &.active {
+            border: none;
+            background-color: #EA6F5A;
+            color: #fff;
+
+            .btn-like {
+
+                a {
+                    position: relative;
+                    color: #fff;
+                }
+    
+                &:before {
+                    background-position: right;
+                }
+            }
+
+            .modal-wrap { 
+
+                border-left: 1px solid #fff;
+
+                a { color: #fff; }
+            }
+        }
+
+        @media (max-width: 576px) {
+            padding: 9px 0 10px 0;
+
+            .btn-like {
+                font-size: 15px;
+
+                a { padding: 18px 25px 18px 40px; }
+
+                &:before {
+                    width: 36px;
+                    height: 36px;
+                    left: 0px;
+                }
+            }
+            .modal-wrap {
+                font-size: 14px;
+
+                a { padding: 18px 16px 18px 10px; }
+            }
+        }
     }
 
     .share-group {
@@ -960,6 +1006,7 @@
             display: inline-block;
             position: relative;
             cursor: pointer;
+            outline: none;
 
             .fa-weixin {
                 color: #00bb29;
@@ -986,12 +1033,56 @@
                 line-height: 2;
             }
         }
+
+        @media (max-width: 576px) {
+            .share-circle {
+                width: 42px;
+                height: 42px;
+
+                &.more-share{
+                    padding: 2px 18px;
+                }
+
+                i {
+                    font-size: 20px;
+                    line-height: 2;
+                }
+            }
+        }
         
     }
 }
 
+ul.share-list {
 
+    list-style: none;
+    padding: 0;
+    margin: 0;
 
+    a {
+        padding: 5px 10px 5px 8px;
+        display: block;
+        color: #000;
+
+        &:hover {
+            color: #000;
+            background-color: #e9e9e9;
+        }
+    }
+
+    i {
+        margin-right: 10px;
+    }
+        
+    span {
+        vertical-align: middle;
+    }
+}
+
+/* popover padding fix */
+.popover-body {
+    padding: 0;
+}
 /* Anchor place left on bigger screen */
 .anchorjs-link {
     font-size: 130%;

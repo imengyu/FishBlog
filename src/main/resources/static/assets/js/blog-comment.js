@@ -1,6 +1,6 @@
 // 评论组件
 Vue.component('commenter', {
-    props: [ 'currentPostId', 'currentPostIdOrName' ],
+    props: [ 'currentPostId', 'currentPostIdOrName','authedUserInfo' ],
     data: function () {
         return {
             count: 0,
@@ -46,12 +46,16 @@ Vue.component('commenter', {
 
             authed: false,
             authedUserId: -1,
-            authedUserInfo: null,
             authedUserName: '',
             userInfos: null,
             requestingUserInfo: {},
             requestingUserInfoCount: 0,
         }
+    },
+    watch: {
+        authedUserInfo(val) {
+            this.loadLastUserInfo();
+        },
     },
     methods: {
         moreClick() {
@@ -80,30 +84,23 @@ Vue.component('commenter', {
             if(last_cm_mail_notify != null && last_cm_mail_notify == 'true') $('#comment_replyformail').prop("checked", 'checked');
              
             var main = this;
-            var url = address_blog_api + "auth/auth-test";
-            $.ajax({
-                url: url,
-                success: function (response) {
-                    main.loading = false;
-                    if (response.success) {
-                        main.authed = true;
-                        main.authedUserInfo = response.data;
-                        main.authedUserId = main.authedUserInfo.id;
-                        if(!isNullOrEmpty(main.authedUserInfo.friendlyName)) main.authedUserName = main.authedUserInfo.friendlyName;
-                        else main.authedUserName = main.authedUserInfo.name;
-                        $("#comment-login-github").hide();
-                        $("#comment_name").attr('readonly','readonly').attr('placeholder','');
-                        $("#comment_email").attr('readonly','readonly').attr('placeholder','');
-                        $("#comment_name").val(main.authedUserInfo.friendlyName);
-                        $("#comment_email").val(main.authedUserInfo.email);
-                        $("#comment_name_static").text(main.authedUserInfo.friendlyName);
-                        $("#comment_email_static").text(main.authedUserInfo.email);
-                        $("#comment_website").val(main.authedUserInfo.home);
-                        $("#comment-user-head").show();
-                        $("#comment-user-head").attr('src', getImageUrlFormHash(main.authedUserInfo.headimg));
-                    } 
-                }
-            });
+
+            if (main.authedUserInfo) {
+                main.authed = true;
+                main.authedUserId = main.authedUserInfo.id;
+                if (!isNullOrEmpty(main.authedUserInfo.friendlyName)) main.authedUserName = main.authedUserInfo.friendlyName;
+                else main.authedUserName = main.authedUserInfo.name;
+                $("#comment-login-github").hide();
+                $("#comment_name").attr('readonly', 'readonly').attr('placeholder', '');
+                $("#comment_email").attr('readonly', 'readonly').attr('placeholder', '');
+                $("#comment_name").val(main.authedUserInfo.friendlyName);
+                $("#comment_email").val(main.authedUserInfo.email);
+                $("#comment_name_static").text(main.authedUserInfo.friendlyName);
+                $("#comment_email_static").text(main.authedUserInfo.email);
+                $("#comment_website").val(main.authedUserInfo.home);
+                $("#comment-user-head").show();
+                $("#comment-user-head").attr('src', getImageUrlFormHash(main.authedUserInfo.headimg));
+            }
         },
         loadPostComment() {
             var main = this;

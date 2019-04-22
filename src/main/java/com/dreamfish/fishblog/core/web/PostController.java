@@ -78,9 +78,11 @@ public class PostController {
     //增加文章查看数
     @GetMapping("/updateLikeCount")
     @ResponseBody
+    @RequestAuth(User.LEVEL_GUEST)
     public Result updateLikeCount(
             @RequestParam("id")
-                    Integer id){
-        return postService.increasePostViewCount(id);
+                    Integer id,
+            @RequestParam(value = "like", required = false, defaultValue = "true") Boolean like){
+        return postService.increasePostLikeCount(id, like);
     }
 }

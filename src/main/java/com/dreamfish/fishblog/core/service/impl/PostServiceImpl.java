@@ -19,6 +19,7 @@ import com.dreamfish.fishblog.core.utils.request.RequestUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.response.PostErrorCode;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -200,8 +201,28 @@ public class PostServiceImpl implements PostService {
     }
     @Override
     @CacheEvict(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0")
-    public Result increasePostLikeCount(Integer id) {
-        postMapper.increasePostValue(id, "like_count");
+    public Result increasePostLikeCount(Integer id, Boolean like) {
+
+        Integer userId = PublicAuth.authGetUseId(ContextHolderUtils.getRequest());
+        if(userId < AuthCode.SUCCESS) return Result.failure(ResultCodeEnum.FAILED_AUTH);
+
+        String likeUsers = postMapper.getPostLikeUsersById(id);
+        if(!StringUtils.isEmpty(likeUsers)){
+            if(like && (likeUsers.contains("-" + userId)))
+                return Result.failure(ResultCodeEnum.FAILED_MULTIPLE_ACTION.getCode(), "您已经赞过该文章");
+            else if(!like && !likeUsers.contains("-" + userId))
+                return Result.failure(ResultCodeEnum.FAILED_MULTIPLE_ACTION.getCode(), "您未赞过该文章");
+        }else likeUsers = "";
+
+        if(like) {
+            likeUsers += "-" + userId;//增加用户ID
+            postMapper.increasePostValue(id, "like_count");
+        }
+        else {
+            likeUsers = likeUsers.replace("-" + userId, "");//删除用户ID
+            postMapper.decreasePostValue(id, "like_count");
+        }
+        postMapper.updatePostLikeUsersById(id, likeUsers);
         return Result.success();
     }
 }

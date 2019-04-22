@@ -518,7 +518,6 @@
 .main-menu-white #mobile-nav-toggle,.main-menu-white .nav-menu-dropdown {
 	color: $black;
 }
-
 //Header fade mask
 .main-menu-white-fade-mask:not(.header-scrolled){
 	color: $black;
@@ -531,7 +530,14 @@
     
 
 	#mobile-nav-toggle{
-		color: $white;
+        color: $white;
+        
+        &.icon-menu {
+            background-image: url(/assets/images/icon/ico-menu-white.svg)
+        }
+        &.icon-close {
+            background-image: url(/assets/images/icon/ico-close-white.svg)
+        }
 	}
 }
 .main-menu-white-fade-mask:not(.header-scrolled).main-menu-white .nav-menu a {

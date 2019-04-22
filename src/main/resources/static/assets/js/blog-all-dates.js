@@ -12,7 +12,7 @@ var main = new Vue({
   },
   methods: {
     loadPosts: function () {
-      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/25?sortBy=date";
+      var url = address_blog_api + "posts/page/" + this.currentPostPage + "/25?sortBy=date&noTopMost=true";
       $('#main').css('height', $('#main').height() + 'px');
 
       this.contentMainLoading = true;

@@ -86,7 +86,7 @@ public class PostSimpleController {
 
         Page<PostSimple> result;
         try {
-            result = postSimpleService.getSimplePostsWithPageable(pageIndex, pageSize, sortByStrToVal(sortBy), onlyTag, byDate, byClass, byUser, byStatus, false);
+            result = postSimpleService.getSimplePostsWithPageable(pageIndex, pageSize, sortByStrToVal(sortBy), onlyTag, byDate, byClass, byUser, byStatus, noTopMost);
         } catch (NoPrivilegeException e) {
             return Result.failure(e.getCode().toString(), e.getMessage(), "");
         }
@@ -130,8 +130,8 @@ public class PostSimpleController {
             else return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "参数 archives[" + i + "] 类型有误","");
         } return postSimpleService.getPostsStats(ids);
     }
-    //获取一些文章的状态
-    @RequestMapping(value = "/stat/{postId}", name = "获取一些文章的状态", method = RequestMethod.GET)
+    //获取一个文章的状态
+    @RequestMapping(value = "/stat/{postId}", name = "获取一个文章的状态", method = RequestMethod.GET)
     @ResponseBody
     public Result getPostStats(@PathVariable("postId") Integer postId) {
         return Result.success(postSimpleService.getPostsStats(postId));

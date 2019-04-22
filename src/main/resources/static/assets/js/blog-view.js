@@ -9,6 +9,11 @@ var main = new Vue({
         loadFailed: false,
         laodErr: "",
 
+        authed: false,
+        authedUserId: -1,
+        authedUserInfo: null,
+        authedUserLiked: false,
+
         postTags: null,
         postContent: null,
         postContentWithHtml: null,
@@ -38,6 +43,8 @@ var main = new Vue({
                             main.currentPostId = response.data.id;
                             main.postTags = response.data.postTagNames;
                             if (main.postContent.enableComment) main.postCanComment = true;
+                            main.reloadPostStats();
+                            main.loadAuthInfo();
                             main.generatePostContent();
                             main.initComment();
                             main.isLoaded = true;
@@ -57,6 +64,20 @@ var main = new Vue({
                 main.laodErr = "没有找到指定的文章";
                 main.loadFailed = true;
             }
+        },
+        loadAuthInfo(){
+            var url = address_blog_api + "auth/auth-test";
+            $.ajax({
+                url: url,
+                success: function (response) {
+                    main.loading = false;
+                    if (response.success) {
+                        main.authed = true;
+                        main.authedUserInfo = response.data;
+                        main.authedUserId = main.authedUserInfo.id;
+                    } 
+                }
+            });
         },
 
         //Generate
@@ -117,6 +138,10 @@ var main = new Vue({
                         imgSrc: $(this).attr('src')
                     });
                 });
+                //tooltip & popover
+                //------- Enable tooltips everywhere --------//  
+                $('[data-toggle="tooltip"]').tooltip();
+                $('[data-toggle="popover"]').popover();
                 //目录生成
                 main.generateCatalog();
             }, 500);
@@ -247,15 +272,26 @@ var main = new Vue({
             },1500)
         },
         updateLikeCount: function(){
-            if(document.referrer!=document.location.toString())
-                $.get(address_blog_api + "post/updateLikeCount?id=" + main.currentPostId);
+            if(this.authed){
+                $.ajax({
+                    url: address_blog_api + "post/updateLikeCount?id=" + main.currentPostId + (main.authedUserLiked ? '&like=false' : '&like=true'),
+                    success: function (response) {
+                        if (response.success) {
+                            main.authedUserLiked = !main.authedUserLiked;
+                            if(main.postContent && typeof main.postContent.likeCount != 'undefined') 
+                                main.postContent.likeCount += (main.authedUserLiked ? 1 : -1)
+                        }
+                        else if(response.code == 489) toast(response.message, 'info', 5000); 
+                    }
+                });
+            }
+            else toast('您必须登录才能赞此篇文章哦！', 'info', 5000);
         },
         reloadPostStats: function () {
 
             $.ajax({
-                url: address_blog_api + 'posts/stat/',
-                type: 'post',
-                data: JSON.stringify(getPosts),
+                url: address_blog_api + 'posts/stat/' + main.currentPostId,
+                type: 'get',
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
@@ -263,9 +299,13 @@ var main = new Vue({
                         main.postContent.viewCount = response.data.viewCount;
                         main.postContent.commentCount = response.data.commentCount;
                         main.postContent.likeCount = response.data.likeCount;
+                        if(response.data.currentUserLiked) main.authedUserLiked = true;
                     }
                 }, error: function (xhr, err) { }
             });
+
+        },
+        share: function (type){
 
         },
 

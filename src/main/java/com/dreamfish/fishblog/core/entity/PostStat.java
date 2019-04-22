@@ -1,5 +1,6 @@
 package com.dreamfish.fishblog.core.entity;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 
 public class PostStat implements Serializable {
@@ -9,6 +10,18 @@ public class PostStat implements Serializable {
     private Integer viewCount;
     private Integer commentCount;
     private Integer likeCount;
+
+    @Transient
+    private Boolean currentUserLiked;
+
+
+    public Boolean getCurrentUserLiked() {
+        return currentUserLiked;
+    }
+
+    public void setCurrentUserLiked(Boolean currentUserLiked) {
+        this.currentUserLiked = currentUserLiked;
+    }
 
     public Integer getLikeCount() {
         return likeCount;

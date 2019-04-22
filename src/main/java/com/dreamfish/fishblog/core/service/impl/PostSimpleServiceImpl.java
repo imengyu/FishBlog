@@ -7,10 +7,12 @@ import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.exception.InvalidArgumentException;
 import com.dreamfish.fishblog.core.exception.NoPrivilegeException;
+import com.dreamfish.fishblog.core.mapper.PostMapper;
 import com.dreamfish.fishblog.core.mapper.PostSimpleMapper;
 import com.dreamfish.fishblog.core.repository.PostSimpleRepository;
 import com.dreamfish.fishblog.core.service.PostSimpleService;
 import com.dreamfish.fishblog.core.utils.Result;
+import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.log.ActionLog;
@@ -36,6 +38,8 @@ import java.util.Map;
 @Service
 public class PostSimpleServiceImpl implements PostSimpleService {
 
+    @Autowired
+    private PostMapper postMapper = null;
     @Autowired
     private PostSimpleMapper postSimpleMapper = null;
     @Autowired
@@ -232,7 +236,17 @@ public class PostSimpleServiceImpl implements PostSimpleService {
     @Override
     @Cacheable(value = "blog-simple-reader-cache", key = "'post_stat_'+#p0")
     public PostStat getPostsStats(Integer id) {
-        return postSimpleMapper.getPostStatById(id);
+        PostStat rs = postSimpleMapper.getPostStatById(id);
+
+        //Get authed user is liked this archive
+        Integer userId = PublicAuth.authGetUseId(ContextHolderUtils.getRequest());
+        if(userId >=  AuthCode.SUCCESS) {
+            String likeUsers = postMapper.getPostLikeUsersById(id);
+            if (!StringUtils.isEmpty(likeUsers)) rs.setCurrentUserLiked(likeUsers.contains("-" + userId));
+            else rs.setCurrentUserLiked(false);
+        } else rs.setCurrentUserLiked(false);
+
+        return rs;
     }
 
     //文章状态参数转数值

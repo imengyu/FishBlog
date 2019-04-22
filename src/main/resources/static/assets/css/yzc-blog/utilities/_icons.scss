@@ -5,3 +5,29 @@
 .icon-close {
     background-image: url(/assets/images/icon/ico-close.svg)
 }
+
+.social-icon-sprite {
+    display: inline-block;
+    *display: inline;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    width: 18px;
+    height: 18px;
+    background: url(/images/blocks/social-icon.png) no-repeat;
+}
+.social-icon-zone {
+    background-position: -60px 0;
+}
+.social-icon-twitter {
+    background-position: -80px 0;
+}
+.social-icon-facebook {
+    background-position: -100px 0;
+}
+.social-icon-google {
+    background-position: -120px 0;
+}
+.social-icon-douban {
+    background-position: -140px 0;
+}
