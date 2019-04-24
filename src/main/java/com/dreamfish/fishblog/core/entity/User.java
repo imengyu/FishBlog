@@ -47,6 +47,24 @@ public class User implements Serializable {
     private Integer privilege;
     private String friendlyName;
     private String headimg;
+    private Integer bindUser;
+    private Integer messageCount;
+
+    public Integer getMessageCount() {
+        return messageCount;
+    }
+
+    public void setMessageCount(Integer messageCount) {
+        this.messageCount = messageCount;
+    }
+
+    public Integer getBindUser() {
+        return bindUser;
+    }
+
+    public void setBindUser(Integer bindUser) {
+        this.bindUser = bindUser;
+    }
 
     public Integer getPrivilege() {
         return privilege;

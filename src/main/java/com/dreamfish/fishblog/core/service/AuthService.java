@@ -10,6 +10,7 @@ public interface AuthService {
     int AUTH_TOKEN_GUEST_EXPIRE_TIME = 60*60*24; //1 Day
     int AUTH_TOKEN_DEFAULT_EXPIRE_TIME = 60*60; //60 Min
     String AUTH_TOKEN_NAME = "COMMON_AUTH_TOKEN";
+    String AUTH_PASSWORD_KEY = "dreamfish_blog_sz_password";
 
     UserExtened authGetAuthedUserInfo(HttpServletRequest request);
     int authLogin(String userNaame, String passwd, HttpServletRequest request);

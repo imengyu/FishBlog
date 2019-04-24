@@ -73,6 +73,10 @@ public class StatController {
     @ResponseBody
     public Result getStatTopPage(@RequestParam("maxCount") Integer maxCount){ return statService.getStatTopPage(maxCount); }
 
+    @GetMapping("/stat/today")
+    @ResponseBody
+    public Result getStatToday(){ return statService.getStatToday(); }
+
     @GetMapping("/stat/topPost")
     @RequestAuth(User.LEVEL_WRITER)
     @ResponseBody

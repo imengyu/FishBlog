@@ -1,7 +1,5 @@
 package com.dreamfish.fishblog.core.web;
 
-import com.dreamfish.fishblog.core.annotation.RequestAuth;
-import com.dreamfish.fishblog.core.entity.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,11 +21,15 @@ public class UserPageController {
     public ModelAndView recPasswordSend()  {
         ModelAndView view = new ModelAndView("admin/auth-sign-out");
 
-
-
-
         view.addObject("logout_stat", "发送找回密码信息成功");
-        view.addObject("logout_msg", "我们已经成功向您提供的地址发送了一封找回密码的信息，它会引导您恢复密码，请注意查收");
+        view.addObject("logout_msg", "我们已经成功向您提供的地址发送了一封找回密码的信息，它会引导您找回密码，请注意查收");
+        return view;
+    }
+    @GetMapping("/user/baned/")
+    public ModelAndView userBaned() {
+        ModelAndView view = new ModelAndView("admin/auth-sign-out");
+        view.addObject("logout_stat", "由于管理员或管理者进行的设置，拒绝此账号登录本站");
+        view.addObject("logout_msg", "请联系管理员获得更详细的信息，或换用账号登录");
         return view;
     }
 }

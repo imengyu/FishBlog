@@ -1,6 +1,5 @@
 package com.dreamfish.fishblog.core.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -33,6 +32,8 @@ public class UserExtened implements Serializable {
     private String gender;
     private String introduction;
     private String cardBackground;
+    private Integer bindUser;
+    private Integer messageCount;
 
     public String getHeadimg() { return headimg; }
     public String getFriendlyName() {
@@ -73,7 +74,19 @@ public class UserExtened implements Serializable {
     public String getThirdId() {
         return thirdId;
     }
+    public Integer getBindUser() {
+        return bindUser;
+    }
+    public Integer getMessageCount() {
+        return messageCount;
+    }
 
+    public void setMessageCount(Integer messageCount) {
+        this.messageCount = messageCount;
+    }
+    public void setBindUser(Integer bindUser) {
+        this.bindUser = bindUser;
+    }
     public void setThirdId(String thirdId) {
         this.thirdId = thirdId;
     }

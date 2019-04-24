@@ -25,7 +25,7 @@
             "/assets/libs/jquery/jquery.min.js",
             "/assets/libs/bootstrap/js/bootstrap.min.js", 
             "/assets/libs/vue.js/vue.min.js",
-            "utils.min.js", "string-hlp.min.js", "blog-view.min.js", "blog-comment.min.js",
+            "utils.min.js", "string-hlp.min.js", "blog-view.min.js", "blog-comment.min.js","blog-userauth-info.min.js",
             "/assets/libs/scrollReveal/scrollReveal.js",
             "/assets/libs/anchorjs/anchor.min.js",
             "/assets/libs/compress/md5.min.js",
@@ -114,7 +114,7 @@
                         <div v-if="isLoaded">
                             <p v-if="postContent.lastmodifyDate" class="text-secondary mt-3 mb-2">本文最后在 {{ postContent.lastmodifyDate }} 进行了编辑
                             </p>
-                            <div v-if="authedUserInfo"  class="like">
+                            <div class="like">
                                 <div :class="'btn like-group' + (authedUserLiked ? ' active' : '')" v-on:click="updateLikeCount()">
                                     <div class="btn-like"><a>喜欢</a></div>
                                     <div class="modal-wrap" v-if="postContent.likeCount && postContent.likeCount>0"><a>{{ postContent.likeCount }}</a></div>
@@ -158,7 +158,7 @@
                     <div v-if="isLoaded">
                         <p v-if="postContent.lastmodifyDate" class="text-secondary mt-3 mb-2">本文最后在 {{ postContent.lastmodifyDate }} 进行了编辑</p>
                     
-                        <div v-if="authedUserInfo" class="like">
+                        <div class="like">
                             <div :class="'btn like-group' + (authedUserLiked ? ' active' : '')" v-on:click="updateLikeCount()">
                                 <div class="btn-like"><a>喜欢</a></div>
                                 <div class="modal-wrap" v-if="postContent.likeCount && postContent.likeCount>0"><a>{{ postContent.likeCount }}</a></div>

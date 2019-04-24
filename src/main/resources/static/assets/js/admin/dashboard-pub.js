@@ -53,7 +53,9 @@ function initAuthInfo(){
         success: function (response) {
             if (!isNullOrEmpty(response) && response.success) {
                 currentAuthedUser=response.data;
-                
+
+                genUserMenuInfo(currentAuthedUser);
+
                 $('.current-user-name').html(currentAuthedUser.name + '<i></i>');
                 $('.current-user-head').attr('src', getImageUrlFormHash(currentAuthedUser.headimg));
 

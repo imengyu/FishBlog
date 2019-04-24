@@ -877,12 +877,10 @@
         .toast-close {
 
             position: absolute;
-            top: 15px;
+            top: 17px;
             right: 15px;
             display: inline-block;
             vertical-align: middle;
-
-            
             
             @include size(15px, 15px);
 
@@ -1077,6 +1075,10 @@ ul.share-list {
     span {
         vertical-align: middle;
     }
+}
+/*footer overflow fix*/
+footer > div {
+    max-width: 100%;
 }
 
 /* popover padding fix */

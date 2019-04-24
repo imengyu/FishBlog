@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="梦想小鱼的博客,ALONE SPACE,DreamFish,梦想小鱼的个人分享博客,梦想小鱼的个人分享平台,梦想小鱼">
+    <meta name="description" content="梦想小鱼的个人分享博客-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
+    <title></title>
+    <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
+    <script type="text/javascript" src="/assets/js/config.js"></script>
+    <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
+    <script type="text/javascript">
+        setLoaderCSS(new Array(
+            "/assets/libs/bootstrap/css/bootstrap.min.css", 
+            "/assets/libs/font-awesome/css/font-awesome.min.css", 
+            "yzc-blog.min.css",
+            "/assets/libs/owl.carousel/css/owl.carousel.css",
+            "/assets/libs/owl.carousel/css/owl.theme.css",
+            "/assets/libs/owl.carousel/css/owl.transitions.css"));
+        setLoaderJS(new Array(
+            address_blog_api + "settings.js",
+            "/assets/libs/jquery/jquery.min.js",
+            "/assets/libs/popper/popper.min.js",
+            "/assets/libs/bootstrap/js/bootstrap.min.js",
+            "utils.min.js","blog-userauth-info.min.js",
+            "/assets/libs/scrollReveal/scrollReveal.js",
+            "/assets/libs/owl.carousel/js/owl.carousel.min.js"));
+    </script>
+    <!--Baidu tongji-->
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?b817302b643ad43baed860443308c8d1";
+          var s = document.getElementsByTagName("script")[0]; 
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+
+<body class="not-load">
+
+    <!--Header-->
+    <header id="header-small">
+        <div class="container main-menu main-menu-white main-menu-white-auto-mask" style="padding-top: 40px; padding-bottom: 30px;">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div class="nav-header-text">
+                    <span class="logo" id="header-logo"></span>
+                    <a href="/" id="header-title"></a>
+                </div>
+                <button type="button" class="icon-menu" id="mobile-nav-toggle"></button>
+                <nav id="nav-menu-container" class="nav-menu-container">
+                    <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
+                    </ul>
+                </nav><!-- #nav-menu-container -->
+            </div>
+        </div>
+        <div class="bg-img dealy-load-bgimg" data-original="/images/background/bg1.jpg"></div>
+        <div class="home-wrapper">
+            <div class="container">
+                <div class="row">
+                    <!-- home content -->
+                    <div class="col">
+                        <div class="home-content">
+                            <h1 class="white-text shadow-text">梦想小鱼的<br>随手记录册</h1>
+                            <p class="white-text shadow-text">不抛弃不放弃，即使是失败了又如何？</p>
+                            <button class="flat-btn flat-btn-white flat-pill ml-1"
+                                onclick="location.href = 'archives/'">查看所有文章分类</button>
+                        </div>
+                    </div>
+                    <!-- /home content -->
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--Main-->
+    <article id="main-archives" class="sm-padding bg-grey-no-border pb-0 pt-0">
+        <div id="main-loading-center-absolute"><div style="height:366px" class="d-flex justify-content-center align-items-center"><div class="text-center"><span class="simple-loading"></span><p class="text-secondary mt-2">正在加载文章</p></div></div></div>
+        <div class="container">
+            <div class="row " id="main-archives-area">
+
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-4 col-sm-12"><a class="flat-btn flat-pill btn-block" href="archives/">查看更多文章</a></div>
+            </div>
+        </div>
+        <script>
+            setLoaderEndCallback(function () {
+                //Load archives
+                $.ajax({
+                    url: address_blog_api + "posts?maxCount=12&sortBy=view",
+                    success: function (response) {
+                        if (response.success) {
+                            $('#main-loading-center-absolute').fadeOut();
+                            loadPosts(response.data);
+                        } else loadError(response.message);
+                    }, error: function (xhr, err) { loadError(err) }
+                });
+                //Load to list
+                function loadPosts(posts){
+                    for(var i=0;i<3;i++)
+                        loadPostCol(i);
+                    for(var i=0, len = posts.length;i<len;i++) {
+                        if(i == 0 || i % 3 == 0)
+                            loadPostItem(0, posts[i]);
+                        else if(i == 1 || (i - 1) % 3 == 0)
+                            loadPostItem(1, posts[i]);
+                        else if(i == 2 || (i - 2) % 3 == 0)
+                            loadPostItem(2, posts[i]);
+                    }
+                }
+                function loadPostCol(i){
+                    $("#main-archives-area").append($('<div class="col-sm-12 col-md-6 col-lg-4" id="main-archives-col-' + i + '"></div>'));
+                }
+                function loadPostItem(postCol,post){
+                    $("#main-archives-col-" + postCol).append('\
+                    <div class="blog" data-scroll-reveal="enter from the bottom after 0.6s" data-scroll-reveal-id="' + post.id + '"\
+                        data-scroll-reveal-initialized="true" data-scroll-reveal-complete="true">' + (post.previewImage ? 
+                        '<div class="blog-img">\
+                            <img class="img-responsive"\
+                                src="' + getImageUrlFormHash(post.previewImage) + '" alt="' + post.title + '">\
+                        </div>' : '') + 
+                        '<div class="blog-content">\
+                            <p style="marign-bottom:7px;">' + getPostPrefix(post.postPrefix) + '</p>\
+                            <a href="'+ getPostRealUrl(post) + '" target="_blank">\
+                                <h3>' + post.title + '</h3>\
+                                <p>' + post.previewText + '</p>\
+                            </a>\
+                            <ul class="blog-meta">\
+                                <li><i class="fa fa-clock-o"></i>' + post.postDate.substr(0, 10) + '</li>\
+                                <li><i class="fa fa-comments"></i>' + post.commentCount + '</li>\
+                                <li><i class="fa fa-eye"></i>' + post.viewCount + '</li>\
+                            </ul>\
+                        </div>\
+                    </div>\
+                    ');
+                }
+                function loadError(msg){
+                    $('#main-loading-center-absolute').html('<p class="text-center text-danger pt-5 pb-5"><i class="fa fa-times-circle mb-3" style="font-size: 36px;"></i><br>加载文章失败！<br>' + msg + '</p>');
+                    
+                }
+            });
+        </script>
+    </article>
+
+    <!--Ablot mee-->
+    <section id="alone" class="section bg-grey-no-border info-area md-padding">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="col-lg-8">
+                    <div class="info-head text-center">
+                        <h1 class="title info-head-text">ALONE</h1>
+                        <p>I M ALONE</p>
+                    </div>
+                </div>
+            </div>
+            <div class="single-info row">
+                <div class="col-lg-6 col-md-12 info-thumb-top text-center no-padding info-left">
+                    <div class="info-thumb">
+                        <img data-original="/images/blocks/about-img.jpg" class="img-async img-fluid" alt="about-img">
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 no-padding info-rigth">
+                    <div class="info-content">
+                        <h2 class="info-head-text">一个人，
+                            <br>生活在一座城，<br>念着一个人，<br>在另一座城，<br>独自漫步人海，<br>历经千秋万载。
+                        </h2>
+                        <p>
+                            孤独是你最忠实的朋友，他会一直陪你到生命的尽头。<br>
+                            很多人都以为孤独是个好东西，都希望可以独自享用它。 <br>
+                            你笑的那么没心没肺，却没人知道你的笑是你的无声落泪。 <br>
+                            也许是不知是梦的缘故，流离的人习惯追逐幻影。 <br>
+                            有一种渴，只能用烟来安慰，酒来麻醉，这种渴就是孤独。 <br>
+                            一句对不起，就这样拥有了故事没有了你。<br>
+                            最深的孤独——无可奉告 <br>
+                            岁月静好，愿君安好，不再相见，不再相念。 <br>
+                            最孤独的不是等待，是遥遥无期的曙光。<br>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--Timeline-->
+    <section id="timeline" class="section md-padding">
+        <div class="container">
+            <div class="row timeline justify-content-center">
+                <div class="col-12">
+                    <div class="section-header text-center">
+                        <h2 class="title text-center">博客建设历程</h2>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="timeline-wrap">
+                    
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-exclamation"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h3>全线完成</h3>
+                                <p>2019/04/30</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>新博客功能全线完成</h4>
+                                <p>博客已经开源在 <a href="https://github.com/717021/FishBlog" target="_blank">Github</a> 上</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-exclamation"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h3>大改</h3>
+                                <p>2019/03/11</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>博客后端抛弃 PHP 采用 Java</h4>
+                                <p>
+                                    正式放弃 PHP ，采用 Spring boot + vue.js 的架构来重构博客。
+                                    <br />博客迁移至新地址： <code>blog.imyzc.com</code>
+                                    <br />创造了自己的 API 网关： <code>api.imyzc.com</code>
+                                </p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+                    
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-wrench"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h3>优化+修补</h3>
+                                <p>2019/02/18</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>又优化...</h4>
+                                <p>搞了一个评论系统...</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-wrench"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h3>修修补补</h3>
+                                <p>2019/01/07</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>全站优化</h4>
+                                <p>网站 代码与 CSS 进行了第一次重构。</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-wrench"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h3>修修补补</h3>
+                                <p>2019/01/03</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>系统全线优化</h4>
+                                <p>相比第一版有更多设计与改进，修复不少 BUG 。一直使用到现在。</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-rocket"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h3>博客系统第二版本</h3>
+                                <p>2018/12/06</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>博客系统第二版本建设完成！</h4>
+                                <p>相比第一版有更多设计与改进。</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-paper-plane"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h3>服务器正式投入使用！</h3>
+                                <p>2018/11/29</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>imyzc.com 备案完成</h4>
+                                <p>管局工作效率还是挺高的，顺利通过备案，网站正式对外开放。</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-wrench"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h4>网站改革</h4>
+                                <p>2018/11/12</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>博客第一版基础架构废弃</h4>
+                                <p>继续学习，之前做的太烂了，简直不能看
+                                    <br />使用 html5 进行整站重新设计，全站响应式设计
+                                    <br />后端改用数据库存储博客，而不是直接写入文件
+                                    <br />还在想更多新功能...
+                                </p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-server"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <p>2018/11/08</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>租用了人生第一台服务器</h4>
+                                <p>以优惠的价格租用了人生第一台服务器，迫不及待地将博客托管到服务器上，买了一个域名 <code>imyzc.com</code> 一直用到现在。</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-hand-o-up"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <p>2018/10/29</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>想要更好的...</h4>
+                                <p>新浪云虽然便宜，但是限制颇多，而且我想要一个自己的域名，果断决定放弃新浪云，这时我发现了云服务器。</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-hand-o-right"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <p>2018/10/27</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>博客第一版基础架构完成</h4>
+                                <p>这是这个网站的最初版本，虽然比起现的设计落后不少，但在当时算是很奇迹了。</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-star-half-o"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <p>2018/10/09</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>搭建好了一个勉强可以看看的小网站</h4>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-wrench"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <p>2018/10/15</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>在 新浪云SAE 上搭建了自己的一个小网站</h4>
+                                <p>
+                                    最初仅仅是用来存放网页课程的作业，后来发展到想建设自己的博客<br />
+                                    （现在已经废弃了，仅仅作为我的历史看看）<br />
+                                    它的地址是 <code>yzcblog.applinzi.com</code> (2019/10 以后就会被清除)。
+                                </p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                        <div class="timeline-block">
+                            <div class="timeline-ico">
+                                <i class="fa fa-exclamation-circle"></i>
+                            </div>
+                            <div class="timeline-header">
+                                <h5>开始入坑</h5>
+                                <p>2018/10/11</p>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>在网站规划与建设课程上接触了网站建设（其实以前就接触过了）</h4>
+                                <p>打算做一个自己的网站</p>
+                            </div>
+                        </div> <!-- /timeline-block -->
+
+                    </div> <!-- /timeline-wrap -->
+                </div> <!-- /col-twelve -->
+            </div>
+        </div>
+    </section>
+
+    <!--Testimonials-->
+    <section id="testimonials" class="section sm-padding text-center text-white">
+        <div class="container">
+            <div id="bg_img2" class="bg-img bg-dark">
+            </div>
+            <img src="/images/blocks/right-quote.png" />
+            <div id="owl-testi" class="owl-carousel owl-theme">
+                <div class="item">
+                    <div class="quote">
+                        <h5 style="margin: 25px 0;">
+                            一个人至少拥有一个梦想，有一个理由去坚强。<br />失败不可怕，可怕的是还没开始你就临阵逃脱。
+                        </h5>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="quote">
+                        <h5 style="margin: 25px 0;">
+                            成长是一条必走的路，我们在路上受伤痛在所难免。<br />有一天你发现方向错了，记住停下来就是前进。
+                        </h5>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="quote">
+                        <h5 style="margin: 25px 0;">
+                            只要我们尽力做了，谁都可以成为自己的英雄。<br />当你决心改变的那一刻，成功就会自动找上你。
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            setLoaderEndCallback(function () {
+                /***************** Owl Carousel Testimonials ******************/
+                $("#owl-testi").owlCarousel({
+                    navigation: false, // Show next and prev buttons
+                    paginationSpeed: 400,
+                    singleItem: true,
+                    autoPlay: true
+                });
+            });
+    
+        </script>
+    </section>
+
+    <!--Bottom back to top-->
+    <div class="half bg-dark">
+        <span class="half-bg bg-footer"></span>
+        <div class="container">
+            <div class="row">
+                <div class="col text-center">
+                    <div class="btn-frame bg-dark">
+                        <a onclick="scrollToPos(0);" href="javascript:void(0)" data-toggle="tooltip"
+                            data-placement="top" title="" class="btn btn-top bg-white btn-ico btn-lg btn-rounded"
+                            data-original-title="回到顶部"><i class="fa fa-arrow-up"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Back to top button-->
+    <a id="back-top" href="#back-top" class="go-top" style="display: inline;"><i class="fa fa-angle-up"></i></a>
+
+</body>
+
+</html>

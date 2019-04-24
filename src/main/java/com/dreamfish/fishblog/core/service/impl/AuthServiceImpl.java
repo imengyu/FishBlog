@@ -5,8 +5,8 @@ import com.dreamfish.fishblog.core.entity.UserExtened;
 import com.dreamfish.fishblog.core.exception.InvalidArgumentException;
 import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.service.AuthService;
-import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.StringUtils;
+import com.dreamfish.fishblog.core.utils.encryption.AESUtils;
 import com.dreamfish.fishblog.core.utils.log.ActionLog;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 
@@ -16,7 +16,6 @@ import com.dreamfish.fishblog.core.utils.auth.TokenAuthUtils;
 import com.dreamfish.fishblog.core.utils.request.IpUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -49,11 +48,13 @@ public class AuthServiceImpl implements AuthService {
             return AuthCode.FAIL_BAD_PARARM;
 
         List<User> users =  userMapper.findByUserName(userName);
-        if(users.size() == 0) {
-            return AuthCode.FAIL_NOUSER_FOUND;
-        }
+        if(users.size() == 0) return AuthCode.FAIL_NOUSER_FOUND;
         User user = users.get(0);
-        if(passwd.equals(user.getPasswd())) {
+
+        String passwordRs = AESUtils.encrypt(passwd + "$" + userName, AUTH_PASSWORD_KEY);
+        //System.out.println("passwordRs: " + passwordRs);
+
+        if(passwordRs.equals(user.getPasswd())) {
 
             if(user.getLevel() == User.LEVEL_LOCKED)
                 return AuthCode.FAIL_USER_LOCKED;
@@ -88,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
     public UserExtened authGetAuthedUserInfo(HttpServletRequest request){
         Integer currentLoggedUserId = PublicAuth.authGetUseId(request);
         if(currentLoggedUserId!=null && currentLoggedUserId!=0 && userMapper.isUserIdExists(currentLoggedUserId)!= null)
-            return userMapper.findByFullById(currentLoggedUserId);
+            return userMapper.findFullById(currentLoggedUserId);
         return null;
     }
 

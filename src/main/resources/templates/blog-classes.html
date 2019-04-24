@@ -12,7 +12,7 @@
     <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
     <script type="text/javascript">
         setLoaderCSS(new Array("/assets/libs/bootstrap/css/bootstrap.min.css", "/assets/libs/font-awesome/css/font-awesome.min.css", "yzc-blog.min.css"));
-        setLoaderJS(new Array(address_blog_api + "settings.js","/assets/libs/jquery/jquery.min.js", "/assets/libs/popper/popper.min.js", "/assets/libs/jquery/jquery.min.js", "/assets/libs/bootstrap/js/bootstrap.min.js", "/assets/libs/vue.js/vue.js", "utils.min.js", "string-hlp.min.js", "blog-classes.min.js", "blog-components.min.js", "/assets/libs/scrollReveal/scrollReveal.js"));
+        setLoaderJS(new Array(address_blog_api + "settings.js","/assets/libs/jquery/jquery.min.js", "/assets/libs/popper/popper.min.js", "/assets/libs/jquery/jquery.min.js", "/assets/libs/bootstrap/js/bootstrap.min.js", "/assets/libs/vue.js/vue.js", "utils.min.js", "string-hlp.min.js", "blog-classes.min.js", "blog-userauth-info.min.js", "blog-components.min.js", "/assets/libs/scrollReveal/scrollReveal.js"));
     </script>
     <!--Baidu tongji-->
     <script>
@@ -29,8 +29,8 @@
 <body class="not-load">
     <div id="main">
         <!--Header-->
-        <header id="header-minimum">
-            <div class="container main-menu main-menu-white" style="padding-top: 40px; padding-bottom: 30px;">
+        <header id="header-small">
+            <div class="container main-menu main-menu-white main-menu-white-auto-mask-no-fade main-menu-white-fade" style="padding-top: 40px; padding-bottom: 30px;">
                 <div class="row align-items-center justify-content-between d-flex">
                     <div class="nav-header-text">
                         <span class="logo" id="header-logo"></span>
@@ -41,6 +41,21 @@
                         <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
                         </ul>
                     </nav>
+                </div>
+            </div>
+            <div class="bg-img dealy-load-bgimg" data-original="/images/background/background4.jpg"></div>
+            <div class="home-wrapper">
+                <div class="container">
+                    <div class="row">
+                        <!-- home content -->
+                        <div class="col">
+                            <div class="home-content" v-if="contentClass">
+                                <h1 class="white-text shadow-text">分类：{{ contentClass.title }}</h1>
+                                <p class="white-text shadow-text">{{ contentClass.previewText }}</p>
+                            </div>
+                        </div>
+                        <!-- /home content -->
+                    </div>
                 </div>
             </div>
         </header>
@@ -57,19 +72,6 @@
                                 <li v-if="contentClass" class="breadcrumb-item active" aria-current="page">{{ contentClass.title }}</li>
                             </ol>
                         </nav>
-                    </div>
-                </div>
-                <div v-if="contentClass" class="row justify-content-start">
-                    <div class="col-12 col-sm-12 col-lg-3 ">
-                        <div class="blog-side-content p-0">
-                            <img style="max-width:100%; border-radius:5px" :src="getImageUrl(contentClass.previewImage)" />
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-12 col-lg-9 text-left blog-list">
-                        <div class="blog-side-content" style="padding:20px">
-                            <h4>{{ contentClass.title }}</h4>
-                            <p>{{ contentClass.previewText }}</p>
-                        </div>
                     </div>
                 </div>
                 <div class="row justify-content-start">

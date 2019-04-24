@@ -91,6 +91,14 @@ function getUserHasPrivilege(userData, privilege){
   if(!userData) return false;
   return (userData.privilege & privilege) != 0;
 }
+function genUserMenuInfo(userData) {
+  var userMsgPoint = userData.messageCount ? '<span class="current-user-message-count">' + userData.messageCount + '</span>' : '';
+  if (userData.level == userLevels.admin || userData.level == userLevels.writer) {
+    $('#header-menu').append($('<li class="nav-user" data-toggle="dropdown" data-reference="current_user_menu">' + (location.pathname != '/admin/write-archive/' ? '<button type="button" class="flat-pill flat-btn flat-btn-transparent flat-danger mr-2" onclick="location.href = \'/admin/write-archive/\'">写文章</button>' : '') + '<div><img class="current-user-head" src="/images/default/head-default.png">' + userMsgPoint + '</div><span class="current-user-name">用户名<i></i></span></li><div class="dropdown-menu dropdown-menu-right"><a href="/admin/user-center/" class="dropdown-item"><i class="fa fa-user-o mr-2"></i> 个人信息</a><a href="/user/" class="dropdown-item"><i class="fa fa-address-card-o"></i>&nbsp;&nbsp;关于我</a><a href="/sign-out/" class="dropdown-item"><i class="fa fa-sign-out mr-2"></i> 退出登录</a></div>'));
+  } else {
+    $('#header-menu').append($('<li class="nav-user" data-toggle="dropdown" data-reference="current_user_menu"><div><img class="current-user-head" src="/images/default/head-default.png">' + userMsgPoint + '</div><span class="current-user-name">用户名<i></i></span></li><div class="dropdown-menu dropdown-menu-right"><a href="/user/" class="dropdown-item"><i class="fa fa-address-card-o"></i>&nbsp;&nbsp;关于我</a><a href="/sign-out/" class="dropdown-item"><i class="fa fa-sign-out mr-2"></i> 退出登录</a></div>'));
+  }
+}
 /**
  * 判断一个字符串是否为空
  * @param {*} str 要判断的字符串

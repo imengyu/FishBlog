@@ -51,7 +51,7 @@
                                             v-model="archiveObject.title">
                                     </div>
                                     <div class="form-group from-inline col-md-3">
-                                        <label for="archive-urlname"
+                                        <label for="archive-urlname" data-toggle="tooltip"
                                             title="文章URL名字，跟在文章URL后面的文章名，例如：../post/test-post/ 其中的 test-post 您可以自定义">
                                             文章URL名字
                                             <a href="javascript:;" class="text-primary ml-2"
@@ -77,7 +77,7 @@
                                         v-model="archiveObject.previewText" placeholder="文章的简介说明文字">
                                 </div>
                                 <div class="form-group">
-                                    <label for="archive-keywords">文章关键词</label>
+                                    <label for="archive-keywords" data-toggle="tooltip" title="显示在 &lt;meta name=&quot;keywords&quot;&gt  标签关键词，多个用逗号(,)分隔，">文章关键词</label>
                                     <input type="text" class="form-control" id="archive-keywords"
                                         v-model="archiveObject.keywords" placeholder="关键词，多个用逗号(,)分隔">
                                 </div>
@@ -104,7 +104,7 @@
                                             v-model="archiveObject.viewCount">
                                     </div>
                                     <div class="form-group col-md-2">
-                                        <label for="archive-commentCount" title="如果评论数与实际不符，您可以重写它">重写评论数</label>
+                                        <label for="archive-commentCount" data-toggle="tooltip" title="如果评论数与实际不符，您可以重写它">重写评论数</label>
                                         <input type="text" class="form-control" id="archive-commentCount"
                                             v-model="archiveObject.commentCount">
                                         <div class="custom-control custom-checkbox mt-1">
@@ -168,17 +168,17 @@
                                         <label class="custom-control-label"
                                             for="archive-add-last-modify-date">自动添加修改日期</label>
                                     </div>
-                                    <div class="custom-control custom-checkbox ml-3" title="取消勾选此项以后，用户将不能从文章列表中看到这篇文章（但是依然可以看这篇文章）">
+                                    <div class="custom-control custom-checkbox ml-3" data-toggle="tooltip" title="取消勾选此项以后，用户将不能从文章列表中看到这篇文章（但是依然可以看这篇文章）">
                                         <input type="checkbox" class="custom-control-input"
                                             id="archive-show-in-list" v-model="archiveObject.showInList">
                                         <label class="custom-control-label" for="archive-show-in-list">显示在文章列表中</label>
                                     </div>
-                                    <div class="custom-control custom-checkbox ml-3" title="取消勾选此项以后，用户将不能从文章列表中看到这篇文章（但是依然可以看这篇文章）">
+                                    <div class="custom-control custom-checkbox ml-3">
                                         <input type="checkbox" class="custom-control-input"
                                             id="archive-show-catalog" v-model="archiveObject.showCatalog">
                                         <label class="custom-control-label" for="archive-show-catalog">是否显示目录</label>
                                     </div>
-                                    <div class="custom-control custom-checkbox ml-3" title="文章将会置顶在列表的顶部">
+                                    <div class="custom-control custom-checkbox ml-3" data-toggle="tooltip" title="文章将会置顶在列表的顶部">
                                         <input type="checkbox" class="custom-control-input"
                                             id="archive-top-most" v-model="archiveObject.topMost">
                                         <label class="custom-control-label" for="archive-top-most">文章置顶</label>
@@ -215,7 +215,7 @@
                             </div>
                             <div class="form-group">
                                 <label>文章标签<a href="javascript:;" class="text-primary ml-2" v-on:click="clearTag()"
-                                        title="清空文章上的所有标签"><i class="fa fa-trash"></i></a></label>
+                                    data-toggle="tooltip" title="清空文章上的所有标签"><i class="fa fa-trash"></i></a></label>
                                 <div class="tags" v-if="archiveTags">
                                     <div v-for="tag in archiveTags" class="tag-mgr-item"
                                         :style="'background-color:#' + tag.color">

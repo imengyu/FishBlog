@@ -32,10 +32,20 @@ var archiveStatus = {
     DRAFT: 2,
 }
 
+var thirdLogin = {
+    github: true,
+    github_client_id:'d31012693b9ba3773cde',
+    qq: true,
+    weiXin: true,
+    weiBo: true,
+}
 
 //用户浏览数据排除路径
 var excludeStatPath = [
     '/sign-in/',
+    '/user/change-passwd',
+    '/user/rec-passwd/',
+    '/user/baned/',
     '/sign-out/',
     '/admin/',
 ]
@@ -55,12 +65,16 @@ var menuConfig = [
         url: '/archives/post/about/'
     },
     {
-        name: '所有文章',
-        url: '/archives/'
+        name: '友链',
+        url: '/links/'
     },
     {
         name: '归档',
         url: '/archives/month/'
+    },
+    {
+        name: '博客',
+        url: '/archives/'
     },
     {
         name: '主页',

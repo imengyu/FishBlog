@@ -13,6 +13,7 @@ public interface StatService {
     Result getStatIpPv(String startDate, Integer maxCount);
     Result getStatIpPv(Integer page, Integer pageSize);
     Result getStatIpPv();
+    Result getStatToday();
     Result getStatTopPage(Integer maxCount);
     Result getStatTopPost(Integer maxCount);
 }

@@ -70,7 +70,7 @@ function jsErr(event){
     if(loadedJsCount<allJsCount){
         if (typeof jQuery == 'undefined') {
             body.setAttribute('class', 'no-scroll');
-            body.setAttribute('style', 'visibility:visible;background-color:#a00;text-align:center;padding-top:20px;');
+            body.setAttribute('style', 'visibility:visible;background-color:#200;text-align:center;padding-top:20px;');
             body.innerHTML = "<h1 style='color:#fff;'>加载必要的 JS 失败</h1><a href=\"javascript:location.reload(true);\">重新加载</a>";
         } else{
             loadingJsIndex++;
@@ -416,6 +416,9 @@ function blogInitnaize() {
                     $('.main-menu').removeClass('header-scrolled');
                     $('.main-trans-white').addClass('text-white');
                     $('.main-menu-white-auto-mask').addClass('main-menu-white-fade-mask');
+                    $('.main-menu-white-auto-mask-no-fade').addClass('main-menu-white-fade');
+                    $('.main-menu-black-auto-mask').addClass('main-menu-black-fade-mask');
+                    $('.main-menu-black-auto-mask-no-fade').addClass('main-menu-black-fade');
                     if (width > 768) {
                         $('.main-menu').css('padding-top', '40px');
                         $('.main-menu').css('padding-bottom', '30px');
@@ -424,6 +427,10 @@ function blogInitnaize() {
                     $('.main-trans-white').removeClass('text-white');
                     $('.main-menu').addClass('header-scrolled');
                     $('.main-menu-white-auto-mask').removeClass('main-menu-white-fade-mask');
+                    $('.main-menu-white-auto-mask-no-fade').removeClass('main-menu-white-fade');
+                    $('.main-menu-black-auto-mask').removeClass('main-menu-black-fade-mask');
+                    $('.main-menu-black-auto-mask-no-fade').removeClass('main-menu-black-fade');
+
                     if (width > 768) {
                         $('.main-menu').css('padding-top', '15px');
                         $('.main-menu').css('padding-bottom', '15px');
@@ -437,8 +444,13 @@ function blogInitnaize() {
         initTopBar();
         initFooter();
     } catch(err) {
-        toast('Load auto settings error : ' + err,'error', 3500);
+        toast('Init auto compoents error : ' + err,'error', 4000);
     }
+
+    setTimeout(function(){
+        //tooltip fix
+        $('[data-toggle="tooltip"]').tooltip();
+    }, 3500);
 }
 //顶部菜单初始化
 function initTopBar() {
@@ -667,16 +679,10 @@ function toastTypeToIcon(type){
             return '<i class="toast-icon spinner-grow text-primary" style="width:26px;height:26px" role="status"></i>';
     }
 }
-function toastRemoveById(uidz){
-    for(var k in toasts){
-        if(toasts[k].uidz == uidz){
-            toastRemove(toasts[k], toasts[k].alert);
-            break;
-        }
-    }
-}
 function toastRemove(toast, $alert){
-    toastCurrentTop -= $alert.height() + 36;    
+    if(toastCurrentTop>15) toastCurrentTop -= $alert.height() + 36;  
+    else toastCurrentTop = 15;  
+
     $alert.remove();
 
     for(var i = toasts.length - 1, start = toasts.indexOf(toast); i > start; i--)
@@ -688,10 +694,21 @@ function toastRemove(toast, $alert){
     toasts.pop(toasts[toasts.length-1]);
     toastCount--;
 }
+function toastCloseById(uidz){
+    for(var k in toasts){
+        if(toasts[k].uidz == uidz){
+            toastClose(toasts[k]);
+            break;
+        }
+    }
+}
 function toastClose(toast, anim){
-    $alert = toast.alert;
-    if(anim=='slide') $alert.slideUp(300, function(){ toastRemove(toast, $(this)) });
-    else $alert.fadeOut(600, function(){ toastRemove(toast, $(this)) });
+    if(!toast.closed){
+        $alert = toast.alert;
+        toast.closed = true;
+        if(anim=='slide') $alert.slideUp(300, function(){ toastRemove(toast, $(this)) });
+        else $alert.fadeOut(600, function(){ toastRemove(toast, $(this)) });
+    }
 }
 function toastClear(time, toast){
     setTimeout(function(){toastClose(toast)},time)
@@ -699,13 +716,13 @@ function toastClear(time, toast){
 function toast(str, type, time, noclose){
     uidz += parseInt(Math.random() * 10);
     if(!time) time = 2500;
-    if(time == -1) noclose = true;
+    if(time == -1 || time < 2500) noclose = true;
 
     var top = toastCurrentTop;
 
     $newAlert = $('<div class="toast-alert" id="toast-' + uidz + '">' + toastTypeToIcon(type) + 
         '<div class="toast-text" style="' +(noclose?'padding-right:20px':'')+'">' +  str + '</div>' +
-        (noclose ? '' : '<a class="toast-close" href="javascript:;" onclick="toastRemoveById(' + uidz + ')"></a>') + '</div>')
+        (noclose ? '' : '<a class="toast-close" href="javascript:;" onclick="toastCloseById(' + uidz + ')"></a>') + '</div>')
     $('#toast-overlay').append($newAlert);
     $newAlert.css('top', top + 'px');
     $newAlert.css('left', ($(window).width() / 2 - $newAlert.width() / 2) + 'px');
@@ -714,7 +731,8 @@ function toast(str, type, time, noclose){
     var toast = {
         uidz: uidz,
         alert: $newAlert,
-        top: top
+        top: top,
+        closed: false
     };
     toasts[toastCount] = toast;
     toastCount++;

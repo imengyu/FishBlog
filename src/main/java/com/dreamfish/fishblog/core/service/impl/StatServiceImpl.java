@@ -3,6 +3,7 @@ package com.dreamfish.fishblog.core.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.dreamfish.fishblog.core.entity.Stat;
 import com.dreamfish.fishblog.core.entity.User;
+import com.dreamfish.fishblog.core.mapper.PostMapper;
 import com.dreamfish.fishblog.core.mapper.StatIpMapper;
 import com.dreamfish.fishblog.core.mapper.StatMapper;
 import com.dreamfish.fishblog.core.repository.StatDayLogRepository;
@@ -30,6 +31,8 @@ public class StatServiceImpl implements StatService {
     private StatIpMapper statIpMapper = null;
     @Autowired
     private StatDayLogRepository statDayLogRepository = null;
+    @Autowired
+    private PostMapper postMapper = null;
 
     /**
      * 总计数更新入口
@@ -105,6 +108,15 @@ public class StatServiceImpl implements StatService {
     @Override
     public Result getStatIpPv() {
         return Result.success(statMapper.getStatDayLogMonthThisMonth());
+    }
+
+    @Override
+    public Result getStatToday() {
+        Map<String, Integer> data = new HashMap<>();
+        data.put("pv", statMapper.getStat("pvToday").getIntData());
+        data.put("ip", statMapper.getStat("ipToday").getIntData());
+        data.put("count", postMapper.getAllPostCount());
+        return Result.success(data);
     }
 
     @Override

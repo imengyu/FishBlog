@@ -247,7 +247,7 @@ Vue.component('commenter', {
                 if(main.authedUserInfo.home) website = main.authedUserInfo.home;
             }
             else if(!anonymousComment){
-                swal("请先登录", "需要登录才能评论", "info");
+                showFastLogin();
                 return;
             }
             var content = main.currentEditComment;
@@ -366,7 +366,10 @@ Vue.component('commenter', {
         },
         //https://github.com/login/oauth/access_token?client_id=d31012693b9ba3773cde&client_secret=9dad579e417de46aed7ceecc091545f72473d7e1&code=1225aee7f0dbe322007f
         //https://blog.imyzc.com/githubAuthCallback?code=1225aee7f0dbe322007f
-        loginGithub(){
+        showFastLogin(){
+            location.href='/sign-in/?redirect_url=' + location.href
+        },
+        /*loginGithub(){
             if(!this.loginGithubContentTipShowed && !isNullOrEmpty(this.currentEditComment)){
                 swal('登录之前请先复制您的评论内容哦', '因为登录会刷新页面，所以您需要先复制您的评论内容，稍后登录完成以后再粘贴', 'warning');
                 this.loginGithubContentTipShowed = true;
@@ -380,7 +383,7 @@ Vue.component('commenter', {
                 showCloseButton: true,//右上角关闭
             })
             location.href = 'https://github.com/login/oauth/authorize?client_id=d31012693b9ba3773cde&scope=user&redirect_uri=' + encodeURI(getCurrentFullHost() + address_blog_api + 'auth/githubAuthCallback/' + (this.currentPostIdOrName ? this.currentPostIdOrName : this.currentPostId));
-        },
+        },*/
         quitLogin(){
             Swal.fire({
                 title: '退出登录',
@@ -442,7 +445,7 @@ Vue.component('commenter', {
 <a class="dropdown-item" href="javascript:void(0)" v-on:click="quitLogin">退出登录</a>\
 </div>\
 </div>\
-<button type="button" class="flat flat-icon-btn float-right" data-toggle="tooltip" data-placement="left" title="使用 Github 登录" v-on:click="loginGithub" id="comment-login-github"><i class="fa fa-github" style="font-size:28px"></i></button>\
+<!--<button type="button" class="flat flat-icon-btn float-right" data-toggle="tooltip" data-placement="left" title="使用 Github 登录" v-on:click="loginGithub" id="comment-login-github"><i class="fa fa-github" style="font-size:28px"></i></button>-->\
 <form ethod="post" id="comment_form" class="mt-3">\
 <div class="row" v-if="anonymousCanComment() && !authed" >\
 <div class="col-md-6">\
@@ -546,5 +549,6 @@ Vue.component('commenter', {
 <div v-else-if="!loading && !loadFailed" class="text-center text-secondary">没有更多评论了</div>\
 <div v-if="loading" id="comment-loading"><span class="simple-loading"></span><p class="text-secondary text-center mt-2">正在加载评论</p></div>\
 <div v-if="loadFailed" class="text-secondary text-center p-4"><i class="fa fa-exclamation-triangle"></i><br />加载评论失败<br />{{ laodErr }} {{ currentPostId }}</div>\
-</div></div>'
+</div>\
+</div>'
 })

@@ -92,7 +92,10 @@ function initApp() {
                     text: '',
                     useData: 'custom',
                     customDataFunc: function(user){
-                        if(user.userFrom == 'github') return '<i class="fa fa-github text-dark" style="font-size: 26px;" title="此用户来自 Github"></i>';
+                        if(user.userFrom == 'github') return '<i class="fa fa-github text-dark" style="font-size: 26px;" data-toggle="tooltip" title="此用户来自 Github"></i>';
+                        if(user.userFrom == 'qq') return '<i class="fa fa-qq text-primary" style="font-size: 26px;" data-toggle="tooltip" title="此用户来自 QQ"></i>';
+                        if(user.userFrom == 'weixin') return '<i class="fa fa-weixin text-success" style="font-size: 26px;" data-toggle="tooltip" title="此用户来自 微信"></i>';
+                        if(user.userFrom == 'weibo') return '<i class="fa fa-weibo text-danger" style="font-size: 26px;" data-toggle="tooltip" title="此用户来自 微博"></i>';
                         return '';
                     }
                 },

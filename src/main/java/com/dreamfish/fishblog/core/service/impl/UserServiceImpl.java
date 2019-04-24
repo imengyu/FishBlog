@@ -1,14 +1,12 @@
 package com.dreamfish.fishblog.core.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.dreamfish.fishblog.core.annotation.RequestAuth;
-import com.dreamfish.fishblog.core.annotation.RequestPrivilegeAuth;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.entity.UserExtened;
-import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.repository.UserRepository;
 import com.dreamfish.fishblog.core.service.UserService;
+import com.dreamfish.fishblog.core.utils.encryption.AESUtils;
 import com.dreamfish.fishblog.core.utils.log.ActionLog;
 import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.Result;
@@ -23,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static com.dreamfish.fishblog.core.service.AuthService.AUTH_PASSWORD_KEY;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -52,12 +52,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Cacheable(value = "blog-user-cache", key = "'user_full_'+#p0")
     public UserExtened findUser(int id) {
-        return userMapper.findByFullById(id);
+        return userMapper.findFullById(id);
     }
 
     @Override
     public UserExtened findUserByThirdId(String type, String id) {
-        return userMapper.findByFullByThirdId(type + "_" + id);
+        return userMapper.findFullByThirdId(type + "_" + id);
     }
 
     /**
@@ -104,6 +104,8 @@ public class UserServiceImpl implements UserService {
 
         if (userRepository.existsByName(userName))
             return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST.getCode(),"指定用户名已存在");
+
+        user.setPasswd(AESUtils.encrypt(password + "$" + userName, AUTH_PASSWORD_KEY));
 
         UserExtened newUser = addUserInternal(user);
         //日志
@@ -196,8 +198,9 @@ public class UserServiceImpl implements UserService {
         if(currentUserId.intValue() != userId)
             return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(), "试图执行未授权操作");
 
-        String oldPassword = passwords.getString("oldPassword");
-        String newPassword = passwords.getString("newPassword");
+        String userName = userMapper.getUserNameById(userId);
+        String oldPassword = AESUtils.encrypt(passwords.getString("oldPassword") + "$" + userName, AUTH_PASSWORD_KEY);
+        String newPassword = AESUtils.encrypt(passwords.getString("newPassword") + "$" + userName, AUTH_PASSWORD_KEY);
 
         if(StringUtils.isBlank(oldPassword) || StringUtils.isBlank(newPassword))
             return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "密码参数为空");
@@ -224,7 +227,7 @@ public class UserServiceImpl implements UserService {
         if(userID < AuthCode.SUCCESS) return Result.failure(ResultCodeEnum.UNAUTHORIZED);
         if(userID != user.getId()) return Result.failure(ResultCodeEnum.FORIBBEN.getCode(), "当前用户无法修改其他用户个人信息");
 
-        UserExtened userOld = userMapper.findByFullById(user.getId());
+        UserExtened userOld = userMapper.findFullById(user.getId());
         if(userOld == null) return Result.failure(ResultCodeEnum.NOT_FOUNT.getCode(), "未找到指定用户");
 
         user.setPrivilege(userOld.getPrivilege());

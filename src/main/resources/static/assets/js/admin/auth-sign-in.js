@@ -2,6 +2,7 @@ setLoaderFinishCallback(function(){
     initVerifyCode();
 	initLastSets();
 	initErrorInfo();
+	initThirdLogin();
 });
 
 var authCode = {
@@ -18,6 +19,17 @@ var authCode = {
 var verifyed = false;
 var loginSending = false;
 
+function initThirdLogin(){
+	if(thirdLogin.github){
+		$('#log_third').append($('<button type="button" class="logon-act-choose" onclick="loginGithub()" id="comment-login-github"><i class="fa fa-github"></i> <span>使用 Github 登录</span></button>'))
+	} if(thirdLogin.weiXin){
+		$('#log_third').append($('<button type="button" class="logon-act-choose" onclick="loginWeiXin()" id="comment-login-weixin"><i class="fa fa-weixin text-success"></i> <span>使用 微信 登录</span></button>'))
+	} if(thirdLogin.qq){
+		$('#log_third').append($('<button" class="logon-act-choose" onclick="loginQQ()" id="comment-login-qq"><i class="fa fa-qq text-primary"></i> <span>使用 QQ 登录</span></button>'))
+	} if(thirdLogin.weiBo){
+		$('#log_third').append($('<button type="button" class="logon-act-choose" onclick="loginWeiBo()" id="comment-login-weibo"><i class="fa fa-weibo text-danger"></i> <span>使用 微博 登录</span></button>'))
+	}
+}
 function initVerifyCode(){
     $('#valid_panel').slideVerify({
 		type : 2,		//类型
@@ -98,9 +110,10 @@ function login(){
 
 	var reshowLog = function(){
 		loginSending = false;
-		$('#logon_form').fadeIn(200, function(){
-			$('#log_sending').fadeOut();
-		})
+		$('#log_sending').fadeOut(200, function(){
+			$('#logon_form').fadeIn()
+		});
+		
 	}
 
     $.ajax({
@@ -140,17 +153,20 @@ function login(){
     })
 }
 function loginGithub(){
-	Swal.fire({
-		title: '登录中',
-		type: 'info',
-		html: '<div class="text-center"><span class="simple-loading"></span><p class="text-secondary mt-2">正在登录中，请稍后</p></div>', // HTML
-		focusConfirm: true, //聚焦到确定按钮
-		showCloseButton: true,//右上角关闭
-	})
-	location.href = 'https://github.com/login/oauth/authorize?client_id=d31012693b9ba3773cde&scope=user&redirect_uri=' + encodeURI(getCurrentFullHost() + address_blog_api + 'auth/githubAuthCallback/user');
+
+	$('#log_third').fadeOut(200, function(){ $('#log_sending_third').fadeIn(); })
+	var a = getQueryString('redirect_url');
+    if(!isNullOrEmpty(a)) location.href = 'https://github.com/login/oauth/authorize?client_id=' + thirdLogin.github_client_id + '&scope=user&redirect_uri=' + encodeURI(getCurrentFullHost() + address_blog_api + 'auth/githubAuthCallback/?redirect_uri=' + a);
+	else location.href = 'https://github.com/login/oauth/authorize?client_id=' + thirdLogin.github_client_id + '&scope=user&redirect_uri=' + encodeURI(getCurrentFullHost() + address_blog_api + 'auth/githubAuthCallback/user');
 }
 function loginWeiXin(){
 	swal("暂不支持微信登录", "敬请期待", "info");
+}
+function loginWeiBo(){
+	swal("暂不支持微博登录", "敬请期待", "info");
+}
+function loginQQ(){
+	swal("暂不支持qq登录", "敬请期待", "info");
 }
 
 function j(){

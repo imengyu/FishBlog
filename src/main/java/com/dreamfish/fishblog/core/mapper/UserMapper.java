@@ -30,10 +30,10 @@ public interface UserMapper {
 
     @Cacheable(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Select("SELECT * FROM fish_users WHERE id = #{id}")
-    UserExtened findByFullById(@Param("id") Integer id);
+    UserExtened findFullById(@Param("id") Integer id);
 
     @Select("SELECT * FROM fish_users WHERE thrid_id = #{thirdId}")
-    UserExtened findByFullByThirdId(@Param("thirdId") String thirdId);
+    UserExtened findFullByThirdId(@Param("thirdId") String thirdId);
 
     /**
      * 根据用户 id 查询用户头像

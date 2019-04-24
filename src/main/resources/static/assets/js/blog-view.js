@@ -44,7 +44,6 @@ var main = new Vue({
                             main.postTags = response.data.postTagNames;
                             if (main.postContent.enableComment) main.postCanComment = true;
                             main.reloadPostStats();
-                            main.loadAuthInfo();
                             main.generatePostContent();
                             main.initComment();
                             main.isLoaded = true;
@@ -65,20 +64,7 @@ var main = new Vue({
                 main.loadFailed = true;
             }
         },
-        loadAuthInfo(){
-            var url = address_blog_api + "auth/auth-test";
-            $.ajax({
-                url: url,
-                success: function (response) {
-                    main.loading = false;
-                    if (response.success) {
-                        main.authed = true;
-                        main.authedUserInfo = response.data;
-                        main.authedUserId = main.authedUserInfo.id;
-                    } 
-                }
-            });
-        },
+
 
         //Generate
         generateHtml: function () {
@@ -285,7 +271,7 @@ var main = new Vue({
                     }
                 });
             }
-            else toast('您必须登录才能赞此篇文章哦！', 'info', 5000);
+            else this.showFastLogin();
         },
         reloadPostStats: function () {
 
@@ -307,6 +293,9 @@ var main = new Vue({
         },
         share: function (type){
 
+        },
+        showFastLogin: function(){
+            this.$refs.postComment.showFastLogin();
         },
 
         //Clicks
@@ -332,6 +321,14 @@ var main = new Vue({
         },
     }
 })
+
+function initAuthInfoEnd(user){
+    if(user){
+        main.authed = true;
+        main.authedUserInfo = user;
+        main.authedUserId = user.id;
+    }
+}
 
 setLoaderFinishCallback(function () {
     main.loadPost();
