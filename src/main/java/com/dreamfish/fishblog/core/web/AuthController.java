@@ -67,16 +67,22 @@ public class AuthController {
                 return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您的密码错误次数过多，请 15 分钟后再试！");
         }
 
-        Integer authCode = authService.authLogin(user.getName(), user.getPasswd(), request);
+        int authCode = authService.authLogin(user.getName(), user.getPasswd(), request);
         if(authCode >= AuthCode.SUCCESS){
 
             //设置错误计数为0
             httpSession.setAttribute("PasswordIncorrectCount", 0);
             redisService.set(passwordErrCountKey, 0, 900, TimeUnit.SECONDS);
 
-            String authToken = authService.genAuthToken(request);
-            if(!StringUtils.isEmpty(authToken))
-                CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, authToken, -1);
+            if(authCode==AuthCode.SUCCESS_GUEST){//游客
+                String authToken = authService.genAuthToken(request, AuthService.AUTH_TOKEN_GUEST_EXPIRE_TIME);
+                if (!StringUtils.isEmpty(authToken))
+                    CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, authToken, AuthService.AUTH_TOKEN_GUEST_EXPIRE_TIME);
+            }else {//普通用户
+                String authToken = authService.genAuthToken(request);
+                if (!StringUtils.isEmpty(authToken))
+                    CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, authToken, -1);
+            }
             return Result.success();
         }
         else {
@@ -102,7 +108,7 @@ public class AuthController {
                     return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您的密码错误次数过多，请 15 分钟后再试！", String.valueOf(authCode));
                 else return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您还可以尝试 " + (4 - passwordErrCount) + " 次", String.valueOf(authCode));
 
-            }else return Result.failure(ResultCodeEnum.FAILED_AUTH, authCode.toString());
+            }else return Result.failure(ResultCodeEnum.FAILED_AUTH, String.valueOf(authCode));
         }
     }
 

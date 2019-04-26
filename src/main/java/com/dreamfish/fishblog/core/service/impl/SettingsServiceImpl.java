@@ -22,6 +22,7 @@ public class SettingsServiceImpl implements SettingsService {
         js += "var sendStats = " + settingsMapper.getSetting("sendStats") + ";";
         js += "var anonymousComment = " + settingsMapper.getSetting("anonymousComment") + ";";
         js += "var enableSearch = " + settingsMapper.getSetting("enableSearch") + ";";
+        js += "var enableRegister = " + settingsMapper.getSetting("enableRegister") + ";";
         js += "var address_image_center = '" + settingsMapper.getSetting("imageCenter") + "';";
 
         return js;
@@ -44,5 +45,10 @@ public class SettingsServiceImpl implements SettingsService {
     @Override
     public Result getSettings(){
         return Result.success(settingsMapper.getSettings());
+    }
+
+    @Override
+    public String getSettingString(String key) {
+        return settingsMapper.getSetting(key);
     }
 }

@@ -35,6 +35,10 @@ public class AdminPageController {
     @Autowired
     private HttpServletResponse response;
 
+    @GetMapping("/sign-up/")
+    public String register(){
+        return "admin/auth-sign-up";
+    }
     @GetMapping("/sign-in/")
     public String signIn(){
         if(PublicAuth.authCheckIncludeLevel(request, User.LEVEL_WRITER) < AuthCode.SUCCESS) return "admin/auth-sign-in";

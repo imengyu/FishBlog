@@ -64,6 +64,7 @@ function initApp() {
             setMaxStatSaveDays: 30,
             setimageCenter: '',
             setEnableSearch: true,
+            setEnableRegister: true,
 
             version: '未知',
         },
@@ -131,6 +132,8 @@ function initApp() {
                     main.updateSettings('imageCenter', main.setimageCenter);
                 if(main.setEnableSearch != (main.findSet('enableSearch').data == 'true'))
                     main.updateSettings('enableSearch', main.setEnableSearch ? 'true' : 'false');
+                if(main.setEnableRegister != (main.findSet('enableRegister').data == 'true'))
+                    main.updateSettings('enableRegister', main.setEnableRegister ? 'true' : 'false');
                 if(!main.anySetFailed) toast('保存设置成功', 'success', 3000);
             },
             updateSettings(name, val){

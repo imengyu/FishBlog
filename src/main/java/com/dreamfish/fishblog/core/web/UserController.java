@@ -79,6 +79,11 @@ public class UserController {
     @RequestPrivilegeAuth(value = UserPrivileges.PRIVILEGE_MANAGE_USERS)
     public Result addUser(@RequestBody UserExtened user){ return userService.addUser(user); }
 
+    //添加新用户
+    @PostMapping("/users/sign-up")
+    @ResponseBody
+    public Result addUserSignUp(@RequestBody UserExtened user){ return userService.addUserSignUp(user); }
+
     //删除用户
     @DeleteMapping("/user/{userId}")
     @ResponseBody

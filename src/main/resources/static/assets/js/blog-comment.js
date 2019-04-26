@@ -446,6 +446,7 @@ Vue.component('commenter', {
 </div>\
 </div>\
 <!--<button type="button" class="flat flat-icon-btn float-right" data-toggle="tooltip" data-placement="left" title="使用 Github 登录" v-on:click="loginGithub" id="comment-login-github"><i class="fa fa-github" style="font-size:28px"></i></button>-->\
+<button type="button" class="btn flat flat-icon-btn float-right" data-toggle="tooltip" data-placement="left" title="登录" v-on:click="showFastLogin" id="comment-login-github"><i class="fa fa-sign-in" style="font-size:28px"></i></button>\
 <form ethod="post" id="comment_form" class="mt-3">\
 <div class="row" v-if="anonymousCanComment() && !authed" >\
 <div class="col-md-6">\

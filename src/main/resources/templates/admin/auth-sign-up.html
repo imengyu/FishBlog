@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="梦想小鱼的博客,ALONE SPACE,DreamFish,梦想小鱼的个人分享博客,梦想小鱼的个人分享平台,梦想小鱼">
+    <meta name="description" content="梦想小鱼的个人分享博客-一只喜欢炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！">
+    <title>注册</title>
+    <link rel="stylesheet" rev="stylesheet" type="text/css" href="/assets/css/loader.min.css">
+    <script type="text/javascript" src="/assets/js/config.js"></script>
+    <script type="text/javascript" src="/assets/js/yzc-blog.min.js"></script>
+    <script type="text/javascript">
+        constConfig.autoFooter = false;
+        setLoaderCSS(new Array(
+            "/assets/libs/bootstrap/css/bootstrap.min.css",
+            "/assets/libs/font-awesome/css/font-awesome.min.css",
+            "yzc-blog.min.css",
+            "/assets/libs/sweetalert2/css/sweetalert2.min.css"));
+        setLoaderJS(new Array(
+            address_blog_api + "settings.js",
+            "/assets/libs/jquery/jquery.min.js",
+            "/assets/libs/popper/popper.min.js",
+            "/assets/libs/vue.js/vue.js",
+            "/assets/libs/bootstrap/js/bootstrap.min.js",
+            "/assets/libs/compress/md5.min.js",
+            "utils.min.js", "string-hlp.min.js",
+            "/assets/js/admin/auth-sign-up.js",
+            "/assets/libs/sweetalert2/js/sweetalert2.min.js",));
+    </script>
+    <!--Baidu tongji-->
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?b817302b643ad43baed860443308c8d1";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    <style>.logon-icon{position:absolute;width:100px;height:100px;top:10px;left:50%;margin-left:-50px;background-color:#efeff4;border-radius:50%;padding:18px}.logon-icon img{width:64px;height:64px}</style>
+</head>
+
+<body class="not-load">
+
+    <!--Header-->
+    <header id="header-minimum">
+        <div class="container main-menu main-menu-white" style="padding-top: 40px; padding-bottom: 30px;">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div class="nav-header-text">
+                    <span class="logo" id="header-logo"></span>
+                    <a href="/" id="header-title"></a>
+                </div>
+                <button type="button" class="icon-menu" id="mobile-nav-toggle"></button>
+                <nav id="nav-menu-container" class="nav-menu-container">
+                    <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <!--Main-->
+    <article id="main" class="sm-padding bg-grey-no-border">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 col-lg-4" style="padding:20px">
+                    <div v-if="!canRegister()">
+                            <div class="box full text-center d-flex justify-content-center align-items-center flex-column">
+                                    <i class="fa fa-nam text-warning" aria-hidden="true"
+                                        style="font-size: 3.5em"></i>
+                                    <p class="text-secondary mt-2">当前无法注册<br /><span class="text-secondary">由于管理员设置策略，选择无法注册用户，如果您想注册，请联系管理员</span></p>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary"
+                                            onclick="location.href='/'">返回主页</button>
+                                    </div>
+                                </div>
+                    </div>
+                    <div v-else-if="currentAddSuccess">
+                        <div class="box full text-center d-flex justify-content-center align-items-center flex-column">
+                            <i class="fa fa-check-circle-o text-success" aria-hidden="true"
+                                style="font-size: 3.5em"></i>
+                            <p class="text-secondary mt-2">注册成功<br /><span class="text-secondary">我们已经向您的邮箱发送了一封激活邮件，请您查收邮件完成账号激活</span></p>
+                            <div>
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="location.href='/'">返回主页</button>
+                                <button type="button ml-2" class="btn btn-primary"
+                                    onclick="location.href='/sign-in/'">立即登录</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <div class="text-center mt-4">
+                            <div class="logon-icon"><img src="/images/logo/big_icon.png"></div>
+                            <p class="h2" style="margin-top: 110px;margin-bottom: 20px">注册用户</p>
+                        </div>
+                        <form method="post">
+                            <div class="form-group">
+                                <input :class="'flat' + validEmail0()" type="email" id="signup_email" name="signup_email"
+                                    placeholder="邮箱" v-model="currentAddUserEmail">
+                                <div v-if="validEmail1()" class="invalid-feedback">邮箱格式不正确，请重新输入</div>
+                                <div v-else class="invalid-feedback">请输入邮箱</div>
+                            </div>
+                            <div class="form-group">
+                                <input :class="'flat' + validPassWord1()" type="password" id="signup_new" name="signup_new"
+                                    placeholder="新密码" v-model="currentAddUserPassword">
+                                <div v-if="currentAddUserPassword==''" class="invalid-feedback">请输入新密码</div>
+                                <div class="password-type p-2" id="password_type" style="display:none">
+                                    <p v-if="validPassWord1Len()" class="m-0 text-danger"><i class="fa fa-times"></i>
+                                        长度在8-20位之间</p>
+                                    <p v-else class="m-0 text-success"><i class="fa fa-check"></i>
+                                        长度在8-20位之间</p>
+                                    <p v-if="validPassWord1Char()" class="m-0 text-danger"><i class="fa fa-times"></i>
+                                        必须包含数字、字母或特殊符号其中的两种</p>
+                                    <p v-else class="m-0 text-success"><i class="fa fa-check"></i>
+                                        必须包含数字、字母或特殊符号其中的两种</p>
+                                    <p v-if="validPassWord1UserName()" class="m-0 text-danger"><i class="fa fa-times"></i>
+                                        不可以与用户名相同或包含用户名</p>
+                                    <p v-else class="m-0 text-success"><i class="fa fa-check"></i>
+                                        不可以与用户名相同或包含用户名</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input :class="'flat' + validPassWord2()" type="password" id="signup_new2"
+                                    name="signup_new2" v-model="currentAddUserPassword2" placeholder="再输入一次新密码">
+                                <div v-if="currentAddUserPassword2==''" class="invalid-feedback">请再输入一次新密码</div>
+                                <div v-if="currentAddUserPassword!=currentAddUserPassword2" class="invalid-feedback">
+                                    两次密码不一致，请重新输入</div>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="flat-btn flat-btn-black mb-2 mt-3 btn-block"
+                                    v-on:click="submitChange()">注册</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    <footer>
+        <div class="row align-items-center  justify-content-center mt-3">
+            <p class="text-secondary">Copyright © 2019 Dreamfish.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

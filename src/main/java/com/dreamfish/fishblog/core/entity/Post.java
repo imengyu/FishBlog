@@ -1,5 +1,7 @@
 package com.dreamfish.fishblog.core.entity;
 
+import org.hibernate.annotations.DynamicInsert;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -9,6 +11,7 @@ import java.util.List;
  * 文章实体类
  */
 @Entity
+@DynamicInsert(true)
 @Table(name="fish_posts")
 public class Post implements Serializable {
 

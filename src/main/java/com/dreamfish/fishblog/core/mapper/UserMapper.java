@@ -17,7 +17,7 @@ public interface UserMapper {
      * @param username 用户名
      * @return 查询结果
      */
-    @Select("SELECT * FROM fish_users WHERE name = #{username}")
+    @Select("SELECT name,passwd,actived,id,privilege,level FROM fish_users WHERE name = #{username}")
     List<User> findByUserName(@Param("username") String username);
 
     /**
@@ -25,7 +25,7 @@ public interface UserMapper {
      * @param id 用户 id
      * @return 查询结果
      */
-    @Select("SELECT * FROM fish_users WHERE id = #{id}")
+    @Select("SELECT name,passwd,actived,id,privilege,level FROM fish_users WHERE id = #{id}")
     User findById(@Param("id") Integer id);
 
     @Cacheable(value = "blog-user-cache", key = "'user_full_'+#p0")
@@ -34,6 +34,8 @@ public interface UserMapper {
 
     @Select("SELECT * FROM fish_users WHERE thrid_id = #{thirdId}")
     UserExtened findFullByThirdId(@Param("thirdId") String thirdId);
+    @Select("SELECT * FROM fish_users WHERE email = #{email}")
+    UserExtened findFullByEmail(@Param("email") String email);
 
     /**
      * 根据用户 id 查询用户头像
@@ -54,6 +56,9 @@ public interface UserMapper {
 
     @Select("SELECT passwd FROM fish_users WHERE id = #{id}")
     String getUserPasswordById(@Param("id") Integer id);
+
+    @Select("SELECT active_token FROM fish_users WHERE id = #{id}")
+    String getActiveTokenById(@Param("id") Integer id);
 
     @Select("SELECT id,headimg,level FROM fish_users")
     List<User> getAllUserHeads();
@@ -87,4 +92,12 @@ public interface UserMapper {
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET privilege=#{privilege} WHERE id=#{id}")
     void updateUsePrivilege(@Param("id") int id, @Param("privilege") int privilege);
+
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
+    @Update("UPDATE fish_users SET actived=#{actived} WHERE id=#{id}")
+    void updateUseActive(@Param("id") int id, @Param("actived") boolean actived);
+
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
+    @Update("UPDATE fish_users SET active_token=#{active_token} WHERE id=#{id}")
+    void updateUseActiveToken(@Param("id") int id, @Param("active_token") String active_token);
 }

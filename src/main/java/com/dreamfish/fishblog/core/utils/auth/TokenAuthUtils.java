@@ -1,6 +1,7 @@
 package com.dreamfish.fishblog.core.utils.auth;
 
 import com.dreamfish.fishblog.FishblogApplication;
+import com.dreamfish.fishblog.core.exception.BadTokenException;
 import com.dreamfish.fishblog.core.exception.InvalidArgumentException;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.encryption.AESUtils;
@@ -45,7 +46,7 @@ public class TokenAuthUtils {
      */
     public static String genToken(Integer expireTime, String tokenData, String tokenExpireTimeUnit, String tokenKey)  throws InvalidArgumentException{
         if(StringUtils.isEmpty(tokenKey))
-            throw new InvalidArgumentException("Bad tokenKey");
+            throw new InvalidArgumentException("Bad token Key");
         if(expireTime<0)
             throw new InvalidArgumentException("Expire time must greater tan zero");
 
@@ -74,11 +75,13 @@ public class TokenAuthUtils {
      * @return 权限令牌
      * @throws InvalidArgumentException 参数有误异常
      */
-    public static String[] decodeToken(String token, String tokenKey) throws InvalidArgumentException {
+    public static String[] decodeToken(String token, String tokenKey) throws InvalidArgumentException, BadTokenException {
         if(StringUtils.isEmpty(token) || StringUtils.isEmpty(tokenKey))
             throw new InvalidArgumentException("Bad tokenKey");
 
         String orgTokenData = AESUtils.decrypt(token, tokenKey);
+        if(orgTokenData == null)
+            throw new BadTokenException("无法解码TOKEN");
         return orgTokenData.split("=");
     }
 
@@ -89,10 +92,12 @@ public class TokenAuthUtils {
      * @return 权限令牌
      * @throws InvalidArgumentException 参数有误异常
      */
-    public static Integer checkToken(String token, String tokenKey) throws InvalidArgumentException {
+    public static Integer checkToken(String token, String tokenKey) throws InvalidArgumentException, BadTokenException {
         if(StringUtils.isEmpty(token) || StringUtils.isEmpty(tokenKey))
             throw new InvalidArgumentException("Bad tokenKey");
         String orgTokenData = AESUtils.decrypt(token, tokenKey);
+        if(orgTokenData == null)
+            throw new BadTokenException("无法解码TOKEN");
         String[] orgTokenDataArr =  orgTokenData.split("=");
         if(StringUtils.isEmpty(orgTokenData))
             throw new InvalidArgumentException("Bad tokenKey");

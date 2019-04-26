@@ -8,6 +8,7 @@ public class AuthCode {
     public final static int UNKNOW = 0;
     public final static int SUCCESS = 1;
     public final static int SUCCESS_ALREDAY_LOGGED = 2;
+    public final static int SUCCESS_GUEST = 3;
 
     public final static int FAIL_BAD_PASSWD = -1;
     public final static int FAIL_BAD_TOKEN = -2;
@@ -19,4 +20,5 @@ public class AuthCode {
     public final static int FAIL_BAD_IP = -8;
     public final static int FAIL_NO_PRIVILEGE = -9;
     public final static int FAIL_BAD_PARARM = -10;
+    public final static int FAIL_NOT_ACTIVE = -11;
 }

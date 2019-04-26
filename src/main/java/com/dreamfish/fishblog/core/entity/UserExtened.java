@@ -1,6 +1,7 @@
 package com.dreamfish.fishblog.core.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.io.Serializable;
  * 用户扩展信息实体
  */
 @Entity
+@DynamicInsert(true)
 @Table(name="fish_users")
 public class UserExtened implements Serializable {
 
@@ -34,6 +36,8 @@ public class UserExtened implements Serializable {
     private String cardBackground;
     private Integer bindUser;
     private Integer messageCount;
+    private Boolean actived;
+    private String activeToken;
 
     public String getHeadimg() { return headimg; }
     public String getFriendlyName() {
@@ -80,7 +84,19 @@ public class UserExtened implements Serializable {
     public Integer getMessageCount() {
         return messageCount;
     }
+    public Boolean getActived() {
+        return actived;
+    }
+    public String getActiveToken() {
+        return activeToken;
+    }
 
+    public void setActiveToken(String activeToken) {
+        this.activeToken = activeToken;
+    }
+    public void setActived(Boolean actived) {
+        this.actived = actived;
+    }
     public void setMessageCount(Integer messageCount) {
         this.messageCount = messageCount;
     }

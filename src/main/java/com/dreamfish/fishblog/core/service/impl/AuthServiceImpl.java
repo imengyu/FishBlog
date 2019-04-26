@@ -50,6 +50,7 @@ public class AuthServiceImpl implements AuthService {
         List<User> users =  userMapper.findByUserName(userName);
         if(users.size() == 0) return AuthCode.FAIL_NOUSER_FOUND;
         User user = users.get(0);
+        if(!user.getActived())  return AuthCode.FAIL_NOT_ACTIVE;
 
         String passwordRs = AESUtils.encrypt(passwd + "$" + userName, AUTH_PASSWORD_KEY);
         //System.out.println("passwordRs: " + passwordRs);
@@ -68,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
             session.setAttribute("currentLoggedUserName", user.getName());
             session.setAttribute("currentLoggedUserLevel", user.getLevel());
             session.setAttribute("currentLoggedUserPrivileges", user.getPrivilege());
-            return AuthCode.SUCCESS;
+            return user.getLevel() == User.LEVEL_GUEST ? AuthCode.SUCCESS_GUEST : AuthCode.SUCCESS;
         }
         else {
             return AuthCode.FAIL_BAD_PASSWD;
@@ -85,6 +86,11 @@ public class AuthServiceImpl implements AuthService {
         return PublicAuth.authForToken(request, clientToken, requireLevel, requirePrivileges);
     }
 
+    /**
+     * 获取已认证用户信息
+     * @param request 当前请求
+     * @return 返回当前已认证用户信息
+     */
     @Override
     public UserExtened authGetAuthedUserInfo(HttpServletRequest request){
         Integer currentLoggedUserId = PublicAuth.authGetUseId(request);
@@ -92,8 +98,6 @@ public class AuthServiceImpl implements AuthService {
             return userMapper.findFullById(currentLoggedUserId);
         return null;
     }
-
-
 
     /**
      * 认证当前请求用户是否登录

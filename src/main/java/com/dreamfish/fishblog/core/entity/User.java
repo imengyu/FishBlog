@@ -2,6 +2,7 @@ package com.dreamfish.fishblog.core.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.io.Serializable;
  * 用户实体
  */
 @Entity
+@DynamicInsert(true)
 @Table(name = "fish_users")
 public class User implements Serializable {
 
@@ -49,6 +51,7 @@ public class User implements Serializable {
     private String headimg;
     private Integer bindUser;
     private Integer messageCount;
+    private Boolean actived;
 
     public Integer getMessageCount() {
         return messageCount;
@@ -96,6 +99,14 @@ public class User implements Serializable {
 
     public Integer getLevel() {
         return level;
+    }
+
+    public Boolean getActived() {
+        return actived;
+    }
+
+    public void setActived(Boolean actived) {
+        this.actived = actived;
     }
 
     public void setId(Integer id) {

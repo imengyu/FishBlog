@@ -9,4 +9,5 @@ public interface SettingsService {
     Result setSetting(String key, String data);
     Result getSetting(String key);
     Result getSettings();
+    String getSettingString(String key);
 }

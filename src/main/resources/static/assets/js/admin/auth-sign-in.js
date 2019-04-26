@@ -14,7 +14,8 @@ var authCode = {
     FAIL_NOT_LOGIN: -6,
     FAIL_SERVICE_UNAVAILABLE: -7,
     FAIL_BAD_IP: -8,
-    FAIL_NO_PRIVILEGE: -9
+	FAIL_NO_PRIVILEGE: -9,
+	FAIL_NOT_ACTIVE: -11
 }
 var verifyed = false;
 var loginSending = false;
@@ -145,6 +146,10 @@ function login(){
 				else if(extendCode == authCode.FAIL_BAD_PASSWD){		
 					$("#log_psw").val('');			
 					swal("登录失败", "用户名或密码不正确。" + data.message, 'error')
+				}
+				else if(extendCode == authCode.FAIL_NOT_ACTIVE){		
+					$("#log_psw").val('');			
+					swal("登录失败", "请先登录邮箱激活该用户，您才能登录" + data.message, 'error')
 				}
 				else swal("登录失败", data.message, 'error')
 			}
