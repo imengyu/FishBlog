@@ -86,6 +86,11 @@ public class AuthServiceImpl implements AuthService {
         return PublicAuth.authForToken(request, clientToken, requireLevel, requirePrivileges);
     }
 
+    @Override
+    public UserExtened authGetUserInfo(String name) {
+        return userMapper.findFullByUserName(name);
+    }
+
     /**
      * 获取已认证用户信息
      * @param request 当前请求

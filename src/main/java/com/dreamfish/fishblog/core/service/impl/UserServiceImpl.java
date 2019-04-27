@@ -24,11 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -53,6 +51,7 @@ public class UserServiceImpl implements UserService {
 
     private static  final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    //
     //公用方法
     //================================================
     //
@@ -81,9 +80,9 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 通过第三方ID找用户
-     * @param type
-     * @param id
-     * @return
+     * @param type 第三方类型
+     * @param id 第三方ID
+     * @return 用户实体
      */
     @Override
     public UserExtened findUserByThirdId(String type, String id) {
@@ -92,8 +91,8 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 通过Email查找用户
-     * @param email
-     * @return
+     * @param email Email
+     * @return 用户实体
      */
     @Override
     public UserExtened findUserByEmail(String email) {
@@ -156,8 +155,8 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 注册新用户，（公开）需激活
-     * @param user
-     * @return
+     * @param user 用户实体
+     * @return 返回请求结果
      */
     @Override
     public Result addUserSignUp(UserExtened user) {
@@ -184,8 +183,10 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByName(email))
             return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST.getCode(),"该邮箱已被占用，请使用其他邮箱");
 
+        user.setPasswd(AESUtils.encrypt(password + "$" + email, AUTH_PASSWORD_KEY));
+
         //发送激活邮件
-        if(sendUserActiveMail(email, user.getId(), user.getActiveToken())) {
+        if(sendUserActiveMail(email, user.getActiveToken())) {
             user = addUserInternal(user);
             //日志
             ActionLog.logUserAction("注册用户：" + email, ContextHolderUtils.getRequest());
@@ -199,7 +200,7 @@ public class UserServiceImpl implements UserService {
      * 更新用户封禁状态（公开需认证）
      * @param userId 用户 ID
      * @param ban 是否封禁
-     * @return 结果数据
+     * @return 返回请求结果
      */
     @Override
     public Result userUpdateBan(int userId, boolean ban) {
@@ -226,7 +227,7 @@ public class UserServiceImpl implements UserService {
      * 更新用户权限（公开需认证）
      * @param userId 用户 ID
      * @param newPrivilege 用户新权限
-     * @return 结果数据
+     * @return 返回请求结果
      */
     @Override
     public Result userUpdatePrivilege(int userId, int newPrivilege) {
@@ -247,6 +248,7 @@ public class UserServiceImpl implements UserService {
         return Result.success();
     }
 
+    //
     //INTERNAL
     //==============================================
     //
@@ -277,28 +279,74 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean activeUser(String token) {
 
-        String[] tdata;
+        String[] data;
         try {
-            tdata = TokenAuthUtils.decodeToken(token, USER_ACTIVE_TOKEN_KEY);
+            data = TokenAuthUtils.decodeTokenAndGetData(token, USER_ACTIVE_TOKEN_KEY, "&");
         }catch (BadTokenException e){
             return false;
         }
 
-        if(tdata.length >= 2) {
-            String[] data = tdata[2].split("$");
-            if(data.length < 2 || !StringUtils.isInteger(data[0])) return false;
+        if(data.length < 2) return false;
 
-            int uid = Integer.parseInt(data[0]);
-            String atk =  userMapper.getActiveTokenById(uid);
-            if(atk.equals(data[1])){
-                userMapper.updateUseActive(uid, true);
-                return true;
-            }
+        String atk =  userMapper.getActiveTokenByUserName(data[0]);
+        if(atk.equals(data[1]) || atk.equals(data[1] + "=")){
+            userMapper.updateUseActiveByName(data[0], true);
+            return true;
         }
-
         return false;
     }
 
+    /**
+     * 测试用户找回密码token是否正确
+     * @param token 找回密码token
+     * @return 返回结果
+     */
+    @Override
+    public Result testUserChangePasswordToken(String token) {
+        if(StringUtils.isBlank(token)) return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "Bad recover password token");
+        String[] data;
+        try{
+            data = TokenAuthUtils.decodeTokenAndGetData(token, USER_ACTIVE_TOKEN_KEY, "&");
+        }catch (BadTokenException e) {
+            return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "Bad recover password token");
+        }
+        if(data.length < 2 || !StringUtils.isInteger(data[0])) return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "Bad recover password token");
+        return Result.success();
+    }
+
+    /**
+     * 通过找回密码token更改用户密码
+     * @param passwords { token: 找回密码token, newPassword: 新密码 }
+     * @return 返回结果
+     */
+    @Override
+    public Result updateUserPasswordRecover(JSONObject passwords) {
+
+        //检查参数
+        String newPassword = passwords.getString("newPassword");
+        String token = passwords.getString("token");
+        if(StringUtils.isBlank(token)) return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "Bad recover password token");
+        if(StringUtils.isBlank(newPassword)) return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "新密码不可为空！");
+
+        //解密Token
+        String[] data;
+        try {
+            data = TokenAuthUtils.decodeTokenAndGetData(token, USER_ACTIVE_TOKEN_KEY, "&");
+        }catch (BadTokenException e) {
+            return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "Bad recover password token");
+        }
+
+        if(data.length < 2 || !StringUtils.isInteger(data[0]))  return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "Bad recover password token");
+
+        int uid = Integer.parseInt(data[0]);
+        String atk =  userMapper.getActiveTokenById(uid);
+        if(atk.equals(data[1]) || atk.equals(data[1] + "=")){
+            userMapper.updateUserPassword(uid, AESUtils.encrypt(newPassword + "$" + userMapper.getUserNameById(uid), AUTH_PASSWORD_KEY));
+            return Result.success();
+        } else return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "Bad active token");
+    }
+
+    //
     //MAIL AND MESSAGES
     //================================================
     //
@@ -319,10 +367,10 @@ public class UserServiceImpl implements UserService {
         String tkn = AESUtils.encrypt(email + "_active", "UA12USER_RECPASSWD");
         userMapper.updateUseActiveToken(oldUser.getId(), tkn);
 
-        String token = TokenAuthUtils.genToken(0, oldUser.getId() + "$" + tkn, "", USER_ACTIVE_TOKEN_KEY);
-        String link = request.getScheme() +"://" + request.getServerName() + "/user/rec-passwd/" + token + "/";
+        String token = TokenAuthUtils.genToken(0, oldUser.getId() + "&" + tkn, "", USER_ACTIVE_TOKEN_KEY);
+        String link = request.getScheme() +"://" + request.getServerName() + "/user/center/rec-passwd2/?token=" + token + "/";
         try {
-            mailService.sendHtmlMail(email, "恢复在 ALONE SPACE 上的账号密码", "<html><head></head><body><h3>您好，</h3>请点击以下链接恢复您的账号密码：<br/>><a href=\"" + link + "\">恢复账号密码</a></body></html> ");
+            mailService.sendHtmlMail(email, "恢复在 ALONE SPACE 上的账号密码", "<html><head></head><body><h3>您好，" + email + "</h3>请点击以下链接恢复您的账号密码：<br/><a href=\"" + link + "\">恢复账号密码</a></body></html> ");
             return true;
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -332,18 +380,19 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+
     /**
      * 发送激活邮件
      * @param mail 返回一个正在激活的TOKEN
      */
-    private boolean sendUserActiveMail(String mail, Integer userId, String tkn){
+    private boolean sendUserActiveMail(String mail, String tkn){
 
         HttpServletRequest request = ContextHolderUtils.getRequest();
 
-        String token = TokenAuthUtils.genToken(0, userId + "$" + tkn, "", USER_ACTIVE_TOKEN_KEY);
-        String link = request.getScheme() +"://" + request.getServerName() + "/user/active/" + token + "/";
+        String token = TokenAuthUtils.genToken(0, mail + "&" + tkn, "", USER_ACTIVE_TOKEN_KEY);
+        String link = request.getScheme() +"://" + request.getServerName() + "/user/center/active/?token=" + token;
         try {
-            mailService.sendHtmlMail(mail, "激活在 ALONE SPACE 上注册的账号", "<html><head></head><body><h3>您好，</h3>您已成功在 ALONE SPACE 上注册成为会员，只差最后一步了！请点击以下链接激活您的账号：<br/>><a href=\"" + link + "\">激活账号</a></body></html> ");
+            mailService.sendHtmlMail(mail, "激活在 ALONE SPACE 上注册的账号", "<html><head></head><body><h3>您好，" + mail + "</h3>您已成功在 ALONE SPACE 上注册成为会员，只差最后一步了！请点击以下链接激活您的账号：<br/><a href=\"" + link + "\">激活账号</a></body></html> ");
             return true;
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -352,6 +401,7 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    //
     //USERS MANAGEMENT
     //================================================
     //
@@ -387,8 +437,8 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 更新用户信息
-     * @param user
-     * @return
+     * @param user 用户信息
+     * @return 返回是否成功
      */
     @Override
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0.id")
@@ -420,6 +470,6 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Result getUsersWithPageable(Integer pageIndex, Integer pageSize) {
-        return Result.success(userRepository.findAll(new PageRequest(pageIndex, pageSize)));
+        return Result.success(userRepository.findAll(PageRequest.of(pageIndex, pageSize)));
     }
 }

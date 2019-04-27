@@ -63,16 +63,44 @@
                     <div class="row justify-content-center align-items-center">
                         <div class="col-sm-12 col-md-7 col-lg-5">
                             <div class="blog-side-content mt-3 no-display-sm no-display-md">
-                                <div class="blog-side-head mb-3">
+                                <div v-if="currentUserEditing" class="blog-side-head mb-3">
+                                    <div class="author" :style="'background: url('+getUserCardBackground()+') center center no-repeat;'"><img :src="getUserHead()" alt="head-img"
+                                        class="img-responsive mt-3"></div>
+                                    <div class="author_name">
+
+                                        <div class="h3 mt-2">编辑个人信息</div>
+
+                                        <label for="userEmail" class="mt-2 mr-2">性别</label>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="radioMale" name="radioMale" class="custom-control-input" v-on:change="setGender(true)">
+                                            <label class="custom-control-label" for="radioMale"><i
+                                                    class="fa fa-mars mr-2 text-primary"></i>男</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="radioFemale" name="radioFemale" class="custom-control-input" v-on:change="setGender(false)">
+                                            <label class="custom-control-label" for="radioFemale"><i class="fa fa-venus mr-2"
+                                                    style="color: #f76fe5"></i>女</label>
+                                        </div>             
+                                        <input type="text" class="flat mt-2" id="userFriendlyName" placeholder="我的昵称" v-model="currentUser.friendlyName">
+                                        <input type="text" class="flat mt-2" id="userHome" placeholder="我的个人主页地址" v-model="currentUser.home">
+                                        <input type="text" class="flat mt-2" id="userHead" placeholder="我的头像URL地址" v-model="currentUser.headimg">
+                                        <textarea rows="3" class="flat mt-2" id="userIntroduction" placeholder="我的个人简介文字" v-model="currentUser.introduction"></textarea>
+                                    </div>
+                                    <button class="btn btn-primary flat-pill" v-on:click="save()">保存</button>
+                                    <button class="btn btn-secondary flat-pill" onclick="location.reload(true)">取消</button>
+                                </div>
+                                <div v-else class="blog-side-head mb-3">
+                                    <a style="position:absolute;right:25px;top:139px;z-index:100;background-color: #fff;padding-bottom: .65rem;" class="btn flat-round flat-icon" href="javascript:;" v-on:click="edit()" title="编辑个人信息" data-toggle="tooltip" v-if="currentAuthed"><i class="fa fa-pencil"></i></a>
                                     <div class="author" :style="'background: url('+getUserCardBackground()+') center center no-repeat;'"><img :src="getUserHead()" alt="head-img"
                                             class="img-responsive mt-3"></div>
                                     <div class="author_name">
                                         <a v-if="currentUser.gender == '男'"><i class="fa fa-mars mr-2 text-primary"></i></a>
                                         <a v-if="currentUser.gender == '女'"><i class="fa fa-venus mr-2" style="color: #f76fe5"></i></a>
                                         <a :href="currentUser.home"
-                                            target="_blank">{{ currentUser.friendlyName }}</a><span
+                                            target="_blank">{{ getFriendlyName() }}</a><span
                                             v-if="currentUser.level==1">博主</span></div>
-                                    <p v-html="currentUser.introduction"></p>
+                                    <p v-if="currentUser.introduction&&currentUser.introduction!=''" v-html="currentUser.introduction"></p>
+                                    <p v-else class="text-secondary">Ta 很懒，什么简介也没写~</p>
                                 </div>
                             </div>
                         </div>

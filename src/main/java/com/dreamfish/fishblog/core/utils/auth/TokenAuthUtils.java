@@ -78,11 +78,32 @@ public class TokenAuthUtils {
     public static String[] decodeToken(String token, String tokenKey) throws InvalidArgumentException, BadTokenException {
         if(StringUtils.isEmpty(token) || StringUtils.isEmpty(tokenKey))
             throw new InvalidArgumentException("Bad tokenKey");
-
+        if(token.contains(" "))
+            token=token.replace(' ', '+');
         String orgTokenData = AESUtils.decrypt(token, tokenKey);
         if(orgTokenData == null)
             throw new BadTokenException("无法解码TOKEN");
         return orgTokenData.split("=");
+    }
+
+    /**
+     * 解密 权限令牌 并自动分割返回内容
+     * @param token 权限令牌
+     * @param tokenKey 生成权限令牌时提供的密钥
+     * @param divider 内容分割字符
+     * @return 返回已分割的权限令牌内容
+     * @throws InvalidArgumentException 参数有误异常
+     * @throws BadTokenException 权限令牌有误异常
+     */
+    public static String[] decodeTokenAndGetData(String token, String tokenKey, String divider) throws InvalidArgumentException, BadTokenException {
+        String[] rs;
+        try {
+            rs = decodeToken(token, tokenKey);
+            if(rs.length<3) throw new BadTokenException("TOKEN长度有误");
+            return rs[2].split(divider);
+        } catch (BadTokenException e){
+            throw e;
+        }
     }
 
     /**

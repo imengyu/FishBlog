@@ -232,7 +232,7 @@
         position: relative;
         white-space: nowrap;
 
-        a {
+        > a {
             font-size: 14px;
     
             @include prefix(transition, 0.2s color, webkit);
@@ -254,7 +254,7 @@
             }
         }    
 
-        div {
+        > div {
             display: inline-block;
             position: relative;
         }

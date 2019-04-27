@@ -80,6 +80,7 @@ function initErrorInfo(){
 			case 'BadRequest': swal('错误的登录请求', '请检查登录请求是否正确', 'error'); break;
 			case 'SessionOut': swal('您的登录信息已过期', '为了保证安全，您需要重新登录', 'warning'); break;
 			case 'RequestLogin': swal('请登录', '您需要登录才能访问该页面', 'warning'); break;
+			case 'RequestMorPrivilege': swal('请切换账号', '您当前没有权限进入控制台，请切换至更高级的账号', 'warning'); break;
 		}
 	}
 }
@@ -111,10 +112,10 @@ function login(){
 
 	var reshowLog = function(){
 		loginSending = false;
-		$('#log_sending').fadeOut(200, function(){
-			$('#logon_form').fadeIn()
-		});
-		
+		setTimeout(function(){
+			$('#log_sending').hide();
+			$('#logon_form').show();
+		},500);
 	}
 
     $.ajax({
@@ -132,7 +133,10 @@ function login(){
 				window.localStorage.setItem("last_user", $("#log_usrname").val());
 				var a = getQueryString('redirect_url');
     			if(!isNullOrEmpty(a))location.href = decodeURI(a);
-				else location.href = '/admin/';
+				else {
+					if(data.data && (data.data.level == userLevels.writer || data.data.level == userLevels.admin)) location.href = '/admin/';
+					else location.href = '/user/';
+				}
 			} else {
 				resetVerifyCode();
 				reshowLog();
@@ -147,9 +151,8 @@ function login(){
 					$("#log_psw").val('');			
 					swal("登录失败", "用户名或密码不正确。" + data.message, 'error')
 				}
-				else if(extendCode == authCode.FAIL_NOT_ACTIVE){		
-					$("#log_psw").val('');			
-					swal("登录失败", "请先登录邮箱激活该用户，您才能登录" + data.message, 'error')
+				else if(extendCode == authCode.FAIL_NOT_ACTIVE){				
+					swal("登录失败", "请先登录邮箱激活该用户，您才能登录。", 'error')
 				}
 				else swal("登录失败", data.message, 'error')
 			}

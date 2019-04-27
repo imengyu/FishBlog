@@ -287,11 +287,11 @@ a:active { color: #0045bb; text-decoration: none; }
 
 .nav-menu li { position: relative; white-space: nowrap; /*Child black item*/ }
 
-.nav-menu li a { font-size: 14px; transition: 0.2s color; -webkit-transition: 0.2s color; padding: 0 8px 0px 8px; text-decoration: none; display: inline-block; color: #fff; font-weight: 500; font-size: 14px; font-transform: uppercase; outline: none; }
+.nav-menu li > a { font-size: 14px; transition: 0.2s color; -webkit-transition: 0.2s color; padding: 0 8px 0px 8px; text-decoration: none; display: inline-block; color: #fff; font-weight: 500; font-size: 14px; font-transform: uppercase; outline: none; }
 
-.nav-menu li a:hover, .nav-menu li a:active, .nav-menu li a:focus { color: #6195FF !important; }
+.nav-menu li > a:hover, .nav-menu li > a:active, .nav-menu li > a:focus { color: #6195FF !important; }
 
-.nav-menu li div { display: inline-block; position: relative; }
+.nav-menu li > div { display: inline-block; position: relative; }
 
 .nav-menu li .menu-has-children .nav-menu-dropdown { color: #000; }
 

@@ -22,6 +22,8 @@ public interface UserService {
     boolean activeUser(String token);
     boolean sendRepasswordMessage(String emailOrPhone);
 
+    Result testUserChangePasswordToken(String token);
+    Result updateUserPasswordRecover(JSONObject passwords);
     Result updateUserPassword(Integer userId, JSONObject passwords);
     Result updateUser(UserExtened user);
     Result userUpdateBan(int userId, boolean ban);

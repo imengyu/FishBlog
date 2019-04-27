@@ -65,15 +65,14 @@
             <div class="row justify-content-center">
                 <div class="col-12 col-md-6 col-lg-4" style="padding:20px">
                     <div v-if="!canRegister()">
-                            <div class="box full text-center d-flex justify-content-center align-items-center flex-column">
-                                    <i class="fa fa-nam text-warning" aria-hidden="true"
-                                        style="font-size: 3.5em"></i>
-                                    <p class="text-secondary mt-2">当前无法注册<br /><span class="text-secondary">由于管理员设置策略，选择无法注册用户，如果您想注册，请联系管理员</span></p>
-                                    <div>
-                                        <button type="button" class="btn btn-secondary"
-                                            onclick="location.href='/'">返回主页</button>
-                                    </div>
-                                </div>
+                        <div class="box full text-center d-flex justify-content-center align-items-center flex-column">
+                            <i class="fa fa-nam text-warning" aria-hidden="true" style="font-size: 3.5em"></i>
+                            <p class="text-secondary mt-2">当前无法注册<br /><span class="text-secondary">由于管理员设置策略，选择无法注册用户，如果您想注册，请联系管理员</span>
+                            </p>
+                            <div>
+                                <button type="button" class="btn btn-secondary" onclick="location.href='/'">返回主页</button>
+                            </div>
+                        </div>
                     </div>
                     <div v-else-if="currentAddSuccess">
                         <div class="box full text-center d-flex justify-content-center align-items-center flex-column">
@@ -102,8 +101,8 @@
                             </div>
                             <div class="form-group">
                                 <input :class="'flat' + validPassWord1()" type="password" id="signup_new" name="signup_new"
-                                    placeholder="新密码" v-model="currentAddUserPassword">
-                                <div v-if="currentAddUserPassword==''" class="invalid-feedback">请输入新密码</div>
+                                    placeholder="密码" v-model="currentAddUserPassword">
+                                <div v-if="currentAddUserPassword==''" class="invalid-feedback">请输入密码</div>
                                 <div class="password-type p-2" id="password_type" style="display:none">
                                     <p v-if="validPassWord1Len()" class="m-0 text-danger"><i class="fa fa-times"></i>
                                         长度在8-20位之间</p>
@@ -121,14 +120,14 @@
                             </div>
                             <div class="form-group">
                                 <input :class="'flat' + validPassWord2()" type="password" id="signup_new2"
-                                    name="signup_new2" v-model="currentAddUserPassword2" placeholder="再输入一次新密码">
-                                <div v-if="currentAddUserPassword2==''" class="invalid-feedback">请再输入一次新密码</div>
+                                    name="signup_new2" v-model="currentAddUserPassword2" placeholder="再输入一次密码">
+                                <div v-if="currentAddUserPassword2==''" class="invalid-feedback">请再输入一次密码</div>
                                 <div v-if="currentAddUserPassword!=currentAddUserPassword2" class="invalid-feedback">
                                     两次密码不一致，请重新输入</div>
                             </div>
                             <div class="form-group">
                                 <button type="button" class="flat-btn flat-btn-black mb-2 mt-3 btn-block"
-                                    v-on:click="submitChange()">注册</button>
+                                    v-on:click="submitChange()">{{  currentIsSending ? '正在提交' : '注册' }}</button>
                             </div>
                         </form>
                     </div>

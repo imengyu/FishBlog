@@ -111,6 +111,15 @@ public class UserController {
     @ResponseBody
     public Result updateUserPassword(@PathVariable("userId") Integer userId, @RequestBody JSONObject user){ return userService.updateUserPassword(userId, user); }
 
+    //用户找回密码时修改密码
+    @PostMapping("/user/x/password")
+    @ResponseBody
+    public Result updateUserPasswordRecover(@RequestBody JSONObject user){ return userService.updateUserPasswordRecover(user); }
+    //用户修改密码
+    @GetMapping("/user/x/password/token-test")
+    @ResponseBody
+    public Result testUserChangePasswordToken(@RequestParam("token") String token){ return userService.testUserChangePasswordToken(token); }
+
     //封禁用户
     @PostMapping("/user/{userId}/unban")
     @ResponseBody

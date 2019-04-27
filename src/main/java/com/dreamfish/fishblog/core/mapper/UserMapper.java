@@ -31,7 +31,8 @@ public interface UserMapper {
     @Cacheable(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Select("SELECT * FROM fish_users WHERE id = #{id}")
     UserExtened findFullById(@Param("id") Integer id);
-
+    @Select("SELECT * FROM fish_users WHERE name = #{name}")
+    UserExtened findFullByUserName(@Param("name") String name);
     @Select("SELECT * FROM fish_users WHERE thrid_id = #{thirdId}")
     UserExtened findFullByThirdId(@Param("thirdId") String thirdId);
     @Select("SELECT * FROM fish_users WHERE email = #{email}")
@@ -59,6 +60,9 @@ public interface UserMapper {
 
     @Select("SELECT active_token FROM fish_users WHERE id = #{id}")
     String getActiveTokenById(@Param("id") Integer id);
+
+    @Select("SELECT active_token FROM fish_users WHERE name = #{name}")
+    String getActiveTokenByUserName(@Param("name") String name);
 
     @Select("SELECT id,headimg,level FROM fish_users")
     List<User> getAllUserHeads();
@@ -96,6 +100,10 @@ public interface UserMapper {
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET actived=#{actived} WHERE id=#{id}")
     void updateUseActive(@Param("id") int id, @Param("actived") boolean actived);
+
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
+    @Update("UPDATE fish_users SET actived=#{actived} WHERE name=#{name}")
+    void updateUseActiveByName(@Param("name") String name, @Param("actived") boolean actived);
 
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET active_token=#{active_token} WHERE id=#{id}")

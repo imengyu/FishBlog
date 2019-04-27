@@ -12,6 +12,7 @@ public interface AuthService {
     String AUTH_TOKEN_NAME = "COMMON_AUTH_TOKEN";
     String AUTH_PASSWORD_KEY = "dreamfish_blog_sz_password";
 
+    UserExtened authGetUserInfo(String name);
     UserExtened authGetAuthedUserInfo(HttpServletRequest request);
     int authLogin(String userNaame, String passwd, HttpServletRequest request);
     int authForToken(HttpServletRequest request, Cookie clientToken, Integer requireLevel, Integer requirePrivileges);

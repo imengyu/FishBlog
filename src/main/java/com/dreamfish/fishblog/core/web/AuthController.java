@@ -83,11 +83,11 @@ public class AuthController {
                 if (!StringUtils.isEmpty(authToken))
                     CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, authToken, -1);
             }
-            return Result.success();
+            return Result.success(authService.authGetUserInfo(user.getName()));
         }
         else {
 
-            if (authCode != AuthCode.FAIL_USER_LOCKED) {
+            if (authCode != AuthCode.FAIL_USER_LOCKED && authCode != AuthCode.FAIL_NOT_ACTIVE) {
                 //设置或增加密码错误次数
                 if(passwordErrCountInSession==null) {
                     passwordErrCountInSession = 1;

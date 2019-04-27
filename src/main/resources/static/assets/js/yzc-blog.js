@@ -450,6 +450,9 @@ function blogInitnaize() {
     setTimeout(function(){
         //tooltip fix
         $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').click(function(){
+            $(this).tooltip('hide');
+        });
     }, 3500);
 }
 //顶部菜单初始化

@@ -90,10 +90,10 @@
                         <div class="text-center mt-4">
                             <div class="logon-icon"><img src="/images/logo/big_icon.png"></div>
                             <p class="h2" style="margin-top: 110px;margin-bottom: 20px">更改密码</p>
-                            <p class="text-secondary">更改 <span id="change_username">{{currentUserName}}</span> 的密码</p>
+                            <p v-if="!currentIsRecoverPassword" class="text-secondary">更改 <span id="change_username">{{currentUserName}}</span> 的密码</p>
                         </div>
                         <form method="post">
-                            <div class="form-group">
+                            <div v-if="!currentIsRecoverPassword" class="form-group">
                                 <input :class="'flat' + validPassWord0()" type="password" id="change_old" name="change_old"
                                     placeholder="旧密码" v-model="currentAddUserPasswordOld">
                                 <div class="invalid-feedback">请输入旧密码</div>

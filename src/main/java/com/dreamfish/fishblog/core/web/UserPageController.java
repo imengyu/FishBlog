@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,11 +21,11 @@ public class UserPageController {
     @GetMapping("/user/{userId}/")
     public String userPage() { return "blog-user"; }
 
-    @GetMapping("/user/change-passwd/")
+    @GetMapping("/user/center/change-passwd/")
     public String changecPassword()  { return "admin/auth-change-passwd"; }
-    @GetMapping("/user/rec-passwd/")
+    @GetMapping("/user/center/rec-passwd/")
     public String recPassword()  { return "admin/auth-rec-passwd"; }
-    @PostMapping("/user/rec-passwd/send/")
+    @PostMapping("/user/center/rec-passwd/send/")
     public ModelAndView recPasswordSend(@RequestParam("rec_email") @NonNull String email)  {
         ModelAndView view = new ModelAndView("admin/auth-sign-out");
 
@@ -36,17 +35,17 @@ public class UserPageController {
         view.addObject("logout_msg", "我们已经成功向您提供的地址发送了一封找回密码的信息，它会引导您找回密码，请注意查收");
         return view;
     }
-    @PostMapping("/user/rec-passwd/{token}/")
-    public String recPasswordReal(@PathVariable("token") @NonNull String token)  {
+    @GetMapping("/user/center/rec-passwd2/")
+    public String recPasswordReal(@RequestParam("token") @NonNull String token)  {
         return "admin/auth-change-passwd";
     }
-    @PostMapping("/user/active/{token}/")
-    public ModelAndView activeUser(@PathVariable("token") @NonNull String token)  {
-        ModelAndView view = new ModelAndView("auth-active-user-result");
+    @GetMapping("/user/center/active/")
+    public ModelAndView activeUser(@RequestParam("token") @NonNull String token)  {
+        ModelAndView view = new ModelAndView("admin/auth-active-user-result");
         view.addObject("active_success", userService.activeUser(token));
         return view;
     }
-    @GetMapping("/user/baned/")
+    @GetMapping("/user/center/baned/")
     public ModelAndView userBaned() {
         ModelAndView view = new ModelAndView("admin/auth-sign-out");
         view.addObject("logout_stat", "由于管理员或管理者进行的设置，拒绝此账号登录本站");

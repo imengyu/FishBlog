@@ -9,8 +9,7 @@ setLoaderEndCallback(function(){
             if (!isNullOrEmpty(response) && response.success) {
                 currentAuthedUser=response.data;
                 genUserMenuInfo(currentAuthedUser);
-                $('.current-user-name').html(currentAuthedUser.name + '<i></i>');
-                $('.current-user-head').attr('src', getImageUrlFormHash(currentAuthedUser.headimg));
+
                 if(typeof initAuthInfoEnd != 'undefined') initAuthInfoEnd(currentAuthedUser);
             }else  if(typeof initAuthInfoEnd != 'undefined') initAuthInfoEnd(null);
         }, error: function (xhr, err) { if(typeof initAuthInfoEnd != 'undefined') initAuthInfoEnd(null); tocast('连接服务器异常 请检查您的连接？', 'error', 5000);}

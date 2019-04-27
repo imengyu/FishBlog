@@ -19,7 +19,7 @@
         setLoaderJS(new Array(
             address_blog_api + "settings.js",
             "/assets/libs/jquery/jquery.min.js",
-            "/assets/libs/popper/popper.min.js",
+            "/assets/libs/popper/popper.min.js", "blog-userauth-info.min.js",
             "/assets/libs/bootstrap/js/bootstrap.min.js", "utils.min.js"));
     </script>
     <!--Baidu tongji-->
@@ -49,14 +49,6 @@
                 <nav id="nav-menu-container" class="nav-menu-container">
                     <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
                         <li class="menu-active"><a>博客后台</a></li>
-                        <li class="nav-user" data-toggle="dropdown" data-reference="current_user_menu">
-                            <img class="current-user-head" src="/images/default/head-default.png">
-                            <span class="current-user-name">用户名<i></i></span>
-                        </li>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a href="/user/" class="dropdown-item"><i class="fa fa-user-o"></i> 账号信息</a>
-                            <a href="/sign-out/" class="dropdown-item"><i class="fa fa-sign-out"></i> 退出登录</a>
-                        </div>
                     </ul>
                 </nav>
             </div>

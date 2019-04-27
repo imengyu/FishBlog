@@ -19,11 +19,12 @@ function loadBase(){
             if (!isNullOrEmpty(response)) {
                 contentLoadStatus = 1;
                 document.getElementById('dashboard_content').innerHTML = response;
-            
-                initApp();
-                initBase();
-                initAuthInfo();
-
+                
+                initAuthInfo(function(){
+                    initApp();
+                    initBase();
+                });
+                
             } else  contentLoadStatus = -1, showInitError();
         }, error: function (xhr, err) { contentLoadStatus = -2; showInitError();  }
     });
@@ -45,7 +46,7 @@ function initBase(){
     });
     $('.side-area-switch').click(function(){ $('.dashboard-area').toggleClass('side-open'); });
 }
-function initAuthInfo(){
+function initAuthInfo(c){
     $.ajax({
         url: address_blog_api + 'auth/auth-test',
         type: 'get',
@@ -53,18 +54,14 @@ function initAuthInfo(){
         success: function (response) {
             if (!isNullOrEmpty(response) && response.success) {
                 currentAuthedUser=response.data;
-
+                if(currentAuthedUser.level == 3)
+                    location.href = '/sign-in/?redirect_url='+ encodeURI(location.href) + '&error=RequestMorPrivilege';
                 genUserMenuInfo(currentAuthedUser);
-
-                $('.current-user-name').html(currentAuthedUser.name + '<i></i>');
-                $('.current-user-head').attr('src', getImageUrlFormHash(currentAuthedUser.headimg));
-
-                setLoaderHideMaskNow();
-
                 if(typeof initAuthInfoEnd != 'undefined') initAuthInfoEnd(currentAuthedUser);
+                c();
+                setLoaderHideMaskNow();
             }else {
-                if(response.extendCode == '-3')
-                    location.href = '/sign-in/?redirect_url='+ encodeURI(location.href) + '&error=SessionOut';
+                if(response.extendCode == '-3') location.href = '/sign-in/?redirect_url='+ encodeURI(location.href) + '&error=SessionOut';
                 else location.href = '/sign-in/?redirect_url='+ encodeURI(location.href) + '&error=RequestLogin';
             }
         }, error: function (xhr, err) { 

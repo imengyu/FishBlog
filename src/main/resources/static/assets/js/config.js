@@ -43,9 +43,10 @@ var thirdLogin = {
 //用户浏览数据排除路径
 var excludeStatPath = [
     '/sign-in/',
-    '/user/change-passwd',
-    '/user/rec-passwd/',
-    '/user/baned/',
+    '/user/center/change-passwd',
+    '/user/center/rec-passwd/',
+    '/user/center/rec-passwd2/',
+    '/user/center/baned/',
     '/sign-out/',
     '/admin/',
 ]

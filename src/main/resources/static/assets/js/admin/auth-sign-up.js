@@ -13,6 +13,7 @@ function initApp() {
     main = new Vue({
         el: '#main',
         data: {
+            currentIsSending: false,
             currentAddStartValid: false,
             currentAddPasswdStartValid: false,
             currentAddPasswd2StartValid: false,
@@ -91,6 +92,9 @@ function initApp() {
             },
             submitChange(){
 
+                if(this.currentIsSending) return;
+
+                this.currentIsSending = true;
                 this.currentAddStartValid = true;
                 if(this.preSubmitValid()) {
                     $('#password_type').slideDown();
@@ -115,12 +119,14 @@ function initApp() {
                     dataType: "json",
                     success: function (response) {
                         toastClose(t);
+                        main.currentIsSending = false;
                       if (response.success) {
                         main.currentAddSuccess = true;
                       } else swal('提交失败', response.message, 'error');
                     }, error: function (xhr, err) { 
                         toastClose(t);
                         toast('提交失败 : ' + err, 'error', 5000); 
+                        main.currentIsSending = false;
                     }
                 });
 
