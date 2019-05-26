@@ -1,6 +1,6 @@
 appendLoaderJS("/assets/js/components/common-table.min.js");
 appendLoaderJS("/assets/js/components/common-pagination.min.js");
-
+appendLoaderJS("/assets/libs/compress/base64.min.js");
 
 var main;
 
@@ -65,6 +65,7 @@ function initApp() {
             setimageCenter: '',
             setEnableSearch: true,
             setEnableRegister: true,
+            setsideCustomArea: '',
 
             version: '未知',
         },
@@ -88,7 +89,8 @@ function initApp() {
                             main.setSendStats = main.findSet('sendStats').data == 'true';
                             main.setAnonymousComment = main.findSet('anonymousComment').data == 'true';
                             main.setMaxStatSaveDays = parseInt(main.findSet('maxStatSaveDays').data);
-                            main.setimageCenter = main.findSet('imageCenter').data
+                            main.setimageCenter = main.findSet('imageCenter').data;
+                            main.setsideCustomArea = base64.decode(main.findSet('sideCustomArea').data.replace(" ","+"));
                             main.setEnableSearch = main.findSet('enableSearch').data == 'true';
                         }
                         else { toast('加载设置失败！' + response.message,'error',5000); main.settingsLoadFailed = true;}
@@ -130,6 +132,8 @@ function initApp() {
                     main.updateSettings('maxStatSaveDays', main.setMaxStatSaveDays);
                 if(main.setimageCenter != main.findSet('imageCenter').data)
                     main.updateSettings('imageCenter', main.setimageCenter);
+                if(base64.encode(main.setsideCustomArea) != main.findSet('sideCustomArea').data)
+                    main.updateSettings('sideCustomArea', base64.encode(main.setsideCustomArea));
                 if(main.setEnableSearch != (main.findSet('enableSearch').data == 'true'))
                     main.updateSettings('enableSearch', main.setEnableSearch ? 'true' : 'false');
                 if(main.setEnableRegister != (main.findSet('enableRegister').data == 'true'))

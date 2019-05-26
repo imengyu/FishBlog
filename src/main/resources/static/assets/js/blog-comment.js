@@ -73,7 +73,7 @@ Vue.component('commenter', {
             else this.currentEditComment = insert(this.currentEditComment, getInputCursorPosition('#comment_content'), face);
         },
         loadLastUserInfo()
-        {
+        { 
             var last_cm_name = window.localStorage.getItem("last_cm_name");
             if(last_cm_name != null && last_cm_name != '') $("#comment_name").val(last_cm_name);
             var last_cm_mail = window.localStorage.getItem("last_cm_mail");
@@ -82,25 +82,28 @@ Vue.component('commenter', {
             if(last_cm_website != null && last_cm_website != '') $("#comment_website").val(last_cm_website);
             var last_cm_mail_notify = window.localStorage.getItem("last_cm_mail_notify");
             if(last_cm_mail_notify != null && last_cm_mail_notify == 'true') $('#comment_replyformail').prop("checked", 'checked');
-             
-            var main = this;
 
-            if (main.authedUserInfo) {
-                main.authed = true;
-                main.authedUserId = main.authedUserInfo.id;
-                if (!isNullOrEmpty(main.authedUserInfo.friendlyName)) main.authedUserName = main.authedUserInfo.friendlyName;
-                else main.authedUserName = main.authedUserInfo.name;
-                $("#comment-login-github").hide();
-                $("#comment_name").attr('readonly', 'readonly').attr('placeholder', '');
-                $("#comment_email").attr('readonly', 'readonly').attr('placeholder', '');
-                $("#comment_name").val(main.authedUserInfo.friendlyName);
-                $("#comment_email").val(main.authedUserInfo.email);
-                $("#comment_name_static").text(main.authedUserInfo.friendlyName);
-                $("#comment_email_static").text(main.authedUserInfo.email);
-                $("#comment_website").val(main.authedUserInfo.home);
-                $("#comment-user-head").show();
-                $("#comment-user-head").attr('src', getImageUrlFormHash(main.authedUserInfo.headimg));
-            }
+            var main = this;
+            authSetInfoLoadFinishCallback(function(au){
+                main.authedUserInfo = au
+                if (main.authedUserInfo) {
+                    main.authed = true;
+                    main.authedUserId = main.authedUserInfo.id;
+                    if (!isNullOrEmpty(main.authedUserInfo.friendlyName)) main.authedUserName = main.authedUserInfo.friendlyName;
+                    else main.authedUserName = main.authedUserInfo.name;
+                    $("#comment-login").hide();
+                    $("#comment_name").attr('readonly', 'readonly').attr('placeholder', '');
+                    $("#comment_email").attr('readonly', 'readonly').attr('placeholder', '');
+                    $("#comment_name").val(main.authedUserInfo.friendlyName);
+                    $("#comment_email").val(main.authedUserInfo.email);
+                    $("#comment_name_static").text(main.authedUserInfo.friendlyName);
+                    $("#comment_email_static").text(main.authedUserInfo.email);
+                    $("#comment_website").val(main.authedUserInfo.home);
+                    $("#comment-user-head").show();
+                    $("#comment-user-head").attr('src', getImageUrlFormHash(main.authedUserInfo.headimg));
+                }
+            });
+
         },
         loadPostComment() {
             var main = this;
@@ -365,7 +368,7 @@ Vue.component('commenter', {
             return null;
         },
         //https://github.com/login/oauth/access_token?client_id=d31012693b9ba3773cde&client_secret=9dad579e417de46aed7ceecc091545f72473d7e1&code=1225aee7f0dbe322007f
-        //https://blog.imyzc.com/githubAuthCallback?code=1225aee7f0dbe322007f
+        //https://www.imyzc.com/githubAuthCallback?code=1225aee7f0dbe322007f
         showFastLogin(){
             location.href='/sign-in/?redirect_url=' + location.href
         },
@@ -446,7 +449,7 @@ Vue.component('commenter', {
 </div>\
 </div>\
 <!--<button type="button" class="flat flat-icon-btn float-right" data-toggle="tooltip" data-placement="left" title="使用 Github 登录" v-on:click="loginGithub" id="comment-login-github"><i class="fa fa-github" style="font-size:28px"></i></button>-->\
-<button type="button" class="btn flat flat-icon-btn float-right" data-toggle="tooltip" data-placement="left" title="登录" v-on:click="showFastLogin" id="comment-login-github"><i class="fa fa-sign-in" style="font-size:28px"></i></button>\
+<button type="button" class="btn flat flat-icon-btn float-right" data-toggle="tooltip" data-placement="left" title="登录" v-on:click="showFastLogin" id="comment-login"><i class="fa fa-sign-in" style="font-size:28px"></i></button>\
 <form ethod="post" id="comment_form" class="mt-3">\
 <div class="row" v-if="anonymousCanComment() && !authed" >\
 <div class="col-md-6">\

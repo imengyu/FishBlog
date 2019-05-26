@@ -42,6 +42,11 @@ public class StaticPageController
     @GetMapping("/archives/")
     public ModelAndView archives() {
         if (seacherEngineMode || RequestUtils.checkIsSearchEngines(request)) return postSearcherCacheService.genArchivesViewCache();
+        else return new ModelAndView ("blog-more");
+    }
+    @GetMapping("/archives/all/")
+    public ModelAndView archivesAll() {
+        if (seacherEngineMode || RequestUtils.checkIsSearchEngines(request)) return postSearcherCacheService.genArchivesViewCache();
         else return new ModelAndView ("blog-all");
     }
     @GetMapping("/archives/post/{idOrName}")
@@ -68,6 +73,15 @@ public class StaticPageController
     public ModelAndView  viewClasss(@PathVariable("idOrName") String idOrName) {
         if (seacherEngineMode || RequestUtils.checkIsSearchEngines(request)) return postSearcherCacheService.genClassiewCache(idOrName, response);
         else return new ModelAndView ("blog-classes");
+    }
+
+    @GetMapping("/links/")
+    public ModelAndView  viewClasss() {
+        ModelAndView view = new ModelAndView("blog-links");
+
+
+
+        return view;
     }
 
     @GetMapping("/semode")

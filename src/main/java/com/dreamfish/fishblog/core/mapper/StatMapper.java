@@ -75,6 +75,6 @@ public interface StatMapper {
     @Delete("DELETE FROM fish_stat_ip")
     void clearIpTable();
 
-    @Delete("DELETE FROM fish_logs WHERE TO_DAYS(NOW())-TO_DAYS(date)>#{outdays}")
+    @Delete("DELETE FROM fish_logs WHERE TO_DAYS(NOW())-TO_DAYS(datetime)>#{outdays}")
     void deleteActionLogs(@Param("outdays") Integer outdays);
 }

@@ -21,6 +21,7 @@ public interface UserService {
     void updateUserId(Integer oldId, Integer newId);
     boolean activeUser(String token);
     boolean sendRepasswordMessage(String emailOrPhone);
+    String getUserNameAutoById(Integer id);
 
     Result testUserChangePasswordToken(String token);
     Result updateUserPasswordRecover(JSONObject passwords);

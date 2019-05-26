@@ -11,7 +11,8 @@ import java.util.List;
 @Mapper
 public interface SettingsMapper {
 
-
+    @Select("select * from `fish_settings` WHERE name=#{statKey}")
+    SettingItem getSettingItem(@Param("statKey") String statKey);
     @Select("select data from `fish_settings` WHERE name=#{statKey}")
     String getSetting(@Param("statKey") String statKey);
     @Update("UPDATE `fish_settings` SET data=#{data} WHERE name=#{statKey}")

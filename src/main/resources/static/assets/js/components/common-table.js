@@ -40,7 +40,7 @@ Vue.component('common-table', {
 <div v-if="loadedStatus == \'loading\'" class="full position-absolute blur-none">\
 <div id="log_sending" class="simple-loading-center" style="display:none;height:250px;">\
 <div class="simple-loading-container"><span class="simple-loading"></span></div>\
-</div>\
+</div></div>\
 <table :class="\'table\' + (loadedStatus == \'loading\' ? \' blur-lower\' : \'\')">\
 <thead>\
 <tr>\
@@ -50,7 +50,7 @@ Vue.component('common-table', {
 <label class="custom-control-label" for="checkAll"></label>\
 </div>\
 </th>\
-<th v-for="column in columns" scope="col" :style="(column.width ? \'min-width: \' + column.width + \';\' : \'\') + (column.textAlign ? \'text-align: \' + column.textAlign + \';\' : \'\')">{{ column.text }}</th>\
+<th v-for="column in columns" scope="col" :style="(column.width ? \'max-width: \' + column.width + \'!important;\' : \'\') + (column.textAlign ? \'text-align: \' + column.textAlign + \';\' : \'\')">{{ column.text }}</th>\
 </tr>\
 </thead>\
 <tbody v-if="items && items.length > 0">\
@@ -61,7 +61,7 @@ Vue.component('common-table', {
 <label class="custom-control-label" :for="\'checkItem\' + itemIndex"></label>\
 </div>\
 </th>\
-<td v-for="(column, index) in columns">\
+<td v-for="(column, index) in columns" :style="(column.width ? \'max-width: \' + column.width + \'!important;\' : \'\') + (column.textAlign ? \'text-align: \' + column.textAlign + \';\' : \'\') + (column.scroll ? \'overflow-x: scroll;\' : \'\')">\
 <div v-if="column.useSlot"><slot :name="column.slotName" :item="item"></slot></div>\
 <a v-else-if="!column.useSlot && column.useData==\'index\' && column.useLink" v-on:click="itemClick(item)" v-html="item[index]" href="javascript:;"></a>\
 <a v-else-if="!column.useSlot && column.useData==\'name\' && column.useLink" v-on:click="itemClick(item)" v-html="item[column.dataName]" href="javascript:;"></a>\

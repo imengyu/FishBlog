@@ -33,7 +33,7 @@ public interface UserMapper {
     UserExtened findFullById(@Param("id") Integer id);
     @Select("SELECT * FROM fish_users WHERE name = #{name}")
     UserExtened findFullByUserName(@Param("name") String name);
-    @Select("SELECT * FROM fish_users WHERE thrid_id = #{thirdId}")
+    @Select("SELECT * FROM fish_users WHERE third_id = #{thirdId}")
     UserExtened findFullByThirdId(@Param("thirdId") String thirdId);
     @Select("SELECT * FROM fish_users WHERE email = #{email}")
     UserExtened findFullByEmail(@Param("email") String email);
@@ -95,17 +95,28 @@ public interface UserMapper {
 
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET privilege=#{privilege} WHERE id=#{id}")
-    void updateUsePrivilege(@Param("id") int id, @Param("privilege") int privilege);
+    void updateUserPrivilege(@Param("id") int id, @Param("privilege") int privilege);
 
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET actived=#{actived} WHERE id=#{id}")
-    void updateUseActive(@Param("id") int id, @Param("actived") boolean actived);
+    void updateUserActive(@Param("id") int id, @Param("actived") boolean actived);
 
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET actived=#{actived} WHERE name=#{name}")
-    void updateUseActiveByName(@Param("name") String name, @Param("actived") boolean actived);
+    void updateUserActiveByName(@Param("name") String name, @Param("actived") boolean actived);
 
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET active_token=#{active_token} WHERE id=#{id}")
-    void updateUseActiveToken(@Param("id") int id, @Param("active_token") String active_token);
+    void updateUserActiveToken(@Param("id") int id, @Param("active_token") String active_token);
+
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
+    @Update("UPDATE fish_users SET message_count=#{messageCount} WHERE id=#{id}")
+    void updateUserMessageCount(@Param("id") int id, @Param("messageCount") Integer messageCount);
+
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
+    @Update("UPDATE fish_users SET message_count=message_count+#{count} WHERE id=#{id}")
+    void updateUserMessageCountIncrease(@Param("id") int id, @Param("count") Integer count);
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
+    @Update("UPDATE fish_users SET message_count=message_count-#{count} WHERE id=#{id}")
+    void updateUserMessageCountDerease(@Param("id") int id, @Param("count") Integer count);
 }

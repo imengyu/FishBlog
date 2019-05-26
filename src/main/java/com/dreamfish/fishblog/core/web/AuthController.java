@@ -182,6 +182,7 @@ public class AuthController {
 
                 int oldId = userService.addUserInternal(oldUser).getId();
                 userService.updateUserId(oldId, Integer.parseInt(id));
+                id = String.valueOf(oldId);
             }
             else {
                 //Update user
@@ -202,6 +203,8 @@ public class AuthController {
                         || !oldUser.getHeadimg().equals(avatar_url)) { oldUser.setHeadimg(avatar_url); needUpdate=true; }
 
                 if(needUpdate) userService.updateUserInternal(oldUser);
+
+                id = String.valueOf(oldUser.getId());
             }
 
             //Set login session
@@ -244,6 +247,12 @@ public class AuthController {
 
             return Result.success();
         }
+    }
+    @GetMapping(value = "/githubAuthCallback/user", name = "Github 登录验证错误回调")
+    public Result authGithubAuthCallbackError(
+            @RequestParam("code") String code) throws IOException {
+        response.sendRedirect("/user/");
+        return Result.success();
     }
 
 }

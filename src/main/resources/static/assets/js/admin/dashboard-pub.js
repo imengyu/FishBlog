@@ -20,8 +20,8 @@ function loadBase(){
                 contentLoadStatus = 1;
                 document.getElementById('dashboard_content').innerHTML = response;
                 
+                initApp();
                 initAuthInfo(function(){
-                    initApp();
                     initBase();
                 });
                 
@@ -59,6 +59,10 @@ function initAuthInfo(c){
                 genUserMenuInfo(currentAuthedUser);
                 if(typeof initAuthInfoEnd != 'undefined') initAuthInfoEnd(currentAuthedUser);
                 c();
+                if(currentAuthedUser){
+                    fastUserCenterLoad();
+                    fastUserCenterData(currentAuthedUser);
+                }
                 setLoaderHideMaskNow();
             }else {
                 if(response.extendCode == '-3') location.href = '/sign-in/?redirect_url='+ encodeURI(location.href) + '&error=SessionOut';

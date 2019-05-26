@@ -92,21 +92,22 @@ function getUserHasPrivilege(userData, privilege){
   return (userData.privilege & privilege) != 0;
 }
 function genUserMenuInfo(userData) {
+  $('.nav-user').remove();
   var userMsgPoint = userData.messageCount ? '<span class="current-user-message-count">' + userData.messageCount + '</span>' : '';
   var userName = isNullOrEmpty(userData.friendlyName) ? userData.name : userData.friendlyName;
   var userHead = isNullOrEmpty(userData.headimg) ? '/images/default/head-default.png' : getImageUrlFormHash(userData.headimg);
   if (userData.level == userLevels.admin || userData.level == userLevels.writer) {
-    $('#header-menu').append($('<li class="nav-user">' + (location.pathname != '/admin/write-archive/' ? '<button type="button" class="flat-pill flat-btn flat-btn-transparent flat-danger mr-2" onclick="location.href = \'/admin/write-archive/\'">写文章</button>' : '') + '<div><img class="current-user-head" src="' + userHead + '">' + userMsgPoint + '</div><div id="current_user_dropdown" class="dropdown"><span id="current_user_name" class="current-user-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,20">' + userName + '<i></i></span></div></li>'));
-    $('#current_user_dropdown').append($('<div class="dropdown-menu dropdown-menu-right">\
-      <a class="dropdown-item" href="/admin/write-archives/">写文章/a>\
+    $('#header-menu').append($('<li class="nav-user">' + (location.pathname != '/admin/write-archive/' ? '<button type="button" class="flat-pill flat-btn flat-btn-transparent flat-danger mr-2" onclick="location.href = \'/admin/write-archive/\'">写文章</button>' : '') + '<div id="current_user_center_dropdown" class="dropdown"><img class="current-user-head" src="' + userHead + '">' + userMsgPoint + '</div><div id="current_user_dropdown" class="dropdown"><span id="current_user_name" class="current-user-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,20">' + userName + '<i></i></span></div></li>'));
+    $('#current_user_dropdown').append($('<div class="dropdown-menu dropdown-menu-right shadow-dirty">\
+      <a class="dropdown-item" href="/admin/write-archives/">写文章</a>\
       <a class="dropdown-item" href="/admin/manage-archives/">文章管理</a>\
       <a class="dropdown-item" href="/admin/user-center/">个人信息</a>\
       <div class="dropdown-divider"></div>\
       <a class="dropdown-item" href="/sign-out/">退出登录</a>\
     </div>'));
   } else {
-    $('#header-menu').append($('<li class="nav-user"><div><img class="current-user-head" src="' + userHead + '">' + userMsgPoint + '</div><div id="current_user_dropdown" class="dropdown"><span id="current_user_name" class="current-user-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,20">' + userName + '<i></i></span></div></li>'));
-    $('#current_user_dropdown').append($('<div class="dropdown-menu  dropdown-menu-right">\
+    $('#header-menu').append($('<li class="nav-user"><div id="current_user_center_dropdown" class="dropdown"><img class="current-user-head" src="' + userHead + '">' + userMsgPoint + '</div><div id="current_user_dropdown" class="dropdown"><span id="current_user_name" class="current-user-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,20">' + userName + '<i></i></span></div></li>'));
+    $('#current_user_dropdown').append($('<div class="dropdown-menu dropdown-menu-right shadow-dirty">\
       <a class="dropdown-item" href="/user/">我的个人信息</a>\
       <a class="dropdown-item" href="/sign-out/">退出登录</a>\
     </div>'));

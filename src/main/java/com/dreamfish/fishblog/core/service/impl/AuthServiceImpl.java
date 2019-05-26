@@ -5,6 +5,7 @@ import com.dreamfish.fishblog.core.entity.UserExtened;
 import com.dreamfish.fishblog.core.exception.InvalidArgumentException;
 import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.service.AuthService;
+import com.dreamfish.fishblog.core.service.UserService;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.encryption.AESUtils;
 import com.dreamfish.fishblog.core.utils.log.ActionLog;
@@ -32,6 +33,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private UserMapper userMapper = null;
+    @Autowired
+    private UserService userService = null;
 
     /**
      * 登录认证
@@ -61,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
                 return AuthCode.FAIL_USER_LOCKED;
 
             //日志
-            ActionLog.logUserAction(ActionLog.ACTION_LOGIN, user.getId(), user.getFriendlyName(), IpUtil.getIpAddr(request));
+            ActionLog.logUserAction(ActionLog.ACTION_LOGIN, user.getId(), userService.getUserNameAutoById(user.getId()), IpUtil.getIpAddr(request));
 
             HttpSession session = request.getSession();
             session.setMaxInactiveInterval(AUTH_TOKEN_DEFAULT_EXPIRE_TIME);
@@ -99,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserExtened authGetAuthedUserInfo(HttpServletRequest request){
         Integer currentLoggedUserId = PublicAuth.authGetUseId(request);
-        if(currentLoggedUserId!=null && currentLoggedUserId!=0 && userMapper.isUserIdExists(currentLoggedUserId)!= null)
+        if(currentLoggedUserId!=null && currentLoggedUserId!=0)
             return userMapper.findFullById(currentLoggedUserId);
         return null;
     }

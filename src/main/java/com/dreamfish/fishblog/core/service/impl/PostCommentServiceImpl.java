@@ -8,6 +8,7 @@ import com.dreamfish.fishblog.core.mapper.PostCommentMapper;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
 import com.dreamfish.fishblog.core.repository.PostCommentRepository;
 import com.dreamfish.fishblog.core.repository.PostRepository;
+import com.dreamfish.fishblog.core.service.MessagesService;
 import com.dreamfish.fishblog.core.service.PostCommentService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
@@ -39,7 +40,8 @@ public class PostCommentServiceImpl implements PostCommentService {
     private PostCommentMapper postCommentMapper = null;
     @Autowired
     private PostMapper postMapper = null;
-
+    @Autowired
+    private MessagesService messagesService = null;
 
     @Override
     @Cacheable(value = "blog-single-reader-cache", key = "'comment-single-'+#commentId")
@@ -90,6 +92,18 @@ public class PostCommentServiceImpl implements PostCommentService {
         //Update count post comment count
         postMapper.increasePostValue(postId,"comment_count");
 
+        //推送消息
+        //推送至文章作者
+        Integer postUserId = postMapper.getPostAuthorId(postId);
+        if(postUserId > 0 && postUserId.intValue() != postComment.getAuthorId()) messagesService.sendMessage(postUserId, 0, "您有一个新回复！", postComment.getAuthorName() + " 回复了你的文章 <a href=\"/archives/post/"+postId+"/\" target=\"_blank\">" + postMapper.getPostTitle(postId) + "</a> ，去看看吧！");
+        //推送至父评论
+        Integer parentCommentId = postComment.getParentComment();
+        if(parentCommentId != null && parentCommentId > 0){
+            postUserId = postCommentMapper.getCommentUserId(parentCommentId);
+            if(postUserId > 0 && postUserId.intValue() != postComment.getAuthorId()) messagesService.sendMessage(postUserId, 0, "您有一个新回复！", postComment.getAuthorName() + " 回复了你的评论 <a href=\"/archives/post/"+postId+"/#comment-" +  parentCommentId + "\" target=\"_blank\">" + postMapper.getPostTitle(postId) + "</a> #" +  parentCommentId + " ，去看看吧！");
+        }
+
+        //日志
         ActionLog.logUserAction("创建评论 : " + postId + " : " + postComment.getId(), ContextHolderUtils.getRequest());
 
         return result;
@@ -138,8 +152,6 @@ public class PostCommentServiceImpl implements PostCommentService {
     )
     public Result updateCommentInPost(Integer postId, PostComment postComment, HttpServletRequest request)
     {
-
-
         Integer authCode = PublicAuth.authCheck(request);
         if(authCode < AuthCode.SUCCESS) return Result.failure(ResultCodeEnum.UNAUTHORIZED, String.valueOf(authCode));
 
@@ -195,5 +207,7 @@ public class PostCommentServiceImpl implements PostCommentService {
         postCommentRepository.deleteByPostIdAndIdIn(postId, ids);
         return Result.success();
     }
+
+
 
 }

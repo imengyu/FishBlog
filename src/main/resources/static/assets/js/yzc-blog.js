@@ -579,8 +579,8 @@ function initFooter() {
 
     //生成 Footer
     $footer = $('<!--Footer--><footer id="footer"><ul class="icons">' + footerIcon + '</ul>\
-    <ul class="copyright"><li><i class="fa fa-copyright" aria-hidden="true"></i> 2019. All rights reserved</li><li>Design by <a class="link" href="https://www.imyzc.com/about.html">DreamFish</a></li></ul>\
-    <ul class="copyright copyright-line"><li><a href="https://www.imyzc.com/support-browser.html" target="_blank" class="badge badge-pill badge-dark">推荐使用 Microsoft Edge 或 Chrome 浏览器浏览本页面</a></li></ul>\
+    <ul class="copyright"><li><i class="fa fa-copyright" aria-hidden="true"></i> 2019. All rights reserved</li><li>Design by <a class="link" href="https://www.imyzc.com/archives/post/about/">DreamFish</a></li></ul>\
+    <ul class="copyright copyright-line"><li><a href="#" target="_blank" class="badge badge-pill badge-dark">推荐使用 Microsoft Edge 或 Chrome 浏览器浏览本页面</a></li></ul>\
     <ul class="copyright copyright-line">' + footerLinks + '</ul>\
     <ul class="copyright">' + 
         (isNullOrEmpty(constConfig.icpRecord) ? '' : '<li><a class="link" href="https://www.miitbeian.gov.cn">' + constConfig.icpRecord + '</a></li>') + 

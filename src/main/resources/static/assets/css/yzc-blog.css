@@ -674,7 +674,7 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 
 #footer .copyright li .jgwab p { color: #939393; }
 
-#footer .copyright li .jgwab p i { display: inline-block; position: relative; top: 3px; margin-right: 2px; width: 17px; height: 17px; overflow: hidden; background-size: 17px 17px; background-image: url(https://cdn.imyzc.com/images/beian_icon.png); }
+#footer .copyright li .jgwab p i { display: inline-block; position: relative; top: 3px; margin-right: 2px; width: 17px; height: 17px; overflow: hidden; background-size: 17px 17px; background-image: url(/images/beian_icon.png); }
 
 #footer .copyright p { margin-bottom: 0; }
 
@@ -986,6 +986,26 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 @media (max-width: 576px) { .like .share-group .share-circle { width: 42px; height: 42px; }
   .like .share-group .share-circle.more-share { padding: 2px 18px; }
   .like .share-group .share-circle i { font-size: 20px; line-height: 2; } }
+
+/*Nav message list*/
+.message-list { position: relative; padding: 10px 0; max-width: 300px; max-height: 300px; overflow-y: scroll; cursor: default; }
+
+@media (min-width: 320px) { .message-list { min-width: 300px; } }
+
+@media (max-width: 320px) { .message-list { min-width: 280px; } }
+
+@media (min-width: 768px) { .message-list::-webkit-scrollbar { width: 5px; height: 5px; }
+  .message-list::-webkit-scrollbar-thumb { background: #707070; border-radius: 3px; }
+  .message-list::-webkit-scrollbar-thumb:hover { background: #e0e0e0; }
+  .message-list::-webkit-scrollbar-track { background: transparent; } }
+
+.message-list .message-item { position: relative; border-bottom: 1px solid #e7e5e5; padding: 5px 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
+
+.message-list .message-item:hover { background-color: #efefef; }
+
+.message-list .message-item span { font-size: 13px; color: #000; }
+
+.message-list .message-item a { font-size: 16px; margin-left: 5px; }
 
 ul.share-list { list-style: none; padding: 0; margin: 0; }
 

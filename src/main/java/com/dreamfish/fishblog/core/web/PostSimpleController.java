@@ -2,20 +2,18 @@ package com.dreamfish.fishblog.core.web;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.dreamfish.fishblog.core.entity.Post;
 import com.dreamfish.fishblog.core.entity.PostSimple;
 import com.dreamfish.fishblog.core.exception.NoPrivilegeException;
-import com.dreamfish.fishblog.core.service.PostService;
 import com.dreamfish.fishblog.core.service.PostSimpleService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
+import com.dreamfish.fishblog.core.config.ConstConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,14 +22,13 @@ import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dreamfish.fishblog.core.config.ConstConfig.API_PUBLIC_POSTS;
 
 /**
  * 文章简要信息操作控制器
  */
 @Validated
 @Controller
-@RequestMapping(API_PUBLIC_POSTS)
+@RequestMapping(ConstConfig.API_PUBLIC_POSTS)
 public class PostSimpleController {
 
     @Autowired

@@ -47,6 +47,7 @@ var excludeStatPath = [
     '/user/center/rec-passwd/',
     '/user/center/rec-passwd2/',
     '/user/center/baned/',
+    '/user/active/',
     '/sign-out/',
     '/admin/',
 ]
@@ -72,6 +73,10 @@ var menuConfig = [
     {
         name: '归档',
         url: '/archives/month/'
+    },
+    {
+        name: '文章',
+        url: '/archives/all/'
     },
     {
         name: '博客',

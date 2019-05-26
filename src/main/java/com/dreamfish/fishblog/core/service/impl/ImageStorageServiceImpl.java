@@ -38,11 +38,14 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     private String imagesStoragePath = "";
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public ImageStorageServiceImpl(){
+    public ImageStorageServiceImpl()
+    {
+        /*
         if(imagesStoragePath.equals(""))
             logger.warn("Failed to locate imagesPath, ImageStorageService will not work currently !");
         if(!new File(imagesStoragePath).exists())
             logger.warn("ImagesPath " + imagesStoragePath + " not exist, ImageStorageService will not work currently !");
+        */
     }
 
     @Autowired

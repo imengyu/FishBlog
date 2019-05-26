@@ -244,7 +244,7 @@ public class UserServiceImpl implements UserService {
 
         ActionLog.logUserAction("更新用户权限：" + userId + " 新权限：" + newPrivilege, ContextHolderUtils.getRequest());
 
-        userMapper.updateUsePrivilege(userId, newPrivilege);
+        userMapper.updateUserPrivilege(userId, newPrivilege);
         return Result.success();
     }
 
@@ -290,7 +290,7 @@ public class UserServiceImpl implements UserService {
 
         String atk =  userMapper.getActiveTokenByUserName(data[0]);
         if(atk.equals(data[1]) || atk.equals(data[1] + "=")){
-            userMapper.updateUseActiveByName(data[0], true);
+            userMapper.updateUserActiveByName(data[0], true);
             return true;
         }
         return false;
@@ -365,7 +365,7 @@ public class UserServiceImpl implements UserService {
             return false;
         User oldUser = oldUsers.get(0);
         String tkn = AESUtils.encrypt(email + "_active", "UA12USER_RECPASSWD");
-        userMapper.updateUseActiveToken(oldUser.getId(), tkn);
+        userMapper.updateUserActiveToken(oldUser.getId(), tkn);
 
         String token = TokenAuthUtils.genToken(0, oldUser.getId() + "&" + tkn, "", USER_ACTIVE_TOKEN_KEY);
         String link = request.getScheme() +"://" + request.getServerName() + "/user/center/rec-passwd2/?token=" + token + "/";
@@ -378,6 +378,19 @@ public class UserServiceImpl implements UserService {
         }
 
         return false;
+    }
+
+    /**
+     * 获取用户友好名字
+     * @param id
+     * @return
+     */
+    @Override
+    public String getUserNameAutoById(Integer id) {
+        String u = userMapper.getUserFriendlyNameById(id);
+        if(StringUtils.isBlank(u))
+            u = userMapper.getUserNameById(id);
+        return u;
     }
 
 

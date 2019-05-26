@@ -104,7 +104,7 @@
                         overflow: hidden; 
 
                         background-size: 17px 17px;
-                        background-image: url(https://cdn.imyzc.com/images/beian_icon.png);
+                        background-image: url(/images/beian_icon.png);
                     }
                 }
             }
@@ -1050,6 +1050,55 @@
         
     }
 }
+
+/*Nav message list*/
+.message-list{
+
+    position: relative;
+    padding: 10px 0;
+    max-width: 300px;
+    max-height: 300px;
+    overflow-y: scroll;
+
+    @media (min-width: 320px) { min-width: 300px; }
+    @media (max-width: 320px) { min-width: 280px; }
+
+    cursor: default;
+
+    @include pc-fix-scrollbar();
+
+    .message-item{
+        position: relative;
+        border-bottom: 1px solid #e7e5e5;
+        padding: 5px 8px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #efefef;
+        }
+
+        span{
+            font-size: 13px;
+            color: #000;
+        }
+        a{
+            font-size: 16px;
+            margin-left: 5px;
+        }
+    }
+}
+
+
+
+
+//
+//=======================================================
+//Fixs
+//=======================================================
+//
 
 ul.share-list {
 

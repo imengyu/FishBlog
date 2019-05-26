@@ -10,6 +10,7 @@ public class ExceptionController {
     @ExceptionHandler(value = {Exception.class})
     @ResponseBody
     public ErrorResponseEntity error(Exception ex){
-        return new ErrorResponseEntity(500, "服务暂时不可用");
+        ex.printStackTrace();
+        return new ErrorResponseEntity(500, "服务暂时不可用 : " + ex.toString());
     }
 }

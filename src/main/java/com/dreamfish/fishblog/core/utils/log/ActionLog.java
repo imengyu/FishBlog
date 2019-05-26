@@ -26,8 +26,8 @@ public class ActionLog {
     public static void logUserAction(String action, Integer user, String userName, String ip){
         LogServiceImpl.logService.writeLog(action, user, userName, ip);
     }
-    public static void logUserAction(String action, Integer user, String ip){
-        LogServiceImpl.logService.writeLog(action, user, ip);
+    public static void logUserAction(String action, Integer user, String userName, HttpServletRequest request){
+        LogServiceImpl.logService.writeLog(action, user, userName, IpUtil.getIpAddr(request));
     }
     public static void logUserAction(String action, HttpServletRequest request){
 

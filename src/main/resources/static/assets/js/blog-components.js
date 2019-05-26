@@ -1,5 +1,14 @@
+appendLoaderJS("/assets/libs/compress/base64.min.js");
+
 // 评论组件
 Vue.component('side-area', {
+    props:{
+        showBloger: { default: true },
+        showTags: { default: true },
+        showDates: { default: true },
+        showClass: { default: true },
+        showCustomerArea: { default: true },
+    },
     data: function () {
         return {
             contentTagsLoaded: false,
@@ -11,6 +20,7 @@ Vue.component('side-area', {
             contentTags: null,
             contentDates: null,
             contentClasses: null,
+            contentCusetomerAreaHtml: null,
             allClassCount: 0,
             allDateCount: 0,
             allTagCount: 0,
@@ -26,25 +36,30 @@ Vue.component('side-area', {
             var dates_url = address_blog_api + "month?maxCount=5";
             var blogger_url = address_blog_api + "user/admin";
 
-            $.get(blogger_url, function (response) {
-                if (response.success) {
-                    main.bloggerInfo = response.data;
-                }
-            }, "json");
+            if(this.showBloger){
+                $.get(blogger_url, function (response) {
+                    if (response.success) {
+                        main.bloggerInfo = response.data;
+                    }
+                }, "json");
+            }
+            if(this.showTags){
             $.get(tags_url, function (response) {
                 if (response.success) {
                     main.contentTagsLoaded = true;
                     main.contentTags = response.data.list;
                     main.allTagCount = response.data.allCount;
                 }
-            }, "json");
+            }, "json");}
+            if(this.showDates){
             $.get(classes_url, function (response) {
                 if (response.success) {
                     main.contentClassesLoaded = true;
                     main.contentClasses = response.data.list;
                     main.allClassCount = response.data.allCount;
                 }
-            }, "json");
+            }, "json");}
+            if(this.showClass){
             $.get(dates_url, function (response) {
                 if (response.success) {
                     main.contentDatesLoaded = true;
@@ -52,7 +67,8 @@ Vue.component('side-area', {
                     main.allDateCount = response.data.allCount;
 
                 }
-            }, "json");
+            }, "json");}
+            if(this.showCustomerArea)this.loadSideCustomArea();
         },
         loadMoreTags() {
             var main = this;
@@ -82,6 +98,10 @@ Vue.component('side-area', {
                 }
             }, "json");
         },
+        loadSideCustomArea(){
+            if(!isNullOrEmpty(sideCustomArea))
+                this.contentCusetomerAreaHtml = base64.decode(sideCustomArea.replace(" ","+"));
+        },
         goViewTag (tagId) {
             var newUrl = partPositions.viewTag + tagId + '/';
             if(location.pathname.indexOf(partPositions.viewTag) == 0 && location.pathname != partPositions.viewAll) location.href = newUrl;
@@ -110,7 +130,7 @@ Vue.component('side-area', {
         },
     },
     template: '<div><div class="blog-side-content mt-3 no-display-sm no-display-md">\
-<div v-if="bloggerInfo" class="blog-side-head mb-3">\
+<div v-if="showBloger && bloggerInfo" class="blog-side-head mb-3">\
 <div class="author" :style="\'background: url(\'+getUserCardBackground()+\') center center no-repeat;\'">\
 <img class="img-responsive mt-3" :src="getImageUrl(bloggerInfo.headimg)" alt="head-img">\
 </div>\
@@ -122,7 +142,7 @@ DreamFish</a><span>博主</span>\
 <p>{{ bloggerInfo.introduction }}</p>\
 </div>\
 </div>\
-<div class="blog-side-content mt-3">\
+<div v-if="showTags" class="blog-side-content mt-3">\
 <h5 class="blog-title">分类标签</h5>\
 <div class="tags" v-if="contentTagsLoaded">\
 <a v-for="tag in contentTags" class="tag-color" v-on:click="goViewTag(tag.id)"\
@@ -132,7 +152,7 @@ href="javascript:void(0);" :id="\'tag_\'+tag.id"\
 <div v-if="contentTagsLoaded && allTagCount > 15 && !contentAllTagsLoaded" class="text-center mt-2">\
 <button v-on:click="loadMoreTags" class="flat flat-btn btn-link">显示全部</button></div>\
 </div>\
-<div class="blog-side-content mt-3">\
+<div v-if="showDates" class="blog-side-content mt-3">\
 <h5 class="blog-title">文章归档</h5>\
 <div class="dates" v-if="contentDatesLoaded">\
 <a v-for="date in contentDates" class="tag-color" v-on:click="goViewDate(date.date.substr(0,4), date.date.substr(5, 2))" href="javascript:void(0);">{{ getDateString(date.date) + \' (\' + date.count + \')\' }}</a>\
@@ -140,7 +160,7 @@ href="javascript:void(0);" :id="\'tag_\'+tag.id"\
 <div v-if="contentDatesLoaded && allDateCount > 5 && !contentAllDatesLoaded" class="text-center mt-2">\
 <button v-on:click="loadMoreDates" class="flat flat-btn btn-link">显示全部</button></div>\
 </div>\
-<div class="blog-side-content mt-3">\
+<div v-if="showClass" class="blog-side-content mt-3">\
 <h5 class="blog-title">文章分类</h5>\
 <div class="tags" v-if="contentClassesLoaded">\
 <a v-for="pclass in contentClasses" class="tag-color bg-info"\
@@ -149,5 +169,8 @@ href="javascript:void(0);">{{ pclass.title }}</a>\
 </div>\
 <div v-if="contentClassesLoaded && allClassCount > 5 && !contentAllClassesLoaded" class="text-center mt-2">\
 <button v-on:click="loadMoreClasses" class="flat flat-btn btn-link">显示全部</button></div>\
-</div></div>'
+</div>\
+<div v-if="showCustomerArea && contentCusetomerAreaHtml != \'\'" v-html="contentCusetomerAreaHtml" class="blog-side-content mt-3 p-0">\
+</div>\
+</div>'
 })

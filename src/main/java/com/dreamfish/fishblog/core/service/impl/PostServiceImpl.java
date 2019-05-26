@@ -8,8 +8,11 @@ import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.mapper.PostCommentMapper;
 import com.dreamfish.fishblog.core.mapper.PostDatesMapper;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
+import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.repository.PostRepository;
+import com.dreamfish.fishblog.core.service.MessagesService;
 import com.dreamfish.fishblog.core.service.PostService;
+import com.dreamfish.fishblog.core.service.UserService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
@@ -48,6 +51,10 @@ public class PostServiceImpl implements PostService {
     private PostDatesMapper postDatesMapper = null;
     @Autowired
     private PostCommentMapper postCommentMapper = null;
+    @Autowired
+    private MessagesService messagesService = null;
+    @Autowired
+    private UserService userService = null;
 
     @Override
     public Result findPostWithIdOrUrlName(String idOrUrlName, boolean authForRead) {
@@ -222,6 +229,11 @@ public class PostServiceImpl implements PostService {
             likeUsers = likeUsers.replace("-" + userId, "");//删除用户ID
             postMapper.decreasePostValue(id, "like_count");
         }
+
+        //通知作者
+        Integer postUserId = postMapper.getPostAuthorId(id);
+        if(postUserId > 0 && postUserId.intValue() != userId) messagesService.sendMessage(postUserId, 0, "您有收获了一个赞！", userService.getUserNameAutoById(userId) + " 赞了你的文章 <a href=\"/archives/post/"+id+"/\" target=\"_blank\">" + postMapper.getPostTitle(id) + "</a> ！");
+
         postMapper.updatePostLikeUsersById(id, likeUsers);
         return Result.success();
     }

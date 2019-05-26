@@ -1,5 +1,6 @@
 package com.dreamfish.fishblog.core.utils;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,4 +77,14 @@ public class StringUtils {
         return m.matches();
     }
 
+
+    public static String intListToInStr(List<Integer> ids){
+        StringBuilder sb = new StringBuilder();
+        for(Integer id : ids){
+            sb.append(id);
+            sb.append(",");
+        }
+        sb.delete(sb.length()-1,sb.length());
+        return sb.toString();
+    }
 }
