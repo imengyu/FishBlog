@@ -29,10 +29,9 @@ public interface PostDatesMapper {
      * 删除文章归档时间
      *
      * @param id 文章归档时间 ID
-     * @return
      */
     @Delete("DELETE FROM fish_post_dates WHERE id=#{id}")
-    void deletDate(@Param("id") Integer id);
+    void deleteDate(@Param("id") Integer id);
 
     @Select("SELECT COUNT(*) FROM fish_post_dates")
     Integer getDatesCount();
@@ -44,7 +43,7 @@ public interface PostDatesMapper {
      * @return 返回 ID
      */
     @Insert("INSERT INTO fish_post_dates (date,count) VALUES(#{date.date},#{date.count})")
-    @Options(useGeneratedKeys = true, keyProperty = "date.id", keyColumn = "id")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void addDate(@Param("date") PostDate date);
 
     /**

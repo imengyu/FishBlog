@@ -29,5 +29,6 @@ public interface UserService {
     Result updateUser(UserExtened user);
     Result userUpdateBan(int userId, boolean ban);
     Result userUpdatePrivilege(int userId, int newPrivilege);
-    Result getUsersWithPageable(Integer pageIndex, Integer pageSize);
+    Result userUpdateLevel(int userId, int level);
+    Result getUsersWithPageable(Integer pageIndex, Integer pageSize, Boolean includeTourist);
 }

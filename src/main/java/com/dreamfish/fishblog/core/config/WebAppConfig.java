@@ -20,12 +20,12 @@ import java.util.concurrent.TimeUnit;
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     //获取配置文件中图片的路径
-    @Value("${fishblog.imagesPath}")
+    @Value("${fishblog.images-save-path}")
     private String mImagesPath;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        if (mImagesPath.equals("") || mImagesPath.equals("${fishblog.imagesPath}")) {
+        if (mImagesPath.equals("") || mImagesPath.equals("${fishblog.images-save-path}")) {
             String imagesPath = WebAppConfig.class.getClassLoader().getResource("").getPath();
             if (imagesPath.indexOf(".jar") > 0) {
                 imagesPath = imagesPath.substring(0, imagesPath.indexOf(".jar"));
@@ -44,10 +44,10 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
                 .setCacheControl(CacheControl.maxAge(15, TimeUnit.DAYS).cachePublic());
         super.addResourceHandlers(registry);
     }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new RequestAuthInterceptor()).addPathPatterns("/**");
         super.addInterceptors(registry);
     }
-
 }

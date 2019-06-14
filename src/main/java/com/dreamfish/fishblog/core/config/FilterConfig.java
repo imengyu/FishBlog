@@ -35,8 +35,12 @@ public class FilterConfig {
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
             response.setHeader("X-Powered-By","FishBlog/1.1.3");
-            response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
             response.setHeader("Access-Control-Max-Age", "3600");
+            response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+            //跨域设置
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+            response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+            response.setHeader("Access-Control-Allow-Headers","content-type");
             filterChain.doFilter(request, response);
         }
     }

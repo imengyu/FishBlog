@@ -35,7 +35,7 @@ public class User implements Serializable {
      * 访客组，只能评论，无法登录
      */
     public static final int LEVEL_GUEST = 3;
-
+    public static final int LEVEL_MAX = 3;
 
     private static final long serialVersionUID = -3711977388670023741L;
 

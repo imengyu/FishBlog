@@ -138,26 +138,26 @@ public class PostClassificationServiceImpl implements PostClassificationService 
     @Override
     @CacheEvict(value = "blog-dates-cache", allEntries = true)
     public void deleteDate(Integer id) {
-        postDatesMapper.deletDate(id);
+        postDatesMapper.deleteDate(id);
     }
 
     @Override
     @CacheEvict(value = "blog-classes-cache", allEntries = true)
     public PostClass addClass(PostClass postClass) {
         postClass = postClassRepository.saveAndFlush(postClass);
-        ActionLog.logUserAction("创建分类："+postClass.getId(), ContextHolderUtils.getRequest());
+        ActionLog.logUserAction("创建分类："+postClass.getId() + " 标题：" + postClass.getTitle(), ContextHolderUtils.getRequest());
         return postClass;
     }
     @Override
     @CacheEvict(value = "blog-classes-cache", allEntries = true)
     public void updateClass(PostClass postClass) {
         postClassRepository.saveAndFlush(postClass);
-        ActionLog.logUserAction("更新分类："+postClass.getId(), ContextHolderUtils.getRequest());
+        ActionLog.logUserAction("更新分类："+postClass.getId()+ " 标题：" + postClass.getTitle(), ContextHolderUtils.getRequest());
     }
     @Override
     @CacheEvict(value = "blog-classes-cache", allEntries = true)
     public void deleteClass(Integer id) {
-        ActionLog.logUserAction("更新分类："+id, ContextHolderUtils.getRequest());
+        ActionLog.logUserAction("删除分类："+id, ContextHolderUtils.getRequest());
         postClassMapper.deleteClass(id);
     }
     @Override

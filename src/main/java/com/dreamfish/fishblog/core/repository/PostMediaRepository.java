@@ -35,12 +35,29 @@ public interface PostMediaRepository extends JpaRepository<PostMedia, Integer> {
     void deleteByPostIdAndHash(Integer postId, String hash);
 
     /**
+     * 查找指定类型的媒体资源
+     * @param resourceType 资源类型
+     * @param pageable 分页
+     * @return 返回分页数据
+     */
+    Page<PostMedia> findByResourceType(String resourceType, Pageable pageable);
+
+    /**
      * 查找指定文章的资源
      * @param postId 文章 ID
      * @param pageable 分页
      * @return 返回分页数据
      */
     Page<PostMedia> findByPostId(Integer postId, Pageable pageable);
+
+    /**
+     * 查询查找指定文章的指定类型的媒体资源
+     * @param postId 文章 ID
+     * @param resourceType 资源类型
+     * @param pageable 分页
+     * @return 返回分页数据
+     */
+    Page<PostMedia> findByPostIdAndResourceType(Integer postId, String resourceType, Pageable pageable);
 
     /**
      * 查找指定文章的指定hash资源

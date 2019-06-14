@@ -30,7 +30,6 @@ public interface PostTagsMapper {
     /**
      * 删除文章标签
      * @param id 文章标签 ID
-     * @return
      */
     @Delete("DELETE FROM fish_post_tags WHERE id=#{id}")
     void deleteTag(@Param("id") Integer id);
@@ -39,12 +38,11 @@ public interface PostTagsMapper {
     Integer getTagsCount();
 
     /**
-     * 新建文章标签
+     * 新建文章标签，返回文章标签 ID
      * @param tag 文章标签
-     * @return 返回文章标签 ID
      */
     @Insert("INSERT INTO fish_post_tags (name,color) VALUES(#{tag.name},#{tag.color})")
-    @Options(useGeneratedKeys = true, keyProperty = "tag.id", keyColumn = "id")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void addTag(@Param("tag") PostTag tag);
 
     /**

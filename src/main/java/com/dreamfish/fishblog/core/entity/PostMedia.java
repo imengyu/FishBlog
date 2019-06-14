@@ -21,6 +21,33 @@ public class PostMedia implements Serializable {
     private String hash;
     private String type;
     private String title;
+    private String contentType;
+    private String resourceType;
+    private boolean uploadFinish;
+
+    public boolean isUploadFinish() {
+        return uploadFinish;
+    }
+
+    public void setUploadFinish(boolean uploadFinish) {
+        this.uploadFinish = uploadFinish;
+    }
+
+    public String getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 
     public Integer getId() {
         return id;

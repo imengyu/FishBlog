@@ -79,7 +79,7 @@ public class PostSimpleController {
             @RequestParam(value = "byStatus", required = false, defaultValue = "none")
                     String byStatus,
              @RequestParam(value = "noTopMost", required = false, defaultValue = "false")
-                    Boolean noTopMost){
+                    Boolean noTopMost) {
 
         Page<PostSimple> result;
         try {

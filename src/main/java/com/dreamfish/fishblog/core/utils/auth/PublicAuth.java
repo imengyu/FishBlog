@@ -6,6 +6,7 @@ import com.dreamfish.fishblog.core.service.AuthService;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.request.CookieUtils;
 import com.dreamfish.fishblog.core.utils.request.IpUtil;
+import com.dreamfish.fishblog.core.utils.request.RequestUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 
 import javax.servlet.http.Cookie;
@@ -14,15 +15,18 @@ import javax.servlet.http.HttpSession;
 
 public class PublicAuth {
 
+    public static int authForToken(HttpServletRequest request, Cookie clientToken, Integer requireLevel, Integer requirePrivileges) {
+        return authForToken(request, clientToken.getValue(), requireLevel, requirePrivileges);
+    }
     /**
      * 认证Token
      * @param clientToken 颁发给用户的名为 AUTH_TOKEN_NAME 的 认证Token Cookie
      * @return 返回 AuthCode 作为认证状态
      */
-    public static int authForToken(HttpServletRequest request, Cookie clientToken, Integer requireLevel, Integer requirePrivileges) {
+    public static int authForToken(HttpServletRequest request, String clientToken, Integer requireLevel, Integer requirePrivileges) {
         if(clientToken==null)
             return AuthCode.FAIL_BAD_TOKEN;
-        String token = clientToken.getValue();
+        String token = clientToken.replace(' ', '+');
         Integer tokenCheckResult;
         String[] tokenOrgData;
 
@@ -82,6 +86,8 @@ public class PublicAuth {
     public static int authCheckIncludeLevel(HttpServletRequest request, Integer requireLevel){
         Cookie cookie = CookieUtils.findCookieByName(request.getCookies(), AuthService.AUTH_TOKEN_NAME);
         if(cookie!=null) return authForToken(request, cookie, requireLevel, 0);
+        else if(!StringUtils.isBlank(request.getParameter("token")))
+            return PublicAuth.authForToken(request, RequestUtils.decoderURLString(request.getParameter("token")), requireLevel, 0);
         else return AuthCode.FAIL_NOT_LOGIN;
     }
 
@@ -95,6 +101,8 @@ public class PublicAuth {
     public static int authCheckIncludeLevelAndPrivileges(HttpServletRequest request, Integer requireLevel, Integer requirePrivileges){
         Cookie cookie = CookieUtils.findCookieByName(request.getCookies(), AuthService.AUTH_TOKEN_NAME);
         if(cookie!=null) return authForToken(request, cookie, requireLevel, requirePrivileges);
+        else if(!StringUtils.isBlank(request.getParameter("token")))
+            return PublicAuth.authForToken(request, RequestUtils.decoderURLString(request.getParameter("token")), requireLevel, requirePrivileges);
         else return AuthCode.FAIL_NOT_LOGIN;
     }
 
@@ -105,20 +113,20 @@ public class PublicAuth {
      * @return 返回 AuthCode 作为认证状态
      */
     public static Integer authGetUseId(HttpServletRequest request){
-
+        String token = "";
         Cookie clientToken = CookieUtils.findCookieByName(request.getCookies(), AuthService.AUTH_TOKEN_NAME);
-        if(clientToken==null)
-            return 0;
+        if(clientToken!=null)
+            token = clientToken.getValue();
+        else if(!StringUtils.isBlank(request.getParameter("token")))
+            token = RequestUtils.decoderURLString(request.getParameter("token")).replace(' ', '+');
 
-        String token = clientToken.getValue();
         Integer tokenCheckResult;
         String[] tokenOrgData;
 
         try {
             tokenCheckResult = TokenAuthUtils.checkToken(token, TokenAuthUtils.TOKEN_DEFAULT_KEY);
         } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-            return AuthCode.UNKNOW;
+            return AuthCode.FAIL_BAD_TOKEN;
         }
 
         if(tokenCheckResult.intValue() == TokenAuthUtils.TOKEN_CHECK_BAD_TOKEN) {

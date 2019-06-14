@@ -62,8 +62,11 @@ public class UserController {
                                        Integer pageIndex,
                            @PathVariable("pageSize")
                                @Min(value = 1, message = "页大小必须大于等于1")
-                                       Integer pageSize) {
-        return userService.getUsersWithPageable(pageIndex, pageSize);
+                                       Integer pageSize,
+                           @RequestParam(value = "includeTourist", required = false, defaultValue = "false")
+                                       Boolean includeTourist
+    ) {
+        return userService.getUsersWithPageable(pageIndex, pageSize, includeTourist);
     }
     //删除部分用户
     @DeleteMapping("/users")
@@ -133,10 +136,18 @@ public class UserController {
     @PostMapping("/user/{userId}/privilege")
     @ResponseBody
     @RequestAuth(value = User.LEVEL_WRITER)
-    @RequestPrivilegeAuth(value = UserPrivileges.PRIVILEGE_MANAGE_USERS)
-    public Result setUserPrivilege(@PathVariable("userId") Integer userId, @RequestBody JSONObject privilege) {
-        return userService.userUpdatePrivilege(userId, privilege.getInteger("privilege"));
+    @RequestPrivilegeAuth(value = (UserPrivileges.PRIVILEGE_MANAGE_USERS & UserPrivileges.PRIVILEGE_GAINT_PRIVILEGE))
+    public Result setUserPrivilege(@PathVariable("userId") Integer userId, @RequestBody JSONObject data) {
+        return userService.userUpdatePrivilege(userId, data.getInteger("privilege"));
     }
 
+    //设置用户用户组
+    @PostMapping("/user/{userId}/level")
+    @ResponseBody
+    @RequestAuth(value = User.LEVEL_WRITER)
+    @RequestPrivilegeAuth(value = UserPrivileges.PRIVILEGE_MANAGE_USERS)
+    public Result setUserLevel(@PathVariable("userId") Integer userId,  @RequestBody JSONObject data) {
+        return userService.userUpdateLevel(userId,  data.getInteger("level"));
+    }
 
 }

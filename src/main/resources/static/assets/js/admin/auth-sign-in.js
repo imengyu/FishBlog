@@ -134,7 +134,7 @@ function login(){
 				var a = getQueryString('redirect_url');
     			if(!isNullOrEmpty(a))location.href = decodeURI(a);
 				else {
-					if(data.data && (data.data.level == userLevels.writer || data.data.level == userLevels.admin)) location.href = '/admin/';
+					if(data.data && (data.data.userData.level == userLevels.writer || data.data.userData.level == userLevels.admin)) location.href = '/admin/';
 					else location.href = '/user/';
 				}
 			} else {

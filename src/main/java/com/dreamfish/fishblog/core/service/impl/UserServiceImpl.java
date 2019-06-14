@@ -100,6 +100,19 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * 获取用户友好名字
+     * @param id
+     * @return
+     */
+    @Override
+    public String getUserNameAutoById(Integer id) {
+        String u = userMapper.getUserFriendlyNameById(id);
+        if(StringUtils.isBlank(u))
+            u = userMapper.getUserNameById(id);
+        return u;
+    }
+
+    /**
      * 带认证删除用户（公开需认证）
      * @param userId 用户 ID
      * @return 返回请求结果
@@ -109,6 +122,8 @@ public class UserServiceImpl implements UserService {
 
         if (!userRepository.existsById(userId))
             return Result.failure(ResultCodeEnum.NOT_FOUNT);
+        if(userId == User.LEVEL_ADMIN)
+            return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无法删除根管理员");
         if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
             return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限删除指定用户");
         if(userId == PublicAuth.authGetUseId(ContextHolderUtils.getRequest()))
@@ -203,21 +218,35 @@ public class UserServiceImpl implements UserService {
      * @return 返回请求结果
      */
     @Override
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     public Result userUpdateBan(int userId, boolean ban) {
 
         if(ban) {
-            if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
-                return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限对指定用户操作");
-            if(userId == PublicAuth.authGetUseId(ContextHolderUtils.getRequest()))
-                return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无法对自己进行操作");
+            if(userId == User.LEVEL_ADMIN)
+                return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无法对根管理员操作");
+            int currentUserId = PublicAuth.authGetUseId(ContextHolderUtils.getRequest());
+            if(userId == currentUserId)
+                return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无法对自己进行操作");
+            int targetUserLevel = userMapper.getUserLevelById(userId);
+            if((targetUserLevel <= User.LEVEL_ADMIN && targetUserLevel != User.LEVEL_LOCKED)
+                    && userMapper.getUserLevelById(currentUserId) > User.LEVEL_ADMIN)
+                return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无权限对指定用户操作");
 
             ActionLog.logUserAction("封禁用户：" + userId, ContextHolderUtils.getRequest());
-
             userMapper.updateUserLevel(userId, User.LEVEL_LOCKED);
         }
         else {
-            ActionLog.logUserAction("解封用户：" + userId, ContextHolderUtils.getRequest());
+            if(userId == User.LEVEL_ADMIN)
+                return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无法对根管理员操作");
+            int currentUserId = PublicAuth.authGetUseId(ContextHolderUtils.getRequest());
+            if(userId == currentUserId)
+                return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无法对自己进行操作");
+            int targetUserLevel = userMapper.getUserLevelById(userId);
+            if((targetUserLevel <= User.LEVEL_ADMIN && targetUserLevel != User.LEVEL_LOCKED)
+                    && userMapper.getUserLevelById(currentUserId) > User.LEVEL_ADMIN)
+                return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无权限对指定用户操作");
 
+            ActionLog.logUserAction("解封用户：" + userId, ContextHolderUtils.getRequest());
             userMapper.updateUserLevelSetToOld(userId);
         }
         return Result.success();
@@ -230,21 +259,46 @@ public class UserServiceImpl implements UserService {
      * @return 返回请求结果
      */
     @Override
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     public Result userUpdatePrivilege(int userId, int newPrivilege) {
 
         //认证
         HttpServletRequest request = ContextHolderUtils.getRequest();
         if(PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, newPrivilege) < AuthCode.SUCCESS)
             return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"当前用户无权限赋予其他用户权限");
-        if(userId == PublicAuth.authGetUseId(ContextHolderUtils.getRequest()))
-            return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无法对自己进行操作");
 
+        int oldPrivilege = userMapper.getUserPrivilegeById(userId);
+        int revokePrivilege = (~newPrivilege) & oldPrivilege;
+
+        if(PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, revokePrivilege) < AuthCode.SUCCESS)
+            return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"当前用户无权限撤销其他用户有而自己没有的权限");
+
+        if(userId == PublicAuth.authGetUseId(ContextHolderUtils.getRequest()))
+            return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无法对自己进行操作");
         if(userMapper.getUserLevelById(userId) <= User.LEVEL_ADMIN)
-            return Result.failure(ResultCodeEnum.UNAUTHORIZED.getCode(),"无权限对指定用户操作");
+            return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无权限对指定用户操作");
 
         ActionLog.logUserAction("更新用户权限：" + userId + " 新权限：" + newPrivilege, ContextHolderUtils.getRequest());
 
         userMapper.updateUserPrivilege(userId, newPrivilege);
+        return Result.success();
+    }
+
+    @Override
+    @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
+    public Result userUpdateLevel(int userId, int level) {
+        if(level < 0 || level > User.LEVEL_MAX) return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(),"用户组参数有误");
+        if(userId == User.LEVEL_ADMIN) return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无法对根管理员操作");
+        int currentUserId = PublicAuth.authGetUseId(ContextHolderUtils.getRequest());
+        if(userId == currentUserId)
+            return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无法对自己进行操作");
+        if(userMapper.getUserLevelById(currentUserId) > level)
+            return Result.failure(ResultCodeEnum.FORIBBEN.getCode(),"无法将用户调整至权限比自己高的用户组");
+
+        ActionLog.logUserAction("更新用户用户组：" + userId + " 新组：" + level, ContextHolderUtils.getRequest());
+
+        userMapper.updateUserLevel(userId, level);
+        userMapper.updateUserLevelOld(userId, level);
         return Result.success();
     }
 
@@ -381,20 +435,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 获取用户友好名字
-     * @param id
-     * @return
-     */
-    @Override
-    public String getUserNameAutoById(Integer id) {
-        String u = userMapper.getUserFriendlyNameById(id);
-        if(StringUtils.isBlank(u))
-            u = userMapper.getUserNameById(id);
-        return u;
-    }
-
-
-    /**
      * 发送激活邮件
      * @param mail 返回一个正在激活的TOKEN
      */
@@ -482,7 +522,8 @@ public class UserServiceImpl implements UserService {
      * @return 分页结果数据
      */
     @Override
-    public Result getUsersWithPageable(Integer pageIndex, Integer pageSize) {
-        return Result.success(userRepository.findAll(PageRequest.of(pageIndex, pageSize)));
+    public Result getUsersWithPageable(Integer pageIndex, Integer pageSize, Boolean includeTourist) {
+        if(includeTourist) return Result.success(userRepository.findAll(PageRequest.of(pageIndex, pageSize)));
+        else  return Result.success(userRepository.findByLevelLessThanEqual(User.LEVEL_WRITER, PageRequest.of(pageIndex, pageSize)));
     }
 }

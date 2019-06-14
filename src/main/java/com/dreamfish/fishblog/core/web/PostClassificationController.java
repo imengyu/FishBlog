@@ -167,11 +167,7 @@ public class PostClassificationController {
     @ResponseBody
     @RequestAuth(User.LEVEL_WRITER)
     @RequestPrivilegeAuth(UserPrivileges.PRIVILEGE_MANAGE_ALL_CLASSANDTAGS)
-    public Result addTag(
-            @PathVariable("id")
-                    Integer id,
-            @RequestBody @NonNull
-                    PostTag postTag){
+    public Result addTag(@RequestBody @NonNull PostTag postTag){
         PostTag newPostTag = postClassificationService.addTag(postTag);
         return Result.success(newPostTag);
     }

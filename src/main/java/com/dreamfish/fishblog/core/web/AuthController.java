@@ -6,14 +6,12 @@ import com.dreamfish.fishblog.core.config.ConstConfig;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.entity.UserExtened;
 import com.dreamfish.fishblog.core.service.AuthService;
-import com.dreamfish.fishblog.core.service.RedisService;
 import com.dreamfish.fishblog.core.service.UserService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.request.HttpClient;
-import com.dreamfish.fishblog.core.utils.request.IpUtil;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import com.dreamfish.fishblog.core.utils.request.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 认证接口控制器
@@ -44,74 +41,12 @@ public class AuthController {
     @Autowired
     private UserService userService = null;
 
-    //Redis
-    @Autowired
-    private RedisService redisService = null;
-
     //开始认证 登录
     @ResponseBody
     @PostMapping(value = "", name = "开始认证")
     public Result authEntry(@RequestBody @NonNull User user) {
-
-        String ip = IpUtil.getIpAddr(request);
-        HttpSession httpSession = request.getSession();
-        String passwordErrCountKey = "password_error_count_" + ip + "_" + user.getName();
-
-        //检查密码错误次数
-        Integer passwordErrCountInSession = (Integer)httpSession.getAttribute("PasswordIncorrectCount");
-        Integer passwordErrCount = redisService.get(passwordErrCountKey);
-        if (passwordErrCountInSession != null && passwordErrCountInSession > 3)
-            return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您的密码错误次数过多，请 15 分钟后再试！");
-        if ((passwordErrCount != null && passwordErrCount > 3)) {
-            if(passwordErrCountInSession == null || passwordErrCountInSession > 3)
-                return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您的密码错误次数过多，请 15 分钟后再试！");
-        }
-
-        int authCode = authService.authLogin(user.getName(), user.getPasswd(), request);
-        if(authCode >= AuthCode.SUCCESS){
-
-            //设置错误计数为0
-            httpSession.setAttribute("PasswordIncorrectCount", 0);
-            redisService.set(passwordErrCountKey, 0, 900, TimeUnit.SECONDS);
-
-            if(authCode==AuthCode.SUCCESS_GUEST){//游客
-                String authToken = authService.genAuthToken(request, AuthService.AUTH_TOKEN_GUEST_EXPIRE_TIME);
-                if (!StringUtils.isEmpty(authToken))
-                    CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, authToken, AuthService.AUTH_TOKEN_GUEST_EXPIRE_TIME);
-            }else {//普通用户
-                String authToken = authService.genAuthToken(request);
-                if (!StringUtils.isEmpty(authToken))
-                    CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, authToken, -1);
-            }
-            return Result.success(authService.authGetUserInfo(user.getName()));
-        }
-        else {
-
-            if (authCode != AuthCode.FAIL_USER_LOCKED && authCode != AuthCode.FAIL_NOT_ACTIVE) {
-                //设置或增加密码错误次数
-                if(passwordErrCountInSession==null) {
-                    passwordErrCountInSession = 1;
-                    httpSession.setAttribute("PasswordIncorrectCount", passwordErrCountInSession);
-                }else{
-                    passwordErrCountInSession++;
-                    httpSession.setAttribute("PasswordIncorrectCount", passwordErrCountInSession);
-                }
-                if (passwordErrCount == null) {
-                    passwordErrCount = 1;
-                    redisService.set(passwordErrCountKey, passwordErrCount, 900, TimeUnit.SECONDS);
-                } else {
-                    passwordErrCount++;
-                    redisService.set(passwordErrCountKey, passwordErrCount, 900, TimeUnit.SECONDS);
-                }
-
-                if (passwordErrCount >= 4)
-                    return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您的密码错误次数过多，请 15 分钟后再试！", String.valueOf(authCode));
-                else return Result.failure(ResultCodeEnum.FAILED_AUTH.getCode(), "您还可以尝试 " + (4 - passwordErrCount) + " 次", String.valueOf(authCode));
-
-            }else return Result.failure(ResultCodeEnum.FAILED_AUTH, String.valueOf(authCode));
-        }
+        return authService.authDoLogin(user, request, response);
     }
-
     //检测认证状态
     @ResponseBody
     @GetMapping(value = "/auth-test-user-id", name = "检测认证状态")
@@ -124,24 +59,13 @@ public class AuthController {
     @ResponseBody
     @GetMapping(value = "/auth-test", name = "检测认证状态")
     public Result authTest() {
-        Integer authCode = authService.checkUserAuth(request);
-        if(authCode >= AuthCode.SUCCESS) return Result.success(authService.authGetAuthedUserInfo(request));
-        else return Result.failure(ResultCodeEnum.FAILED_AUTH, String.valueOf(authCode));
+        return authService.authDoTest(request);
     }
     //结束认证 退出
     @ResponseBody
     @GetMapping(value = "/auth-end", name = "结束认证")
     public Result authEnd(@RequestParam(value = "redirect_uri", required = false) String redirect_uri) throws IOException {
-        Integer authCode = authService.checkUserAuth(request);
-        CookieUtils.setookie(response, AuthService.AUTH_TOKEN_NAME, "", 0);
-        authService.authClear(request);
-        if(!StringUtils.isBlank(redirect_uri)){
-            response.sendRedirect(redirect_uri);
-            return Result.success();
-        }else {
-            if (authCode >= AuthCode.SUCCESS) return Result.success();
-            else return Result.failure(ResultCodeEnum.FAILED_AUTH, String.valueOf(authCode));
-        }
+        return authService.authDoLogout(request, response, redirect_uri);
     }
 
     //Github 登录

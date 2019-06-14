@@ -34,8 +34,11 @@ import java.io.*;
 public class ImageStorageServiceImpl implements ImageStorageService {
 
     //获取配置文件中图片的路径
-    @Value("${fishblog.imagesPath}")
+    @Value("${fishblog.images-save-path}")
     private String imagesStoragePath = "";
+    @Value("${fishblog.images-save-type}")
+    private String imagesStorageSaveType = "";
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public ImageStorageServiceImpl()

@@ -92,7 +92,14 @@ public class StaticPageController
         return Result.success(seacherEngineMode);
     }
 
+    /*百度站长验证假HTML*/
     @GetMapping("baidu_verify_{k}.html")
     @ResponseBody
     public String baiduVerify(@PathVariable("k") String k){ return k; }
+    /*Google网站验证假HTML*/
+    @GetMapping("google{k}.html")
+    @ResponseBody
+    public String googleVerify(@PathVariable("k") String k){
+        return "google-site-verification: google" + k + ".html";
+    }
 }

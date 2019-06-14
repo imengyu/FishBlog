@@ -1,9 +1,13 @@
 package com.dreamfish.fishblog.core.service;
 
+import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.entity.UserExtened;
+import com.dreamfish.fishblog.core.utils.Result;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public interface AuthService {
 
@@ -14,6 +18,11 @@ public interface AuthService {
 
     UserExtened authGetUserInfo(String name);
     UserExtened authGetAuthedUserInfo(HttpServletRequest request);
+
+    Result authDoLogin(User user, HttpServletRequest request, HttpServletResponse response);
+    Result authDoTest(HttpServletRequest request);
+    Result authDoLogout(HttpServletRequest request, HttpServletResponse response, String redirect_uri) throws IOException;
+
     int authLogin(String userNaame, String passwd, HttpServletRequest request);
     int authForToken(HttpServletRequest request, Cookie clientToken, Integer requireLevel, Integer requirePrivileges);
     int checkUserAuth(HttpServletRequest request);

@@ -1,5 +1,6 @@
 package com.dreamfish.fishblog.core.utils.file;
 
+import com.dreamfish.fishblog.core.utils.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -95,6 +96,7 @@ public class FileUtils {
         return value;
     }
 
+
     /**
      * 读取文件为 BYTE
      *
@@ -117,6 +119,113 @@ public class FileUtils {
             out.write(buffer, 0, n);
         }
         return out.toByteArray();
+    }
+
+    public static String getReadableFileSize(BigInteger size) {
+        BigInteger v1024 = BigInteger.valueOf(1024);
+        BigInteger v100 = BigInteger.valueOf(100);
+        //如果字节数少于1024，则直接以B为单位，否则先除于1024，后3位因太少无意义
+        if (size.compareTo(v1024) < 0) {
+            return size.toString() + "B";
+        } else {
+            size = size.divide(v1024);
+        }
+        //如果原字节数除于1024之后，少于1024，则可以直接以KB作为单位
+        //因为还没有到达要使用另一个单位的时候
+        //接下去以此类推
+        if (size.compareTo(v1024) < 0)  return size.toString() + "KB";
+        else size = size.divide(v1024);
+        if (size.compareTo(v1024) < 0) {
+            //因为如果以MB为单位的话，要保留最后1位小数，
+            //因此，把此数乘以100之后再取余
+            size = size.multiply(v100);
+            return size.divide(v100).toString() + "."
+                    + size.mod(v100).toString() + "MB";
+        } else {
+            //否则如果要以GB为单位的，先除于1024再作同样的处理
+            size = size.multiply(v100).divide(v1024);
+            return size.divide(v100).toString() + "."
+                    + size.mod(v100).toString() + "GB";
+        }
+    }
+    /**
+     * 把文件大小转为可读大小例如 KB、MB、GB
+     * @param size 文件大小，B
+     * @return 返回可读大小
+     */
+    public static String getReadableFileSize(long size) {
+        //如果字节数少于1024，则直接以B为单位，否则先除于1024，后3位因太少无意义
+        if (size < 1024) {
+            return String.valueOf(size) + "B";
+        } else {
+            size = size / 1024;
+        }
+        //如果原字节数除于1024之后，少于1024，则可以直接以KB作为单位
+        //因为还没有到达要使用另一个单位的时候
+        //接下去以此类推
+        if (size < 1024) {
+            return String.valueOf(size) + "KB";
+        } else {
+            size = size / 1024;
+        }
+        if (size < 1024) {
+            //因为如果以MB为单位的话，要保留最后1位小数，
+            //因此，把此数乘以100之后再取余
+            size = size * 100;
+            return String.valueOf((size / 100)) + "."
+                    + String.valueOf((size % 100)) + "MB";
+        } else {
+            //否则如果要以GB为单位的，先除于1024再作同样的处理
+            size = size * 100 / 1024;
+            return String.valueOf((size / 100)) + "."
+                    + String.valueOf((size % 100)) + "GB";
+        }
+    }
+
+    /**
+     * 把文件可读大小转为真实Byte数
+     * @param readableSize 可读大小例如 KB、MB、GB
+     * @return Byte数
+     */
+    public static long readableFileSizeToByteCount(String readableSize){
+        String uint = "B";
+        String sNumber = null, sEnd = null;
+        if(readableSize.length()<=2){
+            sEnd = readableSize.substring(readableSize.length() - 1);
+            sNumber = readableSize.substring(0, readableSize.length() - 1);
+        }else {
+            sEnd = readableSize.substring(readableSize.length() - 2);
+            sNumber = readableSize.substring(0, readableSize.length() - 2);
+
+        }
+        if(Character.isDigit(sEnd.charAt(0))){
+            sEnd = sEnd.substring(1);
+            sNumber = readableSize.substring(0, readableSize.length() - 1);
+            if(!Character.isDigit(sEnd.charAt(0))){
+                uint = sEnd;
+                sNumber = readableSize.substring(0, readableSize.length() - 1);
+            }
+        }else uint = sEnd;
+
+        long size = 0;
+        size = Long.parseLong(sNumber);
+
+        if("KB".equals(uint) || "K".equals(uint))
+            size = size * 1024;
+        else if("MB".equals(uint) || "M".equals(uint))
+            size = size * 1048576;
+        else if("GB".equals(uint) || "G".equals(uint))
+            size = size * 1073741824;
+        else if("b".equals(uint))
+            size = size / 8;
+        else if("Kb".equals(uint))
+            size = size * 1048576 / 8;
+        else if("Mb".equals(uint))
+            size = size * 1073741824 / 8;
+        else if("Gb".equals(uint))
+            size = size * 1048576 / 8;
+
+        return size;
     }
 }
 

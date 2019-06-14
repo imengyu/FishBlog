@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * 全局异常处理
@@ -26,55 +25,39 @@ import java.io.IOException;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    /**
-     * 捕获  RuntimeException 异常
-     * TODO  如果你觉得在一个 exceptionHandler 通过  if (e instanceof xxxException) 太麻烦
-     * TODO  那么你还可以自己写多个不同的 exceptionHandler 处理不同异常
-     *
-     * @param request  request
-     * @param e        exception
-     * @param response response
-     * @return 响应结果
-     */
-    @ExceptionHandler(RuntimeException.class)
-    public ErrorResponseEntity runtimeExceptionHandler(HttpServletRequest request, final Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        RuntimeException exception = (RuntimeException) e;
-        return new ErrorResponseEntity(400, exception.getMessage());
-    }
 
-    /**
-     * 捕获 ConstraintViolationException 参数 异常
-     * @param request
-     * @param e
-     * @param response
-     * @return
-     */
+    //捕获 ConstraintViolationException 参数 异常
     @ExceptionHandler(ConstraintViolationException.class)
     public ErrorResponseEntity constraintViolationExceptionHandler(HttpServletRequest request, final Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         ConstraintViolationException exception = (ConstraintViolationException) e;
-        return new ConstraintViolationErrorResponseEntity(400, "请求参数验证失败", exception.getMessage());
+        return new ConstraintViolationErrorResponseEntity(HttpStatus.BAD_REQUEST.value(), "请求参数验证失败", exception.getMessage());
     }
-
-    /**
-     * 捕获 FileNotFoundException 参数 异常
-     * @param request
-     * @param e
-     * @param response
-     * @return
-     */
+    //捕获 FileNotFoundException 参数 异常
     @ExceptionHandler(FileNotFoundException.class)
     public ErrorResponseEntity fileNotFoundExceptionHandler(HttpServletRequest request, final Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.NOT_FOUND.value());
         FileNotFoundException exception = (FileNotFoundException) e;
-        return new ConstraintViolationErrorResponseEntity(404, "未找到指定文件", exception.getMessage());
+        return new ConstraintViolationErrorResponseEntity(HttpStatus.NOT_FOUND.value(), "未找到指定文件", exception.getMessage());
+    }
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ErrorResponseEntity httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request, final Exception e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        e.printStackTrace();
+        return new ErrorResponseEntity(HttpStatus.BAD_REQUEST.value(), "不支持的请求方法");
+    }
+    //捕获  RuntimeException 异常
+    @ExceptionHandler(RuntimeException.class)
+    public ErrorResponseEntity runtimeExceptionHandler(HttpServletRequest request, final Exception e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        RuntimeException exception = (RuntimeException) e;
+        return new ErrorResponseEntity(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
     }
     @ExceptionHandler(NullPointerException.class)
     public ErrorResponseEntity nullPointerExceptionHandler(HttpServletRequest request, final Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         e.printStackTrace();
-        return new ErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务器出现异常，请稍后再试");
+        return new ErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务出现异常，请稍后再试");
     }
 
     /**
@@ -94,7 +77,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
         if (ex instanceof MethodArgumentTypeMismatchException) {
             MethodArgumentTypeMismatchException exception = (MethodArgumentTypeMismatchException) ex;
-            logger.error("参数转换失败，方法：" + exception.getParameter().getMethod().getName() + "，参数：" + exception.getName()
+            logger.error("参数转换失败，方法：" + (exception.getParameter().getMethod() != null ? exception.getParameter().getMethod().getName() : "未知方法") + "，参数：" + exception.getName()
                     + ",信息：" + exception.getLocalizedMessage());
             return new ResponseEntity<>(new ErrorResponseEntity(status.value(), "参数 " + exception.getName() + " 不合法"), status);
         }

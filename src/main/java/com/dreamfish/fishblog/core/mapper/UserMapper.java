@@ -52,6 +52,9 @@ public interface UserMapper {
     @Select("SELECT friendly_name FROM fish_users WHERE id = #{id}")
     String getUserFriendlyNameById(@Param("id") Integer id);
 
+    @Select("SELECT privilege FROM fish_users WHERE id = #{id}")
+    int getUserPrivilegeById(@Param("id") Integer id);
+
     @Select("SELECT level FROM fish_users WHERE id = #{id}")
     Integer getUserLevelById(@Param("id") Integer id);
 
@@ -88,6 +91,9 @@ public interface UserMapper {
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET old_level=level,level=#{level} WHERE id=#{id}")
     void updateUserLevel(@Param("id") int id, @Param("level") int level);
+
+    @Update("UPDATE fish_users SET old_level=#{level} WHERE id=#{id}")
+    void updateUserLevelOld(@Param("id") int id, @Param("level") int level);
 
     @CacheEvict(value = "blog-user-cache", key = "'user_full_'+#p0")
     @Update("UPDATE fish_users SET level=old_level WHERE id=#{id}")
