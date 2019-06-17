@@ -3,6 +3,7 @@ package com.dreamfish.fishblog.core.service.impl;
 import com.dreamfish.fishblog.core.entity.PostMedia;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
+import com.dreamfish.fishblog.core.exception.BadTokenException;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
 import com.dreamfish.fishblog.core.repository.PostMediaRepository;
 import com.dreamfish.fishblog.core.service.MediaStorageService;
@@ -10,6 +11,7 @@ import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
+import com.dreamfish.fishblog.core.utils.auth.TokenAuthUtils;
 import com.dreamfish.fishblog.core.utils.file.FileUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 
@@ -20,6 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -56,34 +63,14 @@ public class MediaStorageServiceImpl implements MediaStorageService {
 
     @Override
     public Result uploadMedia(MultipartFile file, PostMedia postMedia, HttpServletRequest request) {
-        //权限检查
-        Result permissionCheckResult = checkUserPermission(postMedia.getPostId(), request);
-        if(permissionCheckResult != null) return permissionCheckResult;
-        //类型检查
-        Result typeCheckResult = checkUploadFileType(file, postMedia);
-        if(typeCheckResult != null) return typeCheckResult;
-
-        //检查文件是否为空
-        if (file.isEmpty() || StringUtils.isBlank(file.getOriginalFilename()))
-            return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "文件为空，请重新上传","FILE_EMPTY");
-
-
-
-
-        return null;
+        return saveFile(file, false, 0, "", postMedia, FileUtils.getMd5ByFile(file), request);
     }
 
     @Override
-    public Result uploadMediaBlob(MultipartFile file, String token, Integer blobIndex, PostMedia postMedia, HttpServletRequest request) {
-
-        //检查文件是否为空
-        if (file.isEmpty() || StringUtils.isBlank(file.getOriginalFilename()))
-            return Result.failure(ResultCodeEnum.UPLOAD_ERROR,"FILE_EMPTY");
-
-
-
-
-        return null;
+    public Result uploadMediaBlob(MultipartFile file, Integer blobIndex, String multiUploadToken, PostMedia postMedia, HttpServletRequest request) {
+        if(StringUtils.isBlank(postMedia.getHash()))
+            return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "分片上传必须提供原文件完整MD5值");
+        return saveFile(file, true, blobIndex, multiUploadToken, postMedia, postMedia.getHash(), request);
     }
 
     /**
@@ -92,7 +79,7 @@ public class MediaStorageServiceImpl implements MediaStorageService {
      * @return 返回分片参数
      */
     @Override
-    public Result uploadMediaGetSize(long fileSize) {
+    public Result uploadMediaGetSize(long fileSize, PostMedia postMedia) {
         long maxUploadSize = getMaxFileUploadSize();
         if(fileSize < maxUploadSize){
             Map<String, Object> resultData = new HashMap<>();
@@ -107,12 +94,20 @@ public class MediaStorageServiceImpl implements MediaStorageService {
                 chunkLastSize = fileSize - (chunkCount*chunkSize);
                 chunkCount ++;
             }
+
+            if(StringUtils.isBlank(postMedia.getHash()))
+                return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "HASH 不能为空");
+
+            String uploadMultiToken = TokenAuthUtils.genToken(300,postMedia.getHash()+":"+chunkCount+":"+chunkSize+":"+chunkLastSize);
+
             Map<String, Object> resultData = new HashMap<>();
             resultData.put("multipart", "true");
             resultData.put("chunkCount", chunkCount);
             resultData.put("chunkSize", chunkSize);
             resultData.put("chunkLastSize", chunkLastSize);
             resultData.put("serverMaxUploadSize", maxUploadSize);
+            resultData.put("uploadMultiToken", uploadMultiToken);
+
             return Result.success(resultData);
         }
     }
@@ -208,6 +203,9 @@ public class MediaStorageServiceImpl implements MediaStorageService {
         return Result.success(postMedia);
     }
 
+    //
+    // Checks and utils
+    //
 
     /**
      * 基础检查用户是否有权限
@@ -234,7 +232,6 @@ public class MediaStorageServiceImpl implements MediaStorageService {
         }
         return null;
     }
-
     /**
      * 检查文件类型是否合法
      * @param file 文件
@@ -276,6 +273,225 @@ public class MediaStorageServiceImpl implements MediaStorageService {
             uploadChunkSizeByte = FileUtils.readableFileSizeToByteCount(uploadChunkSize);
         return uploadChunkSizeByte;
     }
+    /**
+     * 获取上传文件的MD5值文件名
+     * @param file 上传的文件
+     * @return MD5值文件名
+     */
+    private String getFileMD5Name(MultipartFile file, String fileMd5){
+        String fileType = FileUtils.getFileTypeFormName(file.getOriginalFilename());
+        String fileName = fileMd5;
+        if(!StringUtils.isBlank(fileType))
+            fileName += "." + fileType;
+        return fileName;
+    }
 
+    //
+    // 保存文件方法
+    //
+
+    /**
+     * 保存文件入口
+     * @param file 文件
+     * @param multipart 是否是分片
+     * @param multipartUploadToken 分片上传TOKEN
+     * @param postMedia 媒体
+     * @return 返回操作结果
+     */
+    private Result saveFile(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, PostMedia postMedia, String fileMd5, HttpServletRequest request) {
+        //权限检查
+        Result permissionCheckResult = checkUserPermission(postMedia.getPostId(), request);
+        if(permissionCheckResult != null) return permissionCheckResult;
+        //类型检查
+        Result typeCheckResult = checkUploadFileType(file, postMedia);
+        if(typeCheckResult != null) return typeCheckResult;
+        //检查文件是否为空
+        if (file.isEmpty() || StringUtils.isBlank(file.getOriginalFilename()))
+            return Result.failure(ResultCodeEnum.UPLOAD_ERROR,"FILE_EMPTY");
+
+        //根据媒体类型进行不同的存储
+        if("image".equals(postMedia.getResourceType()))
+            return saveFileImages(file, multipart, blobIndex, multipartUploadToken, postMedia, fileMd5);
+        else if("video".equals(postMedia.getResourceType()))
+            return saveFileVideo(file, multipart, blobIndex, multipartUploadToken, postMedia, fileMd5);
+        else if("file".equals(postMedia.getResourceType()))
+            return saveFileFiles(file, multipart, blobIndex, multipartUploadToken, postMedia, fileMd5);
+        return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "未知媒体类型");
+    }
+    private Result createDir(String dirPath){
+        File saveDirFile = new File(dirPath);
+        if(!saveDirFile.exists()&&!saveDirFile.isDirectory())
+            if(!saveDirFile.mkdirs())
+                return Result.failure(ResultCodeEnum.FORIBBEN.getCode(), "无权限创建文件夹（" + dirPath + "），请确认保存文件路径可访问");
+
+        return null;
+    }
+
+    //保存路径选择
+    private Result saveFileImages(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, PostMedia postMedia, String fileMd5) {
+
+        if(imagesSaveType.equals("local")){
+            String fileName = getFileMD5Name(file, fileMd5);
+            String fileDir = imagesSavePath + "/" + fileName.substring(0, 2) + "/" + postMedia.getPostId() + "/";
+
+            postMedia.setHash(fileMd5);
+            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5);
+        }
+        return Result.failure(ResultCodeEnum.NOT_IMPLEMENTED.getCode(), "不支持的保存方式：" + imagesSaveType);
+    }
+    private Result saveFileVideo(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, PostMedia postMedia, String fileMd5) {
+        if(videosSaveType.equals("local")) {
+            String fileName = file.getOriginalFilename();
+            if(StringUtils.isBlank(fileName)) fileName = file.getName();
+            String fileDir = videosSavePath + "/" + postMedia.getPostId() + "/";
+
+            postMedia.setHash(fileMd5);
+            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5);
+        }
+        return Result.failure(ResultCodeEnum.NOT_IMPLEMENTED.getCode(), "不支持的保存方式：" + videosSaveType);
+    }
+    private Result saveFileFiles(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, PostMedia postMedia, String fileMd5) {
+        if(filesSaveType.equals("local")) {
+            String fileName = file.getOriginalFilename();
+            String fileDir = filesSavePath + "/" + postMedia.getPostId() + "/" + fileMd5 + "/";
+
+            postMedia.setHash(fileMd5);
+            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5);
+        }
+        return Result.failure(ResultCodeEnum.NOT_IMPLEMENTED.getCode(), "不支持的保存方式：" + filesSaveType);
+    }
+
+    private Result saveSingleFileToLocalStorage(MultipartFile file, PostMedia postMedia, String saveDir, String saveFileName, String fileMd5){
+        String filePath = saveDir + saveFileName;
+
+        //Create dir
+        Result createDirResult = createDir(saveDir);
+        if(createDirResult != null) return createDirResult;
+
+        File saveFile = new File(filePath);
+        if(saveFile.exists()) return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
+
+        try {
+            FileUtils.saveToFile(file, filePath);
+            //插入数据库记录
+            postMedia.setHash(fileMd5);
+            postMedia.setUploadFinish(true);
+            postMedia.setUploadDate(new Date());
+            postMedia.setResourcePath(filePath);
+            if (!mediaRepository.existsByPostIdAndHash(postMedia.getPostId(), postMedia.getHash()))
+                postMedia = mediaRepository.saveAndFlush(postMedia);
+            return Result.success(postMedia);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "无权限写入文件 " + filePath + " 错误：" + e.getMessage());
+        }
+    }
+    private Result saveFileToLocalStorage(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, PostMedia postMedia, String saveDir, String saveFileName, String fileMd5) {
+
+        //Single file
+        if(!multipart) return saveSingleFileToLocalStorage(file, postMedia, saveDir, saveFileName, fileMd5);
+        //Multi part file
+        else{
+
+            //Decode token
+            String[] tokenData;
+            try {
+                tokenData = TokenAuthUtils.decodeTokenAndGetData(multipartUploadToken, TokenAuthUtils.TOKEN_DEFAULT_KEY, ":");
+            }catch (BadTokenException e){
+                return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "分片上传 TOKEN 有误");
+            }
+
+            String tokenMd5 = tokenData[0];
+
+            int blobCount = Integer.parseInt(tokenData[1]);
+
+            if(tokenMd5.equals(postMedia.getHash()))
+                return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "分片上传 HASH 有误 (" + postMedia.getHash()+  "/" + tokenMd5 + ")");
+
+            String saveDirTemp = saveDir + "temp/";
+            String filePathTemp = saveDirTemp + "upload-temp-" + fileMd5;
+            String filePathReal = saveDir + saveFileName;
+
+            //Alreday Exists
+            if(new File(filePathReal).exists()) return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
+
+            if(blobIndex == 0) {
+
+                //Create dir
+                Result createDirResult = createDir(saveDirTemp);
+                if(createDirResult != null) return createDirResult;
+
+                File saveFile = new File(filePathTemp);
+                if(saveFile.exists() && saveFile.delete()) return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
+
+                try {
+                    FileUtils.saveToFile(file, filePathTemp);
+                    //插入数据库记录
+                    postMedia.setUploadDate(new Date());
+                    postMedia.setUploadBlob(blobCount);
+                    postMedia.setUploadCurrent(0);
+                    postMedia.setUploadFinish(false);
+                    postMedia.setUploadTempPath(filePathTemp);
+                    postMedia.setResourcePath(filePathReal);
+                    if (!mediaRepository.existsByPostIdAndHash(postMedia.getPostId(), postMedia.getHash()))
+                        postMedia = mediaRepository.saveAndFlush(postMedia);
+                    return Result.success(postMedia);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "无权限写入文件 " + filePathTemp + " 错误：" + e.getMessage());
+                }
+
+            }else{
+
+                File saveFile = new File(filePathTemp);
+                if(!saveFile.exists()) return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "BLOB 丢失");
+
+                PostMedia postMediaOld = mediaRepository.findByPostIdAndHash(postMedia.getPostId(), postMedia.getHash());
+                if(postMediaOld == null) return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "BLOB 顺序错误，无记录");
+
+                if(blobIndex <= postMediaOld.getUploadCurrent())
+                    return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "BLOB 顺序错误，当前顺序 " + postMediaOld.getUploadCurrent());
+
+                try {
+                    FileUtils.saveToFileAppend(file, filePathTemp);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "无权限写入文件 " + filePathTemp + " 错误：" + e.getMessage());
+
+                }
+
+                if(blobIndex == blobCount){
+
+                    //This is the last blob
+                    postMediaOld.setUploadCurrent(0);
+                    postMediaOld.setUploadBlob(0);
+
+                    //Copy file to target path
+                    String targetPath = postMediaOld.getResourcePath();
+                    File targetFile = new File(targetPath);
+                    if(targetFile.exists() && !targetFile.delete()) return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
+
+                    try {
+                        Files.move(Paths.get(filePathTemp), Paths.get(targetPath));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "移动文件失败 " + filePathTemp +  " -> " + targetPath + " 错误：" + e.getMessage());
+                    }
+
+                    postMediaOld.setUploadTempPath("");
+                    postMediaOld.setUploadFinish(true);
+
+                } else {
+
+                    //Normal blob
+                    postMediaOld.setUploadCurrent(blobIndex);
+                }
+                postMedia = mediaRepository.saveAndFlush(postMediaOld);
+                return Result.success(postMedia);
+            }
+        }
+    }
 
 }

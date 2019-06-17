@@ -28,7 +28,7 @@ public class MediaCenterController {
     @PostMapping("/media")
     @ResponseBody
     public Result uploadMedia(
-            @RequestParam(value = "file") MultipartFile file,
+            @RequestParam(value = "file") @RequestBody MultipartFile file,
             @RequestParam(value = "media") @RequestBody PostMedia postMedia) {
         return mediaStorageService.uploadMedia(file, postMedia, request);
     }
@@ -36,17 +36,17 @@ public class MediaCenterController {
     @PostMapping("/media/blob")
     @ResponseBody
     public Result uploadMediaBlob(
-            @RequestParam(value = "file") MultipartFile file,
+            @RequestParam(value = "file") @RequestBody MultipartFile file,
             @RequestParam(value = "media") @RequestBody PostMedia postMedia,
-            @RequestParam(value = "token") String token,
-            @RequestParam(value = "blob") Integer blobIndex) {
-        return mediaStorageService.uploadMediaBlob(file, token, blobIndex, postMedia, request);
+            @RequestParam(value = "blob") @RequestBody Integer blobIndex,
+            @RequestParam(value = "token") @RequestBody String token) {
+        return mediaStorageService.uploadMediaBlob(file, blobIndex, token, postMedia, request);
     }
     //获取最大上传大小
-    @GetMapping("/media/uploadSize")
+    @PostMapping("/media/uploadSize")
     @ResponseBody
-    public Result uploadMaxSize(@RequestParam(value = "size") long fileSize) {
-        return mediaStorageService.uploadMediaGetSize(fileSize);
+    public Result uploadMaxSize(@RequestParam(value = "size") long fileSize, @RequestBody PostMedia postMedia) {
+        return mediaStorageService.uploadMediaGetSize(fileSize, postMedia);
     }
 
     //列举文章媒体库

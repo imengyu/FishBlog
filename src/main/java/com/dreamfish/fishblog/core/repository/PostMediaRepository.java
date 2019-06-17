@@ -20,6 +20,13 @@ public interface PostMediaRepository extends JpaRepository<PostMedia, Integer> {
     boolean existsByPostIdAndHash(Integer postId, String hash);
 
     /**
+     * 检查是否存在 指定资源真实路径的资源
+     * @param resourcePath 资源真实路径
+     * @return 返回是否存在
+     */
+    boolean existsByResourcePath(String resourcePath);
+
+    /**
      * 统计当前表指定hash记录条数
      * @param hash 指定hash
      * @return 返回记录条数

@@ -19,6 +19,8 @@ public class FileUtils {
      * @return
      */
     public static String getFileTypeFormName(String fileName) {
+        if(StringUtils.isBlank(fileName))
+            return "";
         String[] strArray = fileName.split("\\.");
         int suffixIndex = strArray.length - 1;
         return strArray[suffixIndex];
@@ -27,22 +29,43 @@ public class FileUtils {
     /**
      * 上传文件保存
      *
-     * @param file
-     * @param path
-     * @return
-     * @throws IOException
+     * @param file 上传的文件
+     * @param path 目标路径
+     * @return 返回是否成功
+     * @throws IOException IOException
      */
     public static boolean saveToFile(MultipartFile file, String path) throws IOException {
         return Files.copy(file.getInputStream(), Paths.get(path)) > 0;
+    }
+    /**
+     * 上传文件追加
+     *
+     * @param file 上传的文件
+     * @param path 目标路径
+     * @return 返回是否成功
+     * @throws IOException IOException
+     */
+    public static boolean saveToFileAppend(MultipartFile file, String path) throws IOException {
+
+        File orginalFile = new File(path);
+        if(orginalFile.exists()) {
+            InputStream fis = file.getInputStream();
+            FileOutputStream fos = new FileOutputStream(orginalFile, true);
+            byte[] buffer = new byte[1024 * 4];
+            int n = 0;
+            while ((n = fis.read(buffer)) != -1)
+                fos.write(buffer, 0, n);
+            return true;
+        }
+        return false;
     }
 
     /**
      * 写入文本到文件
      *
-     * @param str
-     * @param path
-     * @return
-     * @throws IOException
+     * @param str 文本
+     * @param path 目标路径
+     * @throws IOException IOException
      */
     public static void saveToFile(String str, String path) throws IOException {
 
@@ -55,9 +78,8 @@ public class FileUtils {
 
     /**
      * 计算文件的md5值并且返回
-     *
-     * @param file
-     * @return
+     * @param file 文件
+     * @return 返回文件 MD5
      */
     public static String getMd5ByFile(File file) {
         String value = null;
@@ -83,6 +105,11 @@ public class FileUtils {
         return value;
     }
 
+    /**
+     * 计算上传文件的 md5 值并且返回
+     * @param file 上传的文件
+     * @return 返回文件 MD5
+     */
     public static String getMd5ByFile(MultipartFile file) {
         String value = null;
         try {

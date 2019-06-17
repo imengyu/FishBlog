@@ -3,6 +3,7 @@ package com.dreamfish.fishblog.core.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 文章媒体中心条目
@@ -23,68 +24,88 @@ public class PostMedia implements Serializable {
     private String title;
     private String contentType;
     private String resourceType;
+    private String resourcePath;
     private boolean uploadFinish;
+    private Integer uploadBlob;
+    private Integer uploadCurrent;
+    private String uploadTempPath;
+    private Date uploadDate;
 
+    public Date getUploadDate() {
+        return uploadDate;
+    }
+    public void setUploadDate(Date uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+    public String getUploadTempPath() {
+        return uploadTempPath;
+    }
+    public void setUploadTempPath(String uploadTempPath) {
+        this.uploadTempPath = uploadTempPath;
+    }
+    public Integer getUploadBlob() {
+        return uploadBlob;
+    }
+    public void setUploadBlob(Integer uploadBlob) {
+        this.uploadBlob = uploadBlob;
+    }
+    public Integer getUploadCurrent() {
+        return uploadCurrent;
+    }
+    public void setUploadCurrent(Integer uploadIndex) {
+        this.uploadCurrent = uploadIndex;
+    }
+    public String getResourcePath() {
+        return resourcePath;
+    }
+    public void setResourcePath(String resourcePath) {
+        this.resourcePath = resourcePath;
+    }
     public boolean isUploadFinish() {
         return uploadFinish;
     }
-
     public void setUploadFinish(boolean uploadFinish) {
         this.uploadFinish = uploadFinish;
     }
-
     public String getResourceType() {
         return resourceType;
     }
-
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
     }
-
     public String getContentType() {
         return contentType;
     }
-
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
-
     public Integer getId() {
         return id;
     }
-
     public void setId(Integer id) {
         this.id = id;
     }
-
     public Integer getPostId() {
         return postId;
     }
-
     public void setPostId(Integer postId) {
         this.postId = postId;
     }
-
     public String getHash() {
         return hash;
     }
-
     public void setHash(String hash) {
         this.hash = hash;
     }
-
     public String getType() {
         return type;
     }
-
     public void setType(String type) {
         this.type = type;
     }
-
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }

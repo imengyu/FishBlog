@@ -19,7 +19,7 @@ public class TokenAuthUtils {
     /**
      * 令牌密钥，务必请修改为自己的令牌
      */
-    static final String TOKEN_DEFAULT_KEY = "FishBlogDefaultTokenKey";
+    public static final String TOKEN_DEFAULT_KEY = "FishBlogDefaultTokenKey";
 
     public static final Integer TOKEN_CHECK_UNKNOW = 0;
     public static final Integer TOKEN_CHECK_OK = 1;
