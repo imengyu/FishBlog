@@ -40,12 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         FileNotFoundException exception = (FileNotFoundException) e;
         return new ConstraintViolationErrorResponseEntity(HttpStatus.NOT_FOUND.value(), "未找到指定文件", exception.getMessage());
     }
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ErrorResponseEntity httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request, final Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        e.printStackTrace();
-        return new ErrorResponseEntity(HttpStatus.BAD_REQUEST.value(), "不支持的请求方法");
-    }
+
     //捕获  RuntimeException 异常
     @ExceptionHandler(RuntimeException.class)
     public ErrorResponseEntity runtimeExceptionHandler(HttpServletRequest request, final Exception e, HttpServletResponse response) {

@@ -36,23 +36,31 @@ public class MediaStorageServiceImpl implements MediaStorageService {
 
     //  路径以及保存方法来自配置文件
     @Value("${fishblog.images-save-path}")
-    private String imagesSavePath = "";
+    private String imagesSavePath;
     @Value("${fishblog.images-save-type}")
-    private String imagesSaveType = "";
+    private String imagesSaveType;
+    @Value("${fishblog.images-server-url}")
+    private String imagesServerUrl;
+
     @Value("${fishblog.videos-save-path}")
-    private String videosSavePath = "";
+    private String videosSavePath;
     @Value("${fishblog.videos-save-type}")
-    private String videosSaveType = "";
+    private String videosSaveType;
+    @Value("${fishblog.videos-server-url}")
+    private String videosServerUrl;
+
     @Value("${fishblog.files-save-path}")
-    private String filesSavePath = "";
+    private String filesSavePath;
     @Value("${fishblog.files-save-type}")
-    private String filesSaveType = "";
+    private String filesSaveType;
+    @Value("${fishblog.files-server-url}")
+    private String filesServerUrl;
 
     @Value("${spring.servlet.multipart.max-file-size}")
-    private String maxFileSize = "";
+    private String maxFileSize;
     private long maxFileSizeByte = 0;
     @Value("${fishblog.files-upload-chunk-size}")
-    private String uploadChunkSize = "";
+    private String uploadChunkSize ;
     private long uploadChunkSizeByte = 0;
 
 
@@ -332,10 +340,11 @@ public class MediaStorageServiceImpl implements MediaStorageService {
 
         if(imagesSaveType.equals("local")){
             String fileName = getFileMD5Name(file, fileMd5);
-            String fileDir = imagesSavePath + "/" + fileName.substring(0, 2) + "/" + postMedia.getPostId() + "/";
+            String relativePath = "/" + fileName.substring(0, 2) + "/" + postMedia.getPostId() + "/";
+            String fileDir = imagesSavePath + relativePath;
 
             postMedia.setHash(fileMd5);
-            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5);
+            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5, imagesServerUrl + relativePath + fileName);
         }
         return Result.failure(ResultCodeEnum.NOT_IMPLEMENTED.getCode(), "不支持的保存方式：" + imagesSaveType);
     }
@@ -343,43 +352,58 @@ public class MediaStorageServiceImpl implements MediaStorageService {
         if(videosSaveType.equals("local")) {
             String fileName = file.getOriginalFilename();
             if(StringUtils.isBlank(fileName)) fileName = file.getName();
-            String fileDir = videosSavePath + "/" + postMedia.getPostId() + "/";
+            String relativePath = "/" + postMedia.getPostId() + "/";
+            String fileDir = videosSavePath + relativePath;
 
             postMedia.setHash(fileMd5);
-            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5);
+            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5, videosServerUrl + relativePath + fileName);
         }
         return Result.failure(ResultCodeEnum.NOT_IMPLEMENTED.getCode(), "不支持的保存方式：" + videosSaveType);
     }
     private Result saveFileFiles(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, PostMedia postMedia, String fileMd5) {
         if(filesSaveType.equals("local")) {
             String fileName = file.getOriginalFilename();
-            String fileDir = filesSavePath + "/" + postMedia.getPostId() + "/" + fileMd5 + "/";
+            String relativePath = "/" + postMedia.getPostId() + "/" + fileMd5 + "/";
+            String fileDir = filesSavePath + relativePath;
 
             postMedia.setHash(fileMd5);
-            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5);
+            return saveFileToLocalStorage(file, multipart, blobIndex, multipartUploadToken, postMedia, fileDir, fileName, fileMd5,filesServerUrl + relativePath + fileName);
         }
         return Result.failure(ResultCodeEnum.NOT_IMPLEMENTED.getCode(), "不支持的保存方式：" + filesSaveType);
     }
 
-    private Result saveSingleFileToLocalStorage(MultipartFile file, PostMedia postMedia, String saveDir, String saveFileName, String fileMd5){
+    private Result saveSingleFileToLocalStorage(MultipartFile file, PostMedia postMedia, String saveDir, String saveFileName, String fileMd5, String fileOutLink){
         String filePath = saveDir + saveFileName;
+
+        //记录已存在
+        if (mediaRepository.existsByPostIdAndHash(postMedia.getPostId(), postMedia.getHash())) {
+            PostMedia postMediaOld = mediaRepository.findByPostIdAndHash(postMedia.getPostId(), postMedia.getHash());
+
+            postMedia.setId(postMediaOld.getId());
+            if(postMediaOld.isUploadFinish())
+                return Result.success(postMediaOld);
+        }
 
         //Create dir
         Result createDirResult = createDir(saveDir);
         if(createDirResult != null) return createDirResult;
 
         File saveFile = new File(filePath);
-        if(saveFile.exists()) return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
-
         try {
-            FileUtils.saveToFile(file, filePath);
+
             //插入数据库记录
             postMedia.setHash(fileMd5);
             postMedia.setUploadFinish(true);
             postMedia.setUploadDate(new Date());
-            postMedia.setResourcePath(filePath);
-            if (!mediaRepository.existsByPostIdAndHash(postMedia.getPostId(), postMedia.getHash()))
-                postMedia = mediaRepository.saveAndFlush(postMedia);
+            postMedia.setUploadBlob(1);
+            postMedia.setUploadCurrent(0);
+            postMedia.setUploadPath(filePath);
+            postMedia.setResourcePath(fileOutLink);
+
+            postMedia = mediaRepository.saveAndFlush(postMedia);
+
+            if(!saveFile.exists()) FileUtils.saveToFile(file, filePath);
+
             return Result.success(postMedia);
 
         } catch (IOException e) {
@@ -387,10 +411,10 @@ public class MediaStorageServiceImpl implements MediaStorageService {
             return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "无权限写入文件 " + filePath + " 错误：" + e.getMessage());
         }
     }
-    private Result saveFileToLocalStorage(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, PostMedia postMedia, String saveDir, String saveFileName, String fileMd5) {
+    private Result saveFileToLocalStorage(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, PostMedia postMedia, String saveDir, String saveFileName, String fileMd5, String fileOutLink) {
 
         //Single file
-        if(!multipart) return saveSingleFileToLocalStorage(file, postMedia, saveDir, saveFileName, fileMd5);
+        if(!multipart) return saveSingleFileToLocalStorage(file, postMedia, saveDir, saveFileName, fileMd5, fileOutLink);
         //Multi part file
         else{
 
@@ -402,6 +426,7 @@ public class MediaStorageServiceImpl implements MediaStorageService {
                 return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "分片上传 TOKEN 有误");
             }
 
+            PostMedia postMediaOld = null;
             String tokenMd5 = tokenData[0];
 
             int blobCount = Integer.parseInt(tokenData[1]);
@@ -409,12 +434,22 @@ public class MediaStorageServiceImpl implements MediaStorageService {
             if(tokenMd5.equals(postMedia.getHash()))
                 return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(), "分片上传 HASH 有误 (" + postMedia.getHash()+  "/" + tokenMd5 + ")");
 
+            //已存在记录
+            if (mediaRepository.existsByPostIdAndHash(postMedia.getPostId(), postMedia.getHash())) {
+                postMediaOld = mediaRepository.findByPostIdAndHash(postMedia.getPostId(), postMedia.getHash());
+                postMedia.setId(postMediaOld.getId());
+            }
+
             String saveDirTemp = saveDir + "temp/";
             String filePathTemp = saveDirTemp + "upload-temp-" + fileMd5;
             String filePathReal = saveDir + saveFileName;
 
-            //Alreday Exists
-            if(new File(filePathReal).exists()) return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
+            //already Exists
+            if(new File(filePathReal).exists()) {
+                if(postMediaOld != null && postMediaOld.isUploadFinish())
+                    return Result.success(postMediaOld);
+                return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
+            }
 
             if(blobIndex == 0) {
 
@@ -433,7 +468,9 @@ public class MediaStorageServiceImpl implements MediaStorageService {
                     postMedia.setUploadCurrent(0);
                     postMedia.setUploadFinish(false);
                     postMedia.setUploadTempPath(filePathTemp);
-                    postMedia.setResourcePath(filePathReal);
+                    postMedia.setUploadPath(filePathReal);
+                    postMedia.setResourcePath(fileOutLink);
+
                     if (!mediaRepository.existsByPostIdAndHash(postMedia.getPostId(), postMedia.getHash()))
                         postMedia = mediaRepository.saveAndFlush(postMedia);
                     return Result.success(postMedia);
@@ -447,10 +484,7 @@ public class MediaStorageServiceImpl implements MediaStorageService {
 
                 File saveFile = new File(filePathTemp);
                 if(!saveFile.exists()) return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "BLOB 丢失");
-
-                PostMedia postMediaOld = mediaRepository.findByPostIdAndHash(postMedia.getPostId(), postMedia.getHash());
                 if(postMediaOld == null) return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "BLOB 顺序错误，无记录");
-
                 if(blobIndex <= postMediaOld.getUploadCurrent())
                     return Result.failure(ResultCodeEnum.UPLOAD_ERROR.getCode(), "BLOB 顺序错误，当前顺序 " + postMediaOld.getUploadCurrent());
 
@@ -465,8 +499,7 @@ public class MediaStorageServiceImpl implements MediaStorageService {
                 if(blobIndex == blobCount){
 
                     //This is the last blob
-                    postMediaOld.setUploadCurrent(0);
-                    postMediaOld.setUploadBlob(0);
+                    postMediaOld.setUploadCurrent(blobCount);
 
                     //Copy file to target path
                     String targetPath = postMediaOld.getResourcePath();

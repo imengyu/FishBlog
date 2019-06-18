@@ -4,7 +4,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

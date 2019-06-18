@@ -1,5 +1,7 @@
 package com.dreamfish.fishblog.core.web;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.dreamfish.fishblog.core.config.ConstConfig;
 import com.dreamfish.fishblog.core.entity.PostMedia;
 import com.dreamfish.fishblog.core.service.MediaStorageService;
@@ -29,7 +31,8 @@ public class MediaCenterController {
     @ResponseBody
     public Result uploadMedia(
             @RequestParam(value = "file") @RequestBody MultipartFile file,
-            @RequestParam(value = "media") @RequestBody PostMedia postMedia) {
+            @RequestParam(value = "media") @RequestBody String postMediaJson) {
+        PostMedia postMedia = JSONObject.toJavaObject(JSONObject.parseObject(postMediaJson), PostMedia.class);
         return mediaStorageService.uploadMedia(file, postMedia, request);
     }
     //上传媒体（分片函数）
@@ -37,15 +40,16 @@ public class MediaCenterController {
     @ResponseBody
     public Result uploadMediaBlob(
             @RequestParam(value = "file") @RequestBody MultipartFile file,
-            @RequestParam(value = "media") @RequestBody PostMedia postMedia,
+            @RequestParam(value = "media") @RequestBody String postMediaJson,
             @RequestParam(value = "blob") @RequestBody Integer blobIndex,
             @RequestParam(value = "token") @RequestBody String token) {
+        PostMedia postMedia = JSONObject.toJavaObject(JSONObject.parseObject(postMediaJson), PostMedia.class);
         return mediaStorageService.uploadMediaBlob(file, blobIndex, token, postMedia, request);
     }
     //获取最大上传大小
     @PostMapping("/media/uploadSize")
     @ResponseBody
-    public Result uploadMaxSize(@RequestParam(value = "size") long fileSize, @RequestBody PostMedia postMedia) {
+    public Result uploadMaxSize(@RequestParam(value = "size") Long fileSize, @RequestBody PostMedia postMedia) {
         return mediaStorageService.uploadMediaGetSize(fileSize, postMedia);
     }
 

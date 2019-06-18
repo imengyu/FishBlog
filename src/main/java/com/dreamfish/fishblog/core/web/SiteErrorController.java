@@ -26,19 +26,6 @@ class SiteErrorController implements ErrorController {
             return new ErrorResponseEntity(statusCode, "服务暂时不可用，请稍后再试");
         else return new ErrorResponseEntity(statusCode, "服务暂时出现未知错误，请稍后再试");
     }
-    @RequestMapping(value = "/error", produces = "text/html")
-    public String handleErrorHtml(HttpServletRequest request) {
-        //获取statusCode:401,404,500
-        Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-        if (statusCode == 404) {
-            return "blog-404";
-        } else if (statusCode == 403) {
-            return "blog-403";
-        } else if (statusCode >= 500) {
-            return "blog-5xx";
-        }
-        return "";
-    }
 
     @Override
     public String getErrorPath() {

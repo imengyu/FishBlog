@@ -1,6 +1,8 @@
 package com.dreamfish.fishblog.core.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -28,9 +30,18 @@ public class PostMedia implements Serializable {
     private boolean uploadFinish;
     private Integer uploadBlob;
     private Integer uploadCurrent;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String uploadTempPath;
     private Date uploadDate;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String uploadPath;
 
+    public String getUploadPath() {
+        return uploadPath;
+    }
+    public void setUploadPath(String uploadPath) {
+        this.uploadPath = uploadPath;
+    }
     public Date getUploadDate() {
         return uploadDate;
     }
