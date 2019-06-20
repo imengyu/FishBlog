@@ -55,6 +55,8 @@ public class FileUtils {
             int n = 0;
             while ((n = fis.read(buffer)) != -1)
                 fos.write(buffer, 0, n);
+            fos.close();
+            fis.close();
             return true;
         }
         return false;

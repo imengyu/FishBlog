@@ -27,6 +27,8 @@ public class PostMedia implements Serializable {
     private String contentType;
     private String resourceType;
     private String resourcePath;
+    private String resourcePreviewImage;
+
     private boolean uploadFinish;
     private Integer uploadBlob;
     private Integer uploadCurrent;
@@ -36,6 +38,12 @@ public class PostMedia implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String uploadPath;
 
+    public String getResourcePreviewImage() {
+        return resourcePreviewImage;
+    }
+    public void setResourcePreviewImage(String resourcePreviewImage) {
+        this.resourcePreviewImage = resourcePreviewImage;
+    }
     public String getUploadPath() {
         return uploadPath;
     }

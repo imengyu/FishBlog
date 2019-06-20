@@ -3,6 +3,7 @@ package com.dreamfish.fishblog.core.repository;
 import com.dreamfish.fishblog.core.entity.PostMedia;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,7 @@ public interface PostMediaRepository extends JpaRepository<PostMedia, Integer> {
      * @return 返回分页数据
      */
     Page<PostMedia> findByResourceType(String resourceType, Pageable pageable);
+
 
     /**
      * 查找指定文章的资源

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface MediaStorageService {
 
     Result uploadMedia(MultipartFile file, PostMedia postMedia, HttpServletRequest request);
-    Result uploadMediaBlob(MultipartFile file, Integer blobIndex, String multiUploadToken, PostMedia postMedia, HttpServletRequest request);
+    Result uploadMediaBlob(MultipartFile file, Integer blobIndex, String multiUploadToken, String filename, PostMedia postMedia, HttpServletRequest request);
     Result uploadMediaGetSize(long fileSize, PostMedia postMedia);
     Result listMedia(Integer postId, Integer pageIndex, Integer pageSize, String resType, HttpServletRequest request);
     Result deleteMedia(Integer mediaId, HttpServletRequest request);

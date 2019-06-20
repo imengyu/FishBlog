@@ -41,10 +41,11 @@ public class MediaCenterController {
     public Result uploadMediaBlob(
             @RequestParam(value = "file") @RequestBody MultipartFile file,
             @RequestParam(value = "media") @RequestBody String postMediaJson,
-            @RequestParam(value = "blob") @RequestBody Integer blobIndex,
-            @RequestParam(value = "token") @RequestBody String token) {
+            @RequestParam(value = "blob") Integer blobIndex,
+            @RequestParam(value = "filename") String filename,
+            @RequestParam(value = "token") String token) {
         PostMedia postMedia = JSONObject.toJavaObject(JSONObject.parseObject(postMediaJson), PostMedia.class);
-        return mediaStorageService.uploadMediaBlob(file, blobIndex, token, postMedia, request);
+        return mediaStorageService.uploadMediaBlob(file, blobIndex, token, filename, postMedia, request);
     }
     //获取最大上传大小
     @PostMapping("/media/uploadSize")
@@ -54,7 +55,7 @@ public class MediaCenterController {
     }
 
     //列举文章媒体库
-    @GetMapping("/media/post/{postId}/{pageIndex}/{pageSize}")
+    @GetMapping("/post/{postId}/media/{pageIndex}/{pageSize}")
     @ResponseBody
     public Result getMediaForPost(
             @PathVariable("postId") Integer postId,
