@@ -7,7 +7,7 @@ import com.dreamfish.fishblog.core.config.ConstConfig;
 import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.entity.UserExtened;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
-import com.dreamfish.fishblog.core.service.ImageStorageService;
+import com.dreamfish.fishblog.core.service.MediaStorageService;
 import com.dreamfish.fishblog.core.service.UserService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
@@ -16,7 +16,6 @@ import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +31,8 @@ public class UserController {
 
     @Autowired
     private UserService userService = null;
+    @Autowired
+    private MediaStorageService mediaStorageService = null;
 
     //获取单个用户信息
     @GetMapping("/user/{userId}")
@@ -148,6 +149,16 @@ public class UserController {
     @RequestPrivilegeAuth(value = UserPrivileges.PRIVILEGE_MANAGE_USERS)
     public Result setUserLevel(@PathVariable("userId") Integer userId,  @RequestBody JSONObject data) {
         return userService.userUpdateLevel(userId,  data.getInteger("level"));
+    }
+
+    //上传用户头像
+    @PostMapping("/user/{userId}/head")
+    @ResponseBody
+    @RequestAuth(User.LEVEL_WRITER)
+    public Result uploadUserHeadImage(
+            @RequestParam(value = "file") @NotNull MultipartFile imageFile,
+            @PathVariable("userId") Integer userId) throws IOException {
+        return mediaStorageService.uploadImageForUserHead(imageFile, userId);
     }
 
 }

@@ -5,6 +5,7 @@ import com.dreamfish.fishblog.core.utils.Result;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 public interface MediaStorageService {
 
@@ -15,4 +16,5 @@ public interface MediaStorageService {
     Result deleteMedia(Integer mediaId, HttpServletRequest request);
     Result getMedia(Integer mediaId, HttpServletRequest request);
     Result updateMedia(Integer mediaId, PostMedia postMedia, HttpServletRequest request);
+    Result uploadImageForUserHead(MultipartFile file, Integer userId) throws IOException;
 }

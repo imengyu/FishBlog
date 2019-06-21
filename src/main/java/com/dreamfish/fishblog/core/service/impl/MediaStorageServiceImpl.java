@@ -5,6 +5,7 @@ import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.exception.BadTokenException;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
+import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.repository.PostMediaRepository;
 import com.dreamfish.fishblog.core.service.MediaStorageService;
 import com.dreamfish.fishblog.core.utils.Result;
@@ -13,6 +14,8 @@ import com.dreamfish.fishblog.core.utils.StringUtils;
 import com.dreamfish.fishblog.core.utils.auth.PublicAuth;
 import com.dreamfish.fishblog.core.utils.auth.TokenAuthUtils;
 import com.dreamfish.fishblog.core.utils.file.FileUtils;
+import com.dreamfish.fishblog.core.utils.log.ActionLog;
+import com.dreamfish.fishblog.core.utils.request.ContextHolderUtils;
 import com.dreamfish.fishblog.core.utils.response.AuthCode;
 
 import com.dreamfish.fishblog.core.utils.video.VideoUtils;
@@ -176,8 +179,11 @@ public class MediaStorageServiceImpl implements MediaStorageService {
         File sourceFile = new File(media.getUploadPath());
         if(sourceFile.exists()) sourceFile.delete();
 
-        File previewImageFile = new File(media.getResourcePreviewImage());
-        if(previewImageFile.exists()) previewImageFile.delete();
+        String previewImage = media.getResourcePreviewImage();
+        if(!StringUtils.isBlank(previewImage)) {
+            File previewImageFile = new File(previewImage);
+            if (previewImageFile.exists()) previewImageFile.delete();
+        }
 
         mediaRepository.deleteById(media.getId());
         return Result.success();
@@ -310,6 +316,50 @@ public class MediaStorageServiceImpl implements MediaStorageService {
         if(!StringUtils.isBlank(fileType))
             fileName += "." + fileType;
         return fileName;
+    }
+
+    @Autowired
+    private UserMapper userMapper = null;
+
+    /**
+     * 上传用户头像
+     * @param file 文件
+     * @param userId 用户 ID
+     * @return 返回操作结果
+     * @throws IOException 文件不存在保存异常
+     */
+    @Override
+    public Result uploadImageForUserHead(MultipartFile file, Integer userId) throws IOException {
+
+        //验证用户权限
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        Integer currentUserId = PublicAuth.authGetUseId(request);
+        if(currentUserId.intValue() != userId)
+            return Result.failure(ResultCodeEnum.FORIBBEN,"无权限修改用户头像");
+
+        //检查文件是否为空
+        if (file == null || file.isEmpty() || StringUtils.isBlank(file.getOriginalFilename()))
+            return Result.failure(ResultCodeEnum.UPLOAD_ERROR,"IMG_EMPTY");
+        //检查文件类型
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.contains("image/jpeg") && !contentType.contains("image/jpg"))
+            return Result.failure(ResultCodeEnum.UPLOAD_ERROR,"IMG_FORMAT_ERROR");
+
+        //保存文件
+        String md5 = FileUtils.getMd5ByFile(file);
+        String fileType = FileUtils.getFileTypeFormName(file.getOriginalFilename());
+        String fileRelativePath = "/user/" + md5 + "." + fileType;
+        String filePath = imagesSavePath + fileRelativePath;
+        if(!new File(filePath).exists())
+            FileUtils.saveToFile(file, filePath);
+
+
+        ActionLog.logUserAction("更新用户头像资源 : " + userId + " : " + md5, ContextHolderUtils.getRequest());
+
+
+        //设置用户头像字段
+        userMapper.updateUserHead(userId, imagesServerUrl + fileRelativePath);
+        return Result.success(md5);
     }
 
     //
