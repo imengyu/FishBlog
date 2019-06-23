@@ -1,5 +1,6 @@
 package com.dreamfish.fishblog.core.web;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dreamfish.fishblog.core.annotation.RequestAuth;
 import com.dreamfish.fishblog.core.annotation.RequestPrivilegeAuth;
 import com.dreamfish.fishblog.core.config.ConstConfig;
@@ -7,6 +8,7 @@ import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.service.SettingsService;
 import com.dreamfish.fishblog.core.utils.Result;
+import com.dreamfish.fishblog.core.utils.json.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,40 +26,39 @@ public class SettingsController {
     private SettingsService settingsService = null;
 
     @Cacheable("blog-settings-cache")
+    @RequestMapping(value = "/settings.json", produces = "application/json", method = RequestMethod.GET)
     @ResponseBody
-    @GetMapping("/settings.js")
-    public String getSettingsJs() { return settingsService.getSettingsJs(); }
+    public String getSettingsJson() { return JSONObject.parseObject(settingsService.getSettingsJSON()).toJSONString(); }
+
+    @CacheEvict(value = "blog-settings-cache", allEntries = true)
+    @PutMapping("/settings.json")
+    @RequestAuth(User.LEVEL_WRITER)
+    @RequestPrivilegeAuth(UserPrivileges.PRIVILEGE_GLOBAL_SETTINGS)
+    @ResponseBody
+    public Result setSettingsJson(@RequestBody JSONObject settings) {
+        return Result.success(settingsService.setSettingsJSON(settings));
+    }
 
     @GetMapping("/version")
     @ResponseBody
     public Result version() {
-        return Result.success("1.1.3.0330" );
+        return Result.success("1.5.3.0630" );
     }
 
     @ResponseBody
     @CacheEvict(value = "blog-settings-cache", allEntries = true)
-    @PostMapping("/settings/{key}")
+    @PostMapping("/settings")
     @RequestAuth(User.LEVEL_WRITER)
     @RequestPrivilegeAuth(UserPrivileges.PRIVILEGE_GLOBAL_SETTINGS)
-    public Result setSetting(@PathVariable("key") String key, @RequestBody @RequestParam("value") String value){
-        return settingsService.setSetting(key, value);
-    }
-
-    @ResponseBody
-    @GetMapping("/settings/{key}")
-    @RequestAuth(User.LEVEL_WRITER)
-    @RequestPrivilegeAuth(UserPrivileges.PRIVILEGE_GLOBAL_SETTINGS)
-    public Result getSetting(@RequestParam("key") String key){
-        return settingsService.getSetting(key);
+    public Result setSetting(@RequestBody JSONObject value){
+        return settingsService.setSetting(value.getString("key"), JsonUtils.JsonValueToString(value, "value"));
     }
 
     @ResponseBody
     @GetMapping("/settings")
     @RequestAuth(User.LEVEL_WRITER)
     @RequestPrivilegeAuth(UserPrivileges.PRIVILEGE_GLOBAL_SETTINGS)
-    public Result getSettings(){
-        return settingsService.getSettings();
+    public Result getSetting(@RequestParam("key") String key){
+        return settingsService.getSetting(key);
     }
-
-
-}
+    }

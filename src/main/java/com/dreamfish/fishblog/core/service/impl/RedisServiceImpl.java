@@ -3,6 +3,7 @@ package com.dreamfish.fishblog.core.service.impl;
 import com.alibaba.fastjson.JSON;
 
 import com.dreamfish.fishblog.core.service.RedisService;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisServiceImpl implements RedisService {
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate = null;
 
     @Override
     public <T> void set(String key, T value) {
@@ -42,7 +43,13 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public boolean expire(String key, long expire) {
-        return redisTemplate.expire(key, expire, TimeUnit.SECONDS);
+        Boolean b = redisTemplate.expire(key, expire, TimeUnit.SECONDS);
+        return b!=null && b;
+    }
+    @Override
+    public boolean expire(String key, long expire, TimeUnit timeUnit) {
+        Boolean b = redisTemplate.expire(key, expire, timeUnit);
+        return b!=null && b;
     }
 
     @Override
@@ -86,7 +93,8 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public boolean hasKey(String key) {
-        return redisTemplate.hasKey(key);
+        Boolean b = redisTemplate.hasKey(key);
+        return b!=null && b;
     }
 
     @Override
@@ -97,5 +105,10 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Set<String> keySet(String keyPrefix) {
         return redisTemplate.keys(keyPrefix + "*");
+    }
+
+    @Override
+    public boolean persist(String key){
+        return redisTemplate.persist(key);
     }
 }

@@ -37,6 +37,7 @@ public class UserExtened implements Serializable {
     private Integer bindUser;
     private Integer messageCount;
     private Boolean actived;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String activeToken;
 
     public String getHeadimg() { return headimg; }

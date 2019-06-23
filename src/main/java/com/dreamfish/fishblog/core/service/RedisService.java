@@ -20,6 +20,8 @@ public interface RedisService {
 
     boolean expire(String key, long expire);
 
+    boolean expire(String key, long expire, TimeUnit timeUnit);
+
     void del(String key);
 
     void delBatch(Set<String> keys);
@@ -37,4 +39,6 @@ public interface RedisService {
     long getExpire(String key);
 
     Set<String> keySet(String keyPrefix);
+
+    boolean persist(String key);
 }

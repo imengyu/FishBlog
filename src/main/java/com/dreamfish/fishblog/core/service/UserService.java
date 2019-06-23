@@ -19,6 +19,7 @@ public interface UserService {
     UserExtened addUserInternal(UserExtened user);
     UserExtened updateUserInternal(UserExtened user);
     void updateUserId(Integer oldId, Integer newId);
+    boolean isUserExistsByEmail(String email);
     boolean activeUser(String token);
     boolean sendRepasswordMessage(String emailOrPhone);
     String getUserNameAutoById(Integer id);

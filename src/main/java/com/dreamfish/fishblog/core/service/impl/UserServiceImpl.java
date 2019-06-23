@@ -21,6 +21,7 @@ import com.dreamfish.fishblog.core.utils.response.AuthCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -176,8 +177,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result addUserSignUp(UserExtened user) {
 
-        if(!Boolean.parseBoolean(settingsService.getSettingString("enableRegister")))
-            return Result.failure(ResultCodeEnum.BAD_REQUEST.getCode(),"管理员设置禁止注册");
+        if(!Boolean.parseBoolean(settingsService.getSettingCache("AllowRegister")))
+            return Result.failure(ResultCodeEnum.FAILED_NOT_ALLOW.getCode(),"管理员设置禁止注册");
 
         String email = user.getEmail();
         String password = user.getPasswd();
@@ -325,6 +326,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserId(Integer oldId, Integer newId) { userMapper.updateUserId(oldId, newId); }
 
+    @Override
+    public boolean isUserExistsByEmail(String email) {
+        return userRepository.existsByName(email);
+    }
+
     /**
      * 激活用户
      * @param token 邮箱链接里的TOKEN
@@ -405,6 +411,9 @@ public class UserServiceImpl implements UserService {
     //================================================
     //
 
+    @Value("${fishblog.fish-front-address}")
+    private String baseSiteAddress = "";
+
     /**
      * 发送找回密码邮件
      * @param email 邮箱
@@ -422,7 +431,7 @@ public class UserServiceImpl implements UserService {
         userMapper.updateUserActiveToken(oldUser.getId(), tkn);
 
         String token = TokenAuthUtils.genToken(0, oldUser.getId() + "&" + tkn, "", USER_ACTIVE_TOKEN_KEY);
-        String link = request.getScheme() +"://" + request.getServerName() + "/user/center/rec-passwd2/?token=" + token + "/";
+        String link = baseSiteAddress + "/user/center/rec-password/?token=" + token + "/";
         try {
             mailService.sendHtmlMail(email, "恢复在 ALONE SPACE 上的账号密码", "<html><head></head><body><h3>您好，" + email + "</h3>请点击以下链接恢复您的账号密码：<br/><a href=\"" + link + "\">恢复账号密码</a></body></html> ");
             return true;
@@ -443,7 +452,7 @@ public class UserServiceImpl implements UserService {
         HttpServletRequest request = ContextHolderUtils.getRequest();
 
         String token = TokenAuthUtils.genToken(0, mail + "&" + tkn, "", USER_ACTIVE_TOKEN_KEY);
-        String link = request.getScheme() +"://" + request.getServerName() + "/user/center/active/?token=" + token;
+        String link = baseSiteAddress + "/user/center/active/?token=" + token;
         try {
             mailService.sendHtmlMail(mail, "激活在 ALONE SPACE 上注册的账号", "<html><head></head><body><h3>您好，" + mail + "</h3>您已成功在 ALONE SPACE 上注册成为会员，只差最后一步了！请点击以下链接激活您的账号：<br/><a href=\"" + link + "\">激活账号</a></body></html> ");
             return true;

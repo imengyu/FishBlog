@@ -161,4 +161,20 @@ public class UserController {
         return mediaStorageService.uploadImageForUserHead(imageFile, userId);
     }
 
+    @GetMapping("/user/exists")
+    @ResponseBody
+    public Result getUserExistsByEmail(@RequestParam("k") String email){ return Result.success(userService.isUserExistsByEmail(email)); }
+
+    @PostMapping("/user/recoverPassword")
+    @ResponseBody
+    public Result sendUserRecoverPassword(@RequestBody JSONObject data){
+        userService.sendRepasswordMessage(data.getString("k"));
+        return Result.success();
+    }
+
+    @PostMapping("/user/active")
+    @ResponseBody
+    public Result activeUser(@RequestBody JSONObject data){
+        return Result.success(userService.activeUser(data.getString("k")));
+    }
 }

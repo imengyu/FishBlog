@@ -6,10 +6,12 @@ import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.exception.NoPrivilegeException;
 import com.dreamfish.fishblog.core.mapper.PostCommentMapper;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
+import com.dreamfish.fishblog.core.mapper.SettingsMapper;
 import com.dreamfish.fishblog.core.repository.PostCommentRepository;
 import com.dreamfish.fishblog.core.repository.PostRepository;
 import com.dreamfish.fishblog.core.service.MessagesService;
 import com.dreamfish.fishblog.core.service.PostCommentService;
+import com.dreamfish.fishblog.core.service.SettingsService;
 import com.dreamfish.fishblog.core.utils.Result;
 import com.dreamfish.fishblog.core.utils.ResultCodeEnum;
 import com.dreamfish.fishblog.core.utils.log.ActionLog;
@@ -42,6 +44,8 @@ public class PostCommentServiceImpl implements PostCommentService {
     private PostMapper postMapper = null;
     @Autowired
     private MessagesService messagesService = null;
+    @Autowired
+    private SettingsService settingsService = null;
 
     @Override
     @Cacheable(value = "blog-single-reader-cache", key = "'comment-single-'+#commentId")
@@ -59,7 +63,7 @@ public class PostCommentServiceImpl implements PostCommentService {
     @Cacheable(value = "blog-comment-pages-cache", key = "'comment-in-post-page-'+#p0+'-'+#p1+'-'+#p2")
     public Result getCommentsForPostWithPager(Integer postId, Integer page, Integer pageSize) {
         if(!postRepository.existsById(postId)) return Result.failure(ResultCodeEnum.NOT_FOUNT);
-        Pageable pageable = new PageRequest(page, pageSize, new Sort(Sort.Direction.DESC, "postDate"));
+        Pageable pageable = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "postDate"));
         return Result.success(postCommentRepository.findByPostId(postId, pageable));
     }
 
@@ -77,6 +81,11 @@ public class PostCommentServiceImpl implements PostCommentService {
         if(!postRepository.existsById(postId)) return Result.failure(ResultCodeEnum.NOT_FOUNT);
         if(postComment.getId()!=null && postCommentRepository.existsById(postComment.getId()))
             return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
+
+        if(PublicAuth.authGetUseId(request) < AuthCode.SUCCESS){
+            if(!Boolean.parseBoolean(settingsService.getSettingCache("AllowRegister")))
+                return Result.failure(ResultCodeEnum.FAILED_NOT_ALLOW.getCode(),"不允许匿名用户评论");
+        }
 
         Integer authUserId = PublicAuth.authGetUseId(request);
         if(authUserId > AuthCode.UNKNOW)
