@@ -359,7 +359,7 @@ public class MediaStorageServiceImpl implements MediaStorageService {
 
         //设置用户头像字段
         userMapper.updateUserHead(userId, imagesServerUrl + fileRelativePath);
-        return Result.success(md5);
+        return Result.success(imagesServerUrl + fileRelativePath);
     }
 
     //
