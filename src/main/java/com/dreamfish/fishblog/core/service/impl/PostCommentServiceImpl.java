@@ -7,6 +7,7 @@ import com.dreamfish.fishblog.core.exception.NoPrivilegeException;
 import com.dreamfish.fishblog.core.mapper.PostCommentMapper;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
 import com.dreamfish.fishblog.core.mapper.SettingsMapper;
+import com.dreamfish.fishblog.core.mapper.UserMapper;
 import com.dreamfish.fishblog.core.repository.PostCommentRepository;
 import com.dreamfish.fishblog.core.repository.PostRepository;
 import com.dreamfish.fishblog.core.service.MessagesService;
@@ -42,6 +43,8 @@ public class PostCommentServiceImpl implements PostCommentService {
     private PostCommentMapper postCommentMapper = null;
     @Autowired
     private PostMapper postMapper = null;
+    @Autowired
+    private UserMapper userMapper = null;
     @Autowired
     private MessagesService messagesService = null;
     @Autowired
@@ -82,14 +85,14 @@ public class PostCommentServiceImpl implements PostCommentService {
         if(postComment.getId()!=null && postCommentRepository.existsById(postComment.getId()))
             return Result.failure(ResultCodeEnum.FAILED_RES_ALREADY_EXIST);
 
-        if(PublicAuth.authGetUseId(request) < AuthCode.SUCCESS){
-            if(!Boolean.parseBoolean(settingsService.getSettingCache("AllowRegister")))
+        Integer authUserId = PublicAuth.authGetUseId(request);
+        if(authUserId > AuthCode.UNKNOW) {
+            postComment.setAuthorId(authUserId);
+            postComment.setAuthorName(userMapper.getUserFriendlyNameById(authUserId));
+        }else{
+            if(!Boolean.parseBoolean(settingsService.getSettingCache("AnonymousComment")))
                 return Result.failure(ResultCodeEnum.FAILED_NOT_ALLOW.getCode(),"不允许匿名用户评论");
         }
-
-        Integer authUserId = PublicAuth.authGetUseId(request);
-        if(authUserId > AuthCode.UNKNOW)
-            postComment.setAuthorId(authUserId);
 
         postComment.setId(0);
         postComment.setAuthorIp(IpUtil.getIpAddr(request));

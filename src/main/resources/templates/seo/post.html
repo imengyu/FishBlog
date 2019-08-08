@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title th:text="${post.title} + ' - 梦欤的博客'">梦欤的博客</title>
+  <link rel="shortcut icon" href="/favicon.ico"> 
+  <meta th:if="${post.keywords}!=null" name="keywords" th:attr="content=${post.keywords} + ',梦欤的文章,梦欤的博客,梦欤的小站,梦欤'">
+  <meta th:if="${post.keywords}==null" name="keywords" content="梦欤的文章,梦欤的博客,梦欤的小站">
+  <meta name="description" th:attr="content=${post.previewText} + '梦欤的随手记录册。记录IT知识，一起学习成长！'">
+
+</head>
+
+<body>
+  <h2 th:text="${post.title}"></h2>
+  <div th:utext="${post_content}"></div>
+</body>
+
+</html>

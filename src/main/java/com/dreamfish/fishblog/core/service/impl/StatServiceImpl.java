@@ -17,6 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -33,6 +35,12 @@ public class StatServiceImpl implements StatService {
     private StatDayLogRepository statDayLogRepository = null;
     @Autowired
     private PostMapper postMapper = null;
+
+    @Override
+    public void setStartUpDate() {
+        SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        statMapper.updateStat("startupDate", sdf.format(new Date()));
+    }
 
     /**
      * 总计数更新入口
@@ -65,6 +73,29 @@ public class StatServiceImpl implements StatService {
         else statMapper.addStatPage(url);//没有此页则添加记录
 
         return Result.success();
+    }
+
+    @Override
+    public Result getStatRunDay() {
+
+        Integer runDay = 0;
+        Date startupDate = new Date();
+        Date nowDate = new Date();
+
+        String startupDateString = statMapper.getStat("startupDate").getData();
+        SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            startupDate = sdf.parse(startupDateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        runDay = (int) ((nowDate.getTime() - startupDate.getTime()) / (24 * 60 * 60 * 1000));
+
+        Map<String, Object> resultData = new HashMap<>();
+        resultData.put("runDay", runDay);
+        resultData.put("startupDate", startupDate);
+        return Result.success(resultData);
     }
 
     /**

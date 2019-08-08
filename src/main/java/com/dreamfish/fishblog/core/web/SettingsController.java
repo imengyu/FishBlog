@@ -39,12 +39,6 @@ public class SettingsController {
         return Result.success(settingsService.setSettingsJSON(settings));
     }
 
-    @GetMapping("/version")
-    @ResponseBody
-    public Result version() {
-        return Result.success("1.5.3.0630" );
-    }
-
     @ResponseBody
     @CacheEvict(value = "blog-settings-cache", allEntries = true)
     @PostMapping("/settings")

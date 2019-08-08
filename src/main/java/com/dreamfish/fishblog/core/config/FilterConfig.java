@@ -33,7 +33,7 @@ public class FilterConfig {
     class FixHeaderFilter extends OncePerRequestFilter {
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-            response.setHeader("X-Powered-By","FishBlog/1.1.3");
+            response.setHeader("X-Powered-By","FishBlog/" + ConstConfig.API_VERSION);
             response.setHeader("Access-Control-Max-Age", "3600");
             response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
             //跨域设置

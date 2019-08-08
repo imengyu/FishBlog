@@ -1,7 +1,7 @@
 package com.dreamfish.fishblog.core.task;
 
-import com.dreamfish.fishblog.core.mapper.SettingsMapper;
 import com.dreamfish.fishblog.core.mapper.StatMapper;
+import com.dreamfish.fishblog.core.service.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -21,7 +21,7 @@ public class StatCollectScheduleTask {
     private StatMapper statMapper = null;
 
     @Autowired
-    private SettingsMapper settingsMapper = null;
+    private SettingsService settingsService = null;
 
     /**
      * 每天 23:55:00 刷新PV/IP数据，以及其他数据
@@ -29,7 +29,7 @@ public class StatCollectScheduleTask {
     @Scheduled(cron = "0 55 23 * * ?")
     private void updateStatData() {
 
-        boolean collectStat = Boolean.parseBoolean(settingsMapper.getSetting("sendStats"));
+        boolean collectStat = Boolean.parseBoolean(settingsService.getSettingCache("CollectVisitorStat"));
 
         if(collectStat) {
 
@@ -53,7 +53,7 @@ public class StatCollectScheduleTask {
 
             // 删除 时间比较长的数据
 
-            Integer maxSaveStatDays = Integer.parseInt(settingsMapper.getSetting("maxStatSaveDays"));
+            Integer maxSaveStatDays = Integer.parseInt(settingsService.getSettingCache("MaxStatSaveDays"));
 
             statMapper.deleteDayLog(maxSaveStatDays);
             statMapper.deleteStatPage(maxSaveStatDays);

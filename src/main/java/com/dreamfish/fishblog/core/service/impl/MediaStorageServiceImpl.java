@@ -404,7 +404,7 @@ public class MediaStorageServiceImpl implements MediaStorageService {
     private Result saveFileImages(MultipartFile file, boolean multipart, int blobIndex, String multipartUploadToken, String fileName, PostMedia postMedia, String fileMd5) {
 
         if(imagesSaveType.equals("local")){
-            String relativePath = "/" + fileName.substring(0, 2) + "/" + postMedia.getPostId() + "/";
+            String relativePath = "/" + fileMd5.substring(0, 2) + "/" + postMedia.getPostId() + "/";
             String fileDir = imagesSavePath + relativePath;
 
             postMedia.setHash(fileMd5);

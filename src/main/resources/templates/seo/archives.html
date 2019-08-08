@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>梦欤的文章 - 梦欤的博客</title>
+  <link rel="shortcut icon" href="/favicon.ico"> 
+  <meta name="keywords" content="梦欤的文章,梦欤的博客,梦欤的小站,梦欤,梦欤的随手记录册,YuZeCheng,俞则成">
+  <meta name="description" content="梦欤的个人小站-梦欤的随手记录册。记录IT知识，一起学习成长！">
+  <meta name="author" content="梦欤">
+
+</head>
+
+<body>
+  <h2>梦欤的文章</h2>
+  <div>
+      梦欤的随手记录册。记录IT知识，一起学习成长！
+  </div>
+  <div>
+     <ul>
+         <li th:each="post:${posts}">
+            <h3><a th:href="${post.link}" target="_blank"><span th:text="${post.title}"></span></a></h3>
+            <p th:text="${post.previewText}"></p>
+         </li>
+     </ul>
+   </div>
+</body>
+
+</html>

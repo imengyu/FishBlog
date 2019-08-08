@@ -110,4 +110,6 @@ public class SettingsServiceImpl implements SettingsService {
             redisService.persist("FishSetting_" +  s.getName());
         }
     }
+
+
 }

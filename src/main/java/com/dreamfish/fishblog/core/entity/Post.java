@@ -49,10 +49,13 @@ public class Post implements Serializable {
     private String headimg;
     private Integer viewCount;
     private Integer commentCount;
+    private Integer likeCount;
+
     private Integer postNextId;
     private Integer postPrvId;
     private Boolean enableComment;
     private Integer postPrefix;
+
 
     @Transient
     private String postPrvTitle;
@@ -64,7 +67,6 @@ public class Post implements Serializable {
     private Boolean showCatalog;
     private Boolean topMost;
 
-    private Integer likeCount;
 
     public Integer getLikeCount() {
         return likeCount;
@@ -305,4 +307,5 @@ public class Post implements Serializable {
     public void setPostNextTitle(String postNextTitle) {
         this.postNextTitle = postNextTitle;
     }
+
 }

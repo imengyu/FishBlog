@@ -8,7 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface StatService {
 
+    void setStartUpDate();
     Result updateStat(JSONObject data, HttpServletRequest request);
+    Result getStatRunDay();
     Result getStatSimple();
     Result getStatIpPv(String startDate, Integer maxCount);
     Result getStatIpPv(Integer page, Integer pageSize);

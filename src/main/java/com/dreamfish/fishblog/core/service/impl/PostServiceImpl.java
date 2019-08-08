@@ -1,14 +1,13 @@
 package com.dreamfish.fishblog.core.service.impl;
 
-import com.dreamfish.fishblog.core.entity.Post;
-import com.dreamfish.fishblog.core.entity.PostDate;
-import com.dreamfish.fishblog.core.entity.PostTag;
-import com.dreamfish.fishblog.core.entity.User;
+import com.alibaba.fastjson.JSON;
+import com.dreamfish.fishblog.core.entity.*;
 import com.dreamfish.fishblog.core.enums.UserPrivileges;
 import com.dreamfish.fishblog.core.mapper.PostCommentMapper;
 import com.dreamfish.fishblog.core.mapper.PostDatesMapper;
 import com.dreamfish.fishblog.core.mapper.PostMapper;
 import com.dreamfish.fishblog.core.mapper.UserMapper;
+import com.dreamfish.fishblog.core.repository.PostDraftRepository;
 import com.dreamfish.fishblog.core.repository.PostRepository;
 import com.dreamfish.fishblog.core.service.MessagesService;
 import com.dreamfish.fishblog.core.service.PostService;
@@ -32,10 +31,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 文章 服务
@@ -55,6 +51,8 @@ public class PostServiceImpl implements PostService {
     private MessagesService messagesService = null;
     @Autowired
     private UserService userService = null;
+    @Autowired
+    private PostDraftRepository postDraftRepository = null;
 
     @Override
     public Result findPostWithIdOrUrlName(String idOrUrlName, boolean authForRead) {
@@ -106,7 +104,35 @@ public class PostServiceImpl implements PostService {
 
         return Result.success(post);
     }
+    @Override
+    public Result getPostDraft(Integer postId) {
+        Result authResult = writePostAuth(postId, null);
+        if(authResult!=null) return authResult;
 
+        Map<String, Object> resultData = new HashMap<>();
+        PostDraft postDraft = postDraftRepository.findByBelongPost(postId);
+        if(postDraft != null) {
+            resultData.put("hasDraft", true);
+            resultData.put("json", JSON.parseObject(postDraft.getObjectJson()));
+            resultData.put("lastUpdateTime", postDraft.getUpdateTime());
+        }else resultData.put("hasDraft", false);
+        return Result.success(resultData);
+    }
+    @Override
+    public Result savePostDraft(Integer id, Post post) {
+        Result authResult = writePostAuth(id, post);
+        if(authResult!=null) return authResult;
+
+        PostDraft postDraft = postDraftRepository.findByBelongPost(id);
+        if(postDraft == null) postDraft = new PostDraft();
+
+        postDraft.setBelongPost(id);
+        postDraft.setObjectJson(JSON.toJSONString(post));
+        postDraft.setUpdateTime(new Date());
+
+        postDraftRepository.saveAndFlush(postDraft);
+        return Result.success(post);
+    }
     @Override
     @Caching(
             evict = {
@@ -117,20 +143,13 @@ public class PostServiceImpl implements PostService {
     )
     public Result updatePost(Integer id, Post post) {
 
-        HttpServletRequest request = ContextHolderUtils.getRequest();
-
-        if(post.getId().intValue() != id) return Result.failure(ResultCodeEnum.BAD_REQUEST, String.valueOf(PostErrorCode.POST_REQ_ID_ERROR));
-        if(!postRepository.existsById(post.getId())) return Result.failure(ResultCodeEnum.NOT_FOUNT);
-
-        Integer authorId = PublicAuth.authGetUseId(request);
-        if(authorId <= User.LEVEL_LOCKED) return Result.failure(ResultCodeEnum.UNAUTHORIZED, String.valueOf(authorId));
-        Integer postAuthorId = postMapper.getPostAuthorId(id);
-        if(postAuthorId.intValue() != authorId.intValue()) {
-            int authCode = PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, UserPrivileges.PRIVILEGE_MANAGE_ALL_ARCHIVES);
-            if(authCode < AuthCode.SUCCESS) return Result.failure(ResultCodeEnum.FORIBBEN);
-        }
+        Result authResult = writePostAuth(id, post);
+        if(authResult!=null) return authResult;
 
         ActionLog.logUserAction("更新文章："+id, ContextHolderUtils.getRequest());
+
+        //删除草稿
+        postDraftRepository.deleteByBelongPost(post.getId());
 
         return Result.success(postRepository.saveAndFlush(post));
     }
@@ -174,19 +193,16 @@ public class PostServiceImpl implements PostService {
     )
     public Result deletePost(Integer id) {
 
-        HttpServletRequest request = ContextHolderUtils.getRequest();
-        Integer authorId = PublicAuth.authGetUseId(request);
-        if(authorId <= User.LEVEL_LOCKED) return Result.failure(ResultCodeEnum.UNAUTHORIZED, String.valueOf(authorId));
-        Integer postAuthorId = postMapper.getPostAuthorId(id);
-        if(postAuthorId.intValue() != authorId.intValue()) {
-            int authCode = PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, UserPrivileges.PRIVILEGE_MANAGE_ALL_ARCHIVES);
-            if(authCode < AuthCode.SUCCESS) return Result.failure(ResultCodeEnum.FORIBBEN);
-        }
+        Result authResult = writePostAuth(id, null);
+        if(authResult!=null) return authResult;
 
         if(!postRepository.existsById(id)) return Result.failure(ResultCodeEnum.NOT_FOUNT);
 
         //日志
         ActionLog.logUserAction("删除文章："+id, ContextHolderUtils.getRequest());
+
+        //删除草稿
+        postDraftRepository.deleteByBelongPost(id);
 
         //删除对应归档项
         Date now = new Date();
@@ -236,5 +252,22 @@ public class PostServiceImpl implements PostService {
 
         postMapper.updatePostLikeUsersById(id, likeUsers);
         return Result.success();
+    }
+
+    //写入权限验证
+    private Result writePostAuth(Integer id, Post post){
+        HttpServletRequest request = ContextHolderUtils.getRequest();
+        //检测
+        if(post!=null && post.getId().intValue() != id) return Result.failure(ResultCodeEnum.BAD_REQUEST, String.valueOf(PostErrorCode.POST_REQ_ID_ERROR));
+        if(!postRepository.existsById(id)) return Result.failure(ResultCodeEnum.NOT_FOUNT);
+        //用户ID
+        Integer authorId = PublicAuth.authGetUseId(request);
+        if(authorId <= User.LEVEL_LOCKED) return Result.failure(ResultCodeEnum.UNAUTHORIZED, String.valueOf(authorId));
+        Integer postAuthorId = postMapper.getPostAuthorId(id);
+        if(postAuthorId.intValue() != authorId.intValue()) {
+            int authCode = PublicAuth.authCheckIncludeLevelAndPrivileges(request, User.LEVEL_WRITER, UserPrivileges.PRIVILEGE_MANAGE_ALL_ARCHIVES);
+            if(authCode < AuthCode.SUCCESS) return Result.failure(ResultCodeEnum.FORIBBEN);
+        }
+        return null;
     }
 }

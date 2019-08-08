@@ -50,7 +50,7 @@ public class PostSimpleServiceImpl implements PostSimpleService {
     public List<PostSimple> getSimpleWithMaxCount(Integer maxCount, Integer soryBy) {
         if(soryBy==POST_SORT_NONE) {
             return postSimpleMapper.getAllPostsWithLimit(maxCount);
-        }else if(soryBy==POST_SORT_NONE) {
+        }else if(soryBy==POST_SORT_BY_NAME) {
             return postSimpleMapper.getAllPostsWithLimitOrderBy(maxCount, "top_most DESC, title ASC");
         }else if(soryBy==POST_SORT_BY_DATE) {
             return postSimpleMapper.getAllPostsWithLimitOrderBy(maxCount,"top_most DESC, post_date DESC");

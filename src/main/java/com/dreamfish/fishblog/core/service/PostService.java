@@ -12,4 +12,6 @@ public interface PostService {
     Result deletePost(Integer id);
     Result increasePostViewCount(Integer id);
     Result increasePostLikeCount(Integer id, Boolean like);
+    Result getPostDraft(Integer id);
+    Result savePostDraft(Integer id, Post post);
 }

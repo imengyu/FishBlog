@@ -68,6 +68,18 @@ public class StatController {
             @Min(value = 1, message = "页大小必须大于等于1")
                     Integer pageSize){ return logService.getLogsWithPageable(pageIndex, pageSize); }
 
+    //整体信息
+    @GetMapping("/version")
+    @ResponseBody
+    public Result version() {
+        return Result.success(ConstConfig.API_VERSION);
+    }
+
+    @GetMapping("/stat/runDay")
+    @ResponseBody
+    public Result getRunDay() {
+        return statService.getStatRunDay();
+    }
 
     @GetMapping("/stat/topPage")
     @RequestAuth(User.LEVEL_WRITER)

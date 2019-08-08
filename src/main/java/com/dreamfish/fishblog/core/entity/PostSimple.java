@@ -34,6 +34,8 @@ public class PostSimple implements Serializable {
     private Boolean showInList;
     private Boolean topMost;
     private Integer likeCount;
+    @Transient
+    private String link;
 
     public Integer getLikeCount() {
         return likeCount;
@@ -185,5 +187,13 @@ public class PostSimple implements Serializable {
 
     public void setCommentCount(Integer commentCount) {
         this.commentCount = commentCount;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }

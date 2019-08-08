@@ -7,13 +7,10 @@ import com.dreamfish.fishblog.core.entity.User;
 import com.dreamfish.fishblog.core.service.PostService;
 import com.dreamfish.fishblog.core.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 文章内容操作控制器
@@ -34,7 +31,24 @@ public class PostController {
         return postService.findPostWithIdOrUrlName(idOrUrlName, authPrivate);
 
     }
+    //保获取文章草稿
+    @GetMapping("/{id}/draft")
+    @ResponseBody
+    public Result getPostToDraft(@PathVariable("id") Integer id){
+        return postService.getPostDraft(id);
+    }
 
+    //保存文章内容至草稿
+    @PutMapping("/{id}/draft")
+    @ResponseBody
+    public Result savePostToDraft(
+            @PathVariable("id")
+                    Integer id,
+            @RequestBody @NonNull
+                    Post postData){
+
+        return postService.savePostDraft(id,postData);
+    }
     //更新文章内容
     @PutMapping("/{id}")
     @ResponseBody
